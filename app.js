@@ -46,10 +46,9 @@ app.get( '/', function ( req, res ) {
             line1: req.query.street_address,
             line2: req.query.suburb,
             city: req.query.city,
-            zip: req.query.postcode,
+            //zip: req.query.postcode,
             country: "NZ",
-            phone: req.query.phone,
-            validation_status: "valid"
+            phone: req.query.phone
         }
     } ).request( function ( error, result ) {
         if ( error ) {
