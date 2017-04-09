@@ -1,6 +1,14 @@
 var chargebee = require( 'chargebee' );
 var bodyparser = require( 'body-parser' );
 var app = require( 'express' )();
+var https = require( 'https' );
+var fs = require( 'fs' );
+var sslPath = '/etc/letsencrypt/live/redirect.wowzers.work/';
+var options = {
+    key: fs.readFileSync( sslPath + 'privkey.pem' ),
+    cert: fs.readFileSync( sslPath + 'fullchain.pem' )
+};
+var server = http.createServer( options, this.app );
 chargebee.configure( {
     site: "testcorp-test",
     api_key: "test_htql10oiHR3mKzcuH0QhjIVse2dcugghIf"
@@ -57,6 +65,10 @@ app.get( '/', function ( req, res ) {
 
 } );
 
-app.listen( 8000, function () {
-    console.log( 'Up and running...' );
+server.listen( 443, function () {
+    console.log( 'up and running...' );
 } );
+
+/*app.listen( 8000, function () {
+    console.log( 'Up and running...' );
+} );*/
