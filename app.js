@@ -8,7 +8,7 @@ var options = {
     key: fs.readFileSync( sslPath + 'privkey.pem' ),
     cert: fs.readFileSync( sslPath + 'fullchain.pem' )
 };
-var server = http.createServer( options, this.app );
+var server = https.createServer( options, this.app );
 chargebee.configure( {
     site: "testcorp-test",
     api_key: "test_htql10oiHR3mKzcuH0QhjIVse2dcugghIf"
