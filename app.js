@@ -65,11 +65,11 @@ app.get( '/', function ( req, res ) {
 
 } );
 
-server.listen( 443, function () {
+/*server.listen( 443, function () {
     console.log( 'up and running...' );
-} );
-
-
-/*app.listen( 8000, function () {
-    console.log( 'Up and running...' );
 } );*/
+
+
+app.listen( 80, function () {
+    console.log( 'Up and running...' );
+} );
