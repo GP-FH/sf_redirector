@@ -24,6 +24,7 @@ app.get( '/', function ( req, res ) {
     //console.log( JSON.stringify( req.query ) );
 
     chargebee.hosted_page.checkout_new( {
+        embed
         subscription: {
             plan_id: "upcycle-box"
         },
@@ -48,7 +49,8 @@ app.get( '/', function ( req, res ) {
             city: req.query.city,
             zip: req.query.postcode,
             country: "NZ",
-            phone: req.query.phone
+            phone: req.query.phone,
+            validation_status: 'valid'
         }
     } ).request( function ( error, result ) {
         if ( error ) {
