@@ -1,0 +1,17 @@
+{
+  "name": "form_redirect_node",
+  "version": "1.0.0",
+  "description": "redirects stitchfox users to checkout post profile creation",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "chargebee": "^2.2.0",
+    "express": "^4.15.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marcelo Hudson",
+  "license": "ISC"
+}
