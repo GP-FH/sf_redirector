@@ -1,7 +1,7 @@
 var chargebee = require( 'chargebee' );
 var bodyparser = require( 'body-parser' );
 var airtable = require( 'airtable' );
-var base = new Airtable( {
+var base = new airtable( {
     apiKey: 'keyHuKKha0gYw95XY'
 } ).base( 'app70ISKvV9oTqHeY' );
 var app = require( 'express' )();
