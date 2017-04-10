@@ -30,7 +30,7 @@ app.get( '/', function ( req, res ) {
      *  - add some sort of validation here - header check for referrer OR some sort of manual verification code OR google something
      *  - set up helmut (maybe)
      *  - set up ufw firewall on stitchfox box
-     *  - add immediate data dump to airtable/mysql cause why not!?
+     *
      *  - add plan_id param to the form URL
      *
      */
@@ -60,7 +60,7 @@ app.get( '/', function ( req, res ) {
 
     chargebee.hosted_page.checkout_new( {
         subscription: {
-            plan_id: "upcycle-box"
+            plan_id: req.query.plan_id
         },
         customer: {
             email: req.query.email,
@@ -103,7 +103,3 @@ app.get( '/', function ( req, res ) {
 server.listen( 443, function () {
     console.log( 'up and running...' );
 } );
-
-/*app.listen( 80, function () {
-    console.log( 'Up and running...' );
-} );*/
