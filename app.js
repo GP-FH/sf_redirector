@@ -35,6 +35,8 @@ app.get( '/', function ( req, res ) {
      *
      */
 
+    console.log( 'referrer: ' + req.get( 'Referer' ) );
+
     //dump to airtable first
     base( 'Table 1' ).create( {
         name: req.query.name,
