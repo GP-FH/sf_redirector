@@ -1,5 +1,9 @@
 var chargebee = require( 'chargebee' );
 var bodyparser = require( 'body-parser' );
+var airtable = require( 'airtable' );
+var base = new Airtable( {
+    apiKey: 'keyHuKKha0gYw95XY'
+} ).base( 'app70ISKvV9oTqHeY' );
 var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
@@ -24,9 +28,34 @@ app.get( '/', function ( req, res ) {
     /*
      *  TODO:
      *  - add some sort of validation here - header check for referrer OR some sort of manual verification code OR google something
-     *  - set up helmut
+     *  - set up helmut (maybe)
      *  - set up ufw firewall on stitchfox box
+     *  - add immediate data dump to airtable/mysql cause why not!?
+     *  - add plan_id param to the form URL
+     *
      */
+
+    //dump to airtable first
+    base( 'Table 1' ).create( {
+        name: req.query.name,
+        kid_gender: req.query.kid_gender,
+        kid_name: req.query.kid_name,
+        age: req.query.age,
+        top_size: req.query.top_size,
+        bottom_size: req.query.bottom_size,
+        style: req.query.style,
+        email: req.query.email,
+        street_address: req.query.street_address,
+        suburb: req.query.suburb,
+        city: req.query.city,
+        phone: req.query.phone
+    }, function ( err, record ) {
+        if ( err ) {
+            console.error( err );
+            return;
+        }
+        console.log( record.getId() );
+    } );
 
 
     chargebee.hosted_page.checkout_new( {
