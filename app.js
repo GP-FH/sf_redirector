@@ -8,7 +8,7 @@ var options = {
     key: fs.readFileSync( sslPath + 'privkey.pem' ),
     cert: fs.readFileSync( sslPath + 'fullchain.pem' )
 };
-var server = https.createServer( options, this.app );
+var server = https.createServer( options, app );
 chargebee.configure( {
     site: "testcorp-test",
     api_key: "test_htql10oiHR3mKzcuH0QhjIVse2dcugghIf"
@@ -21,7 +21,13 @@ app.use( bodyparser.urlencoded( {
 
 app.get( '/', function ( req, res ) {
 
-    //console.log( JSON.stringify( req.query ) );
+    /*
+     *  TODO:
+     *  - add some sort of validation here - header check for referrer OR some sort of manual verification code OR google something
+     *  - set up helmut
+     *  - set up ufw firewall on stitchfox box
+     */
+
 
     chargebee.hosted_page.checkout_new( {
         subscription: {
@@ -65,10 +71,10 @@ app.get( '/', function ( req, res ) {
 
 } );
 
-/*server.listen( 443, function () {
+server.listen( 443, function () {
     console.log( 'up and running...' );
-} );*/
-
-app.listen( 80, function () {
-    console.log( 'Up and running...' );
 } );
+
+/*app.listen( 80, function () {
+    console.log( 'Up and running...' );
+} );*/
