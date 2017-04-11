@@ -43,29 +43,7 @@ app.get( '/', function ( req, res ) {
     //  handles typeform request
     if ( req.get( 'Referer' ) == 'https://test-stitchform.typeform.com/to/ZD6g1z' ) {
 
-        //  first, dumps all form data received to airtable
-        base( 'main view' ).create( {
-            name: req.query.name,
-            kid_gender: req.query.kid_gender,
-            kid_name: req.query.kid_name,
-            age: req.query.age,
-            top_size: req.query.top_size,
-            bottom_size: req.query.bottom_size,
-            style: req.query.style,
-            email: req.query.email,
-            street_address: req.query.street_address,
-            suburb: req.query.suburb,
-            city: req.query.city,
-            phone: req.query.phone
-        }, function ( err, record ) {
-            if ( err ) {
-                console.error( err );
-                return;
-            }
-            console.log( record.getId() );
-        } );
-
-        //  second, get a new checkout page from Chargebee
+        //  get a new checkout page from Chargebee
         chargebee.hosted_page.checkout_new( {
             subscription: {
                 plan_id: req.query.plan_id
@@ -117,10 +95,11 @@ app.post( '/', function ( req, res ) {
 
     res.status( 200 ).send();
     console.log( 'chargebee webhook event: ' + JSON.stringify( req.body ) );
-    var customer_id = req.body.content.subscription.customer_id;
+
+    var customer_id = req.body.content.customer.id;
     var plan_id = req.body.content.subscription.customer_id;
 
-    //  get customer data to dump into Airtable
+    //  get customer data using id of newly created subscription from event
     chargebee.customer.retrieve( "Hr5514JQGNrYJw1Cea" ).request(
         function ( error, result ) {
             if ( error ) {
@@ -130,6 +109,28 @@ app.post( '/', function ( req, res ) {
                 console.log( result );
                 var customer = result.customer;
                 var card = result.card;
+
+                //  dump the customer info into airtable
+                base( 'main view' ).create( {
+                    name: customer.billing_address.first_name + ' ' + customer.billing_address.last_name,
+                    kid_gender: customer.cf_im_shopping_for_a,
+                    kid_name: customer.cf_kid_name,
+                    age: customer.cf_how_old_are_they,
+                    top_size: customer.cf_what_size_tops,
+                    bottom_size: customer.cf_what_size_bottoms_do_they_wear,
+                    style: customer.cf_whats_their_style,
+                    email: customer.email,
+                    street_address: customer.billing_address.line1,
+                    suburb: customer.billing_address.line2,
+                    city: customer.billing_address.city,
+                    phone: customer.phone
+                }, function ( err, record ) {
+                    if ( err ) {
+                        console.error( err );
+                        return;
+                    }
+                    console.log( record.getId() );
+                } );
             }
         } );
 } );
