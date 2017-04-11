@@ -34,7 +34,10 @@ app.use( bodyparser.urlencoded( {
     extended: true
 } ) );
 
-
+/*
+ *  currently the only successful GETS should be Typeform submits
+ *
+ */
 app.get( '/', function ( req, res ) {
 
     //  handles typeform request
@@ -104,12 +107,20 @@ app.get( '/', function ( req, res ) {
             }
         } );
     }
-    else {
-        res.status( 200 ).send();
-        console.log( 'chargebee webhook event: ' + req.body );
-    }
+} );
+
+/*
+ *  the only successful POSTS should be Chargebee webhook events
+ *
+ */
+app.post( '/', function ( req, res ) {
+
+    res.status( 200 ).send();
+    console.log( 'chargebee webhook event: ' + req.body );
+
 } );
 
 server.listen( 443, function () {
-    console.log( 'up and running...' );
+console.log( 'up and running...' );
 } );
+);
