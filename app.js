@@ -96,43 +96,46 @@ app.post( '/', function ( req, res ) {
     res.status( 200 ).send();
     console.log( 'chargebee webhook event: ' + JSON.stringify( req.body ) );
 
-    var customer_id = req.body.content.customer.id;
-    var plan_id = req.body.content.subscription.customer_id;
+    if ( req.body.event_type == 'subscription_created' ) {
 
-    //  get customer data using id of newly created subscription from event
-    chargebee.customer.retrieve( "Hr5514JQGNrYJw1Cea" ).request(
-        function ( error, result ) {
-            if ( error ) {
-                console.log( error );
-            }
-            else {
-                console.log( result );
-                var customer = result.customer;
-                var card = result.card;
+        var customer_id = req.body.content.subscription.customer_id;
 
-                //  dump the customer info into airtable
-                base( 'main view' ).create( {
-                    name: customer.billing_address.first_name + ' ' + customer.billing_address.last_name,
-                    kid_gender: customer.cf_im_shopping_for_a,
-                    kid_name: customer.cf_kid_name,
-                    age: customer.cf_how_old_are_they,
-                    top_size: customer.cf_what_size_tops,
-                    bottom_size: customer.cf_what_size_bottoms_do_they_wear,
-                    style: customer.cf_whats_their_style,
-                    email: customer.email,
-                    street_address: customer.billing_address.line1,
-                    suburb: customer.billing_address.line2,
-                    city: customer.billing_address.city,
-                    phone: customer.phone
-                }, function ( err, record ) {
-                    if ( err ) {
-                        console.error( err );
-                        return;
-                    }
-                    console.log( record.getId() );
-                } );
-            }
-        } );
+        //  get customer data using id of newly created subscription from event
+        chargebee.customer.retrieve( customer_id ).request(
+            function ( error, result ) {
+                if ( error ) {
+                    console.log( error );
+                }
+                else {
+                    console.log( result );
+                    var customer = result.customer;
+                    var card = result.card;
+
+                    //  dump the customer info into airtable
+                    base( 'main view' ).create( {
+                        name: customer.billing_address.first_name + ' ' + customer.billing_address.last_name,
+                        kid_gender: customer.cf_im_shopping_for_a,
+                        kid_name: customer.cf_kid_name,
+                        age: customer.cf_how_old_are_they,
+                        top_size: customer.cf_what_size_tops,
+                        bottom_size: customer.cf_what_size_bottoms_do_they_wear,
+                        style: customer.cf_whats_their_style,
+                        email: customer.email,
+                        street_address: customer.billing_address.line1,
+                        suburb: customer.billing_address.line2,
+                        city: customer.billing_address.city,
+                        phone: customer.phone
+                    }, function ( err, record ) {
+                        if ( err ) {
+                            console.error( err );
+                            return;
+                        }
+                        console.log( record.getId() );
+                    } );
+                }
+            } );
+    }
+
 } );
 
 server.listen( 443, function () {
