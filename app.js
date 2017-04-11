@@ -116,7 +116,7 @@ app.get( '/', function ( req, res ) {
 app.post( '/', function ( req, res ) {
 
     res.status( 200 ).send();
-    console.log( 'chargebee webhook event: ' + req.body );
+    console.log( 'chargebee webhook event: ' + JSON.stringify( req.body ) );
 
 } );
 
