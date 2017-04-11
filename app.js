@@ -113,6 +113,7 @@ app.post( '/', function ( req, res ) {
 
                     //  dump the customer info into airtable
                     base( 'main view' ).create( {
+                        customer_id: customer_id,
                         name: customer.billing_address.first_name + ' ' + customer.billing_address.last_name,
                         kid_gender: customer.cf_im_shopping_for_a,
                         kid_name: customer.cf_kid_name,
@@ -130,12 +131,23 @@ app.post( '/', function ( req, res ) {
                             console.error( err );
                             return;
                         }
-                        console.log( record.getId() );
+
+                        //  create an order record
+                        base( 'orders' ).create( {
+                            "customer": [
+                                record.getId()
+                            ]
+                        }, function ( err, record ) {
+                            if ( err ) {
+                                console.error( err );
+                                return;
+                            }
+                            console.log( record.getId() );
+                        } );
                     } );
                 }
             } );
     }
-
 } );
 
 server.listen( 443, function () {
