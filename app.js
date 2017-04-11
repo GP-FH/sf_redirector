@@ -117,7 +117,21 @@ app.post( '/', function ( req, res ) {
 
     res.status( 200 ).send();
     console.log( 'chargebee webhook event: ' + JSON.stringify( req.body ) );
+    var customer_id = req.body.content.subscription.customer_id;
+    var plan_id = req.body.content.subscription.customer_id;
 
+    //  get customer data to dump into Airtable
+    chargebee.customer.retrieve( "Hr5514JQGNrYJw1Cea" ).request(
+        function ( error, result ) {
+            if ( error ) {
+                console.log( error );
+            }
+            else {
+                console.log( result );
+                var customer = result.customer;
+                var card = result.card;
+            }
+        } );
 } );
 
 server.listen( 443, function () {
