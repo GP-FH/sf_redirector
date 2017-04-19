@@ -9,7 +9,7 @@ var winstonPapertrail = new winston.transports.Papertrail( {
     logFormat: function ( level, message ) {
         return '<<<' + level + '>>> ' + message;
     }
-} )
+} );
 
 var logger = new winston.Logger( {
 

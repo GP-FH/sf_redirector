@@ -26,6 +26,7 @@ exports.create = function ( member_id, plan_id ) {
     };
 
     request( options, function ( error, response, body ) {
+
         if ( error ) {
             logger.error( 'Failed to create sales order in Cin7 - reason: ' + error + '. For member_id: ' + member_id );
         }

@@ -22,7 +22,7 @@ var server = https.createServer( options, app );
 
 //  set Chargebee creds
 chargebee.configure( {
-    site: "testcorp-test",
+    site: "stitchfox-test",
     api_key: "test_htql10oiHR3mKzcuH0QhjIVse2dcugghIf"
 } );
 
@@ -41,6 +41,7 @@ app.get( '/', function ( req, res ) {
 
         //  get a new checkout page from Chargebee
         chargebee.hosted_page.checkout_new( {
+
             subscription: {
                 plan_id: req.query.plan_id
             },
@@ -68,10 +69,12 @@ app.get( '/', function ( req, res ) {
                 phone: req.query.phone
             }
         } ).request( function ( error, result ) {
+
             if ( error ) {
                 logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + error );
             }
             else {
+
                 var hosted_page = result.hosted_page;
                 logger.info( 'Checkout page URL successfully got: ' + hosted_page );
                 //  redirect the request to the new, shiny, checkout page
@@ -95,17 +98,21 @@ app.post( '/', function ( req, res ) {
      *  On subscription creation, a new customer and a new sales order is created in Cin7
      */
     if ( req.body.event_type == 'subscription_created' ) {
+
         var customer_id = req.body.content.subscription.customer_id;
         var plan = req.body.content.subscription.plan_id;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
 
         //  get customer data using id of newly created subscription from event
         chargebee.customer.retrieve( customer_id ).request(
+
             function ( error, result ) {
+
                 if ( error ) {
                     logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + error + '. For customer_id: ' + customer_id );
                 }
                 else {
+
                     var customer = result.customer;
                     var card = result.card;
 
@@ -124,10 +131,10 @@ app.post( '/', function ( req, res ) {
                             type: 'Customer',
                             firstName: customer.billing_address.first_name,
                             lastName: customer.billing_address.last_name,
-                            email: customer.email,
-                            phone: customer.phone,
-                            address1: customer.billing_address.line1,
-                            address2: null,
+                            //email: customer.email,
+                            //  phone: customer.phone,
+                            //address1: customer.billing_address.line1,
+                            //  address2: null,
                             city: customer.billing_address.city,
                             state: null,
                             postCode: customer.billing_address.postcode,
@@ -140,6 +147,7 @@ app.post( '/', function ( req, res ) {
                     };
 
                     request( req_options, function ( error, response, body ) {
+
                         if ( error ) {
                             logger.error( 'Failed to create customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
                         }
@@ -163,16 +171,20 @@ app.post( '/', function ( req, res ) {
         );
     }
     else if ( req.body.event_type == 'subscription_renewed' ) {
+
         var customer_id = req.body.content.subscription.customer_id;
         var plan = req.body.content.subscription.plan_id;
 
         //  get customer for renewed subscription
         chargebee.customer.retrieve( customer_id ).request(
+
             function ( error, result ) {
+
                 if ( error ) {
                     logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + error + '. For customer_id: ' + customer_id );
                 }
                 else {
+
                     var customer = result.customer;
                     var card = result.card;
 
@@ -183,8 +195,10 @@ app.post( '/', function ( req, res ) {
                             logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id );
                         }
                         else {
+
                             //  if true create order
                             if ( res ) {
+
                                 //  get cin7 member ID
                                 var options = {
                                     method: 'GET',
@@ -201,6 +215,7 @@ app.post( '/', function ( req, res ) {
                                 };
 
                                 request( options, function ( error, response, body ) {
+
                                     if ( error ) {
                                         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
                                     }
@@ -208,6 +223,7 @@ app.post( '/', function ( req, res ) {
                                         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
                                     }
                                     else {
+
                                         //  create a new sales order in cin7 (waits a second to avoid rate limiting)
                                         setTimeout( function () {
                                             order_manager.create( body[ 0 ].id, plan )
