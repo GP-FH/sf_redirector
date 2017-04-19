@@ -8,6 +8,13 @@ var redis = require( 'redis' );
 var logger = require( './log_service.js' );
 
 /*
+ *  listen for errors
+ */
+client.on( 'error', function ( err ) {
+    logger.error( 'Error with Redis: ' + err );
+} );
+
+/*
  *  creates count for customer with passed id
  */
 exports.set = function ( customer_id ) {
