@@ -7,8 +7,6 @@
 var redis = require( 'redis' );
 var logger = require( './log_service.js' );
 
-
-
 /*
  *  creates count for customer with passed id
  */
