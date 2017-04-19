@@ -77,6 +77,7 @@ app.get( '/', function ( req, res ) {
 
                 var hosted_page = result.hosted_page;
                 logger.info( 'Checkout page URL successfully got: ' + JSON.stringify( hosted_page ) );
+
                 //  redirect the request to the new, shiny, checkout page
                 res.redirect( hosted_page.url );
             }
@@ -126,21 +127,21 @@ app.post( '/', function ( req, res ) {
                             authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
                         },
                         body: [ {
-                            //integrationRef: customer_id,
-                            //isActive: true,
-                            //type: 'Customer',
-                            //firstName: customer.billing_address.first_name,
-                            //lastName: customer.billing_address.last_name,
-                            //email: customer.email,
-                            //  phone: customer.phone,
-                            //address1: customer.billing_address.line1,
-                            //  address2: null,
-                            //city: customer.billing_address.city,
-                            //state: null,
-                            //postCode: customer.billing_address.postcode,
-                            //country: 'New Zealand',
-                            //group: null,
-                            //subGroup: null,
+                            integrationRef: customer_id,
+                            isActive: true,
+                            type: 'Customer',
+                            firstName: customer.billing_address.first_name,
+                            lastName: customer.billing_address.last_name,
+                            email: customer.email,
+                            phone: customer.phone,
+                            address1: customer.billing_address.line1,
+                            address2: null,
+                            city: customer.billing_address.city,
+                            state: null,
+                            postCode: customer.billing_address.postcode,
+                            country: 'New Zealand',
+                            group: null,
+                            subGroup: null,
                             PriceColumn: 'RetailPrice'
                         } ],
                         json: true
@@ -155,6 +156,7 @@ app.post( '/', function ( req, res ) {
                             logger.error( 'Failed to create customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
                         }
                         else {
+
                             logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + body[ 0 ].id );
 
                             //  create a new sales order in cin7 (waits a second to avoid rate limiting)
