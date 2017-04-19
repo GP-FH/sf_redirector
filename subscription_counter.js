@@ -7,12 +7,7 @@
 var redis = require( 'redis' );
 var logger = require( './log_service.js' );
 
-/*
- *  listen for errors
- */
-client.on( 'error', function ( err ) {
-    logger.error( 'Error with Redis: ' + err );
-} );
+
 
 /*
  *  creates count for customer with passed id
@@ -20,6 +15,11 @@ client.on( 'error', function ( err ) {
 exports.set = function ( customer_id ) {
 
     var client = redis.createClient();
+
+    //  listen for errors
+    client.on( 'error', function ( err ) {
+        logger.error( 'Error with Redis: ' + err );
+    } );
 
     client.set( customer_id, 2, function ( err, res ) {
 
@@ -40,6 +40,12 @@ exports.set = function ( customer_id ) {
 exports.increment = function ( customer_id ) {
 
     var client = redis.createClient();
+
+    //  listen for errors
+    client.on( 'error', function ( err ) {
+        logger.error( 'Error with Redis: ' + err );
+    } );
+
     client.incr( customer_id );
     client.quit();
 };
@@ -50,6 +56,11 @@ exports.increment = function ( customer_id ) {
 exports.increment_and_check = function ( customer_id, callback ) {
 
     var client = redis.createClient();
+
+    //  listen for errors
+    client.on( 'error', function ( err ) {
+        logger.error( 'Error with Redis: ' + err );
+    } );
 
     client.incr( customer_id, function ( err, reply ) {
 
