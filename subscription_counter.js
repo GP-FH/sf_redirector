@@ -16,8 +16,10 @@ exports.set = function ( customer_id ) {
 
     //  listen for errors
     client.on( 'error', function ( err ) {
+
         logger.error( 'Error with Redis: ' + err );
         client.quit();
+
     } );
 
     client.set( customer_id, 2, function ( err, res ) {
@@ -42,8 +44,10 @@ exports.increment = function ( customer_id ) {
 
     //  listen for errors
     client.on( 'error', function ( err ) {
+
         logger.error( 'Error with Redis: ' + err );
         client.quit();
+
     } );
 
     client.incr( customer_id );
@@ -59,8 +63,10 @@ exports.increment_and_check = function ( customer_id, callback ) {
 
     //  listen for errors
     client.on( 'error', function ( err ) {
+
         logger.error( 'Error with Redis: ' + err );
         client.quit();
+
     } );
 
     client.incr( customer_id, function ( err, reply ) {
