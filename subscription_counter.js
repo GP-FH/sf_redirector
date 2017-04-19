@@ -26,7 +26,7 @@ exports.set = function ( customer_id ) {
 
         if ( err ) {
 
-            logger.error( 'Error setting initial count for subscription - reason: ' + error + '. For customer_id: ' + customer_id );
+            logger.error( 'Error setting initial count for subscription - reason: ' + err + '. For customer_id: ' + customer_id );
             client.quit();
 
         }
@@ -69,7 +69,7 @@ exports.increment_and_check = function ( customer_id, callback ) {
 
         if ( err ) {
 
-            logger.error( 'Error incrementing count for subscription - reason: ' + error + '. For customer_id: ' + customer_id );
+            logger.error( 'Error incrementing count for subscription - reason: ' + err + '. For customer_id: ' + customer_id );
             return callback( err );
 
         }
