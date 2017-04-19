@@ -76,7 +76,7 @@ app.get( '/', function ( req, res ) {
             else {
 
                 var hosted_page = result.hosted_page;
-                logger.info( 'Checkout page URL successfully got: ' + hosted_page );
+                logger.info( 'Checkout page URL successfully got: ' + JSON.stringify( hosted_page ) );
                 //  redirect the request to the new, shiny, checkout page
                 res.redirect( hosted_page.url );
             }

@@ -7,6 +7,8 @@
 var redis = require( 'redis' );
 var logger = require( './log_service.js' );
 
+
+
 /*
  *  creates count for customer with passed id
  */
@@ -16,14 +18,20 @@ exports.set = function ( customer_id ) {
 
     //  listen for errors
     client.on( 'error', function ( err ) {
-
         logger.error( 'Error with Redis: ' + err );
-        client.quit();
-
     } );
 
-    client.set( customer_id, 2 );
-    client.quit();
+    client.set( customer_id, 2, function ( err, res ) {
+
+        if ( err ) {
+
+            logger.error( 'Error setting initial count for subscription - reason: ' + error + '. For customer_id: ' + customer_id );
+            client.quit();
+
+        }
+
+        client.quit();
+    } );
 };
 
 /*
@@ -35,10 +43,7 @@ exports.increment = function ( customer_id ) {
 
     //  listen for errors
     client.on( 'error', function ( err ) {
-
         logger.error( 'Error with Redis: ' + err );
-        client.quit();
-
     } );
 
     client.incr( customer_id );
@@ -54,13 +59,17 @@ exports.increment_and_check = function ( customer_id, callback ) {
 
     //  listen for errors
     client.on( 'error', function ( err ) {
-
         logger.error( 'Error with Redis: ' + err );
-        client.quit();
-
     } );
 
     client.incr( customer_id, function ( err, reply ) {
+
+        if ( err ) {
+
+            logger.error( 'Error incrementing count for subscription - reason: ' + error + '. For customer_id: ' + customer_id );
+            return callback( err );
+
+        }
 
         //  if reply is 4, reset the counter to 1
         if ( reply == 4 ) {
