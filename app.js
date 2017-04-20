@@ -13,7 +13,6 @@ var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
 var sslPath = '/etc/letsencrypt/live/redirect.wowzers.work/';
-
 var options = {
     key: fs.readFileSync( sslPath + 'privkey.pem' ),
     cert: fs.readFileSync( sslPath + 'fullchain.pem' )
