@@ -3,6 +3,7 @@
  *  Stitchfox Redirector: This service keeps chargebee and cin7 in check - see README for more detailed information
  *
  */
+
 var request = require( 'request' );
 var logger = require( './log_service.js' );
 var chargebee = require( 'chargebee' );
