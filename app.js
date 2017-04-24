@@ -52,7 +52,7 @@ app.get( '/', function ( req, res ) {
       phone: req.query.phone,
       cf_gender: req.query.gender,
       cf_childname: req.query.hername || req.query.hisname || req.query.theirname,
-      cf_childname: req.query.sheage || req.query.heage || req.query.theirage,
+      cf_childage: req.query.sheage || req.query.heage || req.query.theirage,
       cf_size: req.query.size,
       cf_outfits1: req.query.outfits1,
       cf_outfits2: req.query.outfits2,
