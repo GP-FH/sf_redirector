@@ -37,53 +37,53 @@ app.use( bodyparser.urlencoded( {
 app.get( '/', function ( req, res ) {
 
   //  handles typeform request
-  if ( req.get( 'Referer' ) == 'https://stitchform.typeform.com/to/ZD6g1z' ) {
+  //if ( req.get( 'Referer' ) == 'https://stitchform.typeform.com/to/ZD6g1z' ) {
 
-    //  get a new checkout page from Chargebee
-    chargebee.hosted_page.checkout_new( {
+  //  get a new checkout page from Chargebee
+  chargebee.hosted_page.checkout_new( {
 
-      subscription: {
-        plan_id: req.query.boxtype
-      },
-      customer: {
-        email: req.query.email,
-        first_name: req.query.fname,
-        last_name: req.query.lname,
-        phone: req.query.phone,
-        cf_gender: req.query.gender,
-        cf_childname: req.query.hername || req.query.hisname || req.query.theirname,
-        cf_childname: req.query.sheage || req.query.heage || req.query.theirage,
-        cf_size: req.query.size,
-        cf_outfits1: req.query.outfits1,
-        cf_outfits2: req.query.outfits2,
-        cf_palette: req.query.palette,
-        cf_looks: req.query.looks,
-        cf_dontwant: req.query.dontwant1 || req.query.dontwant2 || req.query.dontwant3,
-      },
-      billing_address: {
-        first_name: req.query.fname,
-        last_name: req.query.lname,
-        line1: req.query.streetaddress,
-        line2: req.query.suburb,
-        city: req.query.city,
-        country: "NZ",
-        phone: req.query.phone
-      }
-    } ).request( function ( error, result ) {
+    subscription: {
+      plan_id: req.query.boxtype
+    },
+    customer: {
+      email: req.query.email,
+      first_name: req.query.fname,
+      last_name: req.query.lname,
+      phone: req.query.phone,
+      cf_gender: req.query.gender,
+      cf_childname: req.query.hername || req.query.hisname || req.query.theirname,
+      cf_childname: req.query.sheage || req.query.heage || req.query.theirage,
+      cf_size: req.query.size,
+      cf_outfits1: req.query.outfits1,
+      cf_outfits2: req.query.outfits2,
+      cf_palette: req.query.palette,
+      cf_looks: req.query.looks,
+      cf_dontwant: req.query.dontwant1 || req.query.dontwant2 || req.query.dontwant3,
+    },
+    billing_address: {
+      first_name: req.query.fname,
+      last_name: req.query.lname,
+      line1: req.query.streetaddress,
+      line2: req.query.suburb,
+      city: req.query.city,
+      country: "NZ",
+      phone: req.query.phone
+    }
+  } ).request( function ( error, result ) {
 
-      if ( error ) {
-        logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + error );
-      }
-      else {
+    if ( error ) {
+      logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + error );
+    }
+    else {
 
-        var hosted_page = result.hosted_page;
-        logger.info( 'Checkout page URL successfully got: ' + JSON.stringify( hosted_page ) );
+      var hosted_page = result.hosted_page;
+      logger.info( 'Checkout page URL successfully got: ' + JSON.stringify( hosted_page ) );
 
-        //  redirect the request to the new, shiny, checkout page
-        res.redirect( hosted_page.url );
-      }
-    } );
-  }
+      //  redirect the request to the new, shiny, checkout page
+      res.redirect( hosted_page.url );
+    }
+  } );
+  //}
 } );
 
 /*
