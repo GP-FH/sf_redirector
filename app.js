@@ -72,7 +72,7 @@ app.get( '/', function ( req, res ) {
   } ).request( function ( error, result ) {
 
     if ( error ) {
-      logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + error );
+      logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON, stringify( error ) );
     }
     else {
 
@@ -111,7 +111,7 @@ app.post( '/', function ( req, res ) {
       function ( error, result ) {
 
         if ( error ) {
-          logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + error + '. For customer_id: ' + customer_id );
+          logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
         }
         else {
 
@@ -184,7 +184,7 @@ app.post( '/', function ( req, res ) {
       function ( error, result ) {
 
         if ( error ) {
-          logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + error + '. For customer_id: ' + customer_id );
+          logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
         }
         else {
 
