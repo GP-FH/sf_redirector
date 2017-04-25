@@ -72,7 +72,7 @@ app.get( '/', function ( req, res ) {
   } ).request( function ( error, result ) {
 
     if ( error ) {
-      logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON, stringify( error ) );
+      logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON.stringify( error ) );
     }
     else {
 
