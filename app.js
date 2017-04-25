@@ -39,6 +39,7 @@ app.get( '/', function ( req, res ) {
   //  handles typeform request
   //if ( req.get( 'Referer' ) == 'https://stitchform.typeform.com/to/ZD6g1z' ) {
 
+  logger.info( 'TMP DEBUG: request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url );
   //  get a new checkout page from Chargebee
   chargebee.hosted_page.checkout_new( {
 
