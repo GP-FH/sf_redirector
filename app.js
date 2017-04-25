@@ -238,10 +238,91 @@ app.post( '/', function ( req, res ) {
         }
       }
     );
+  } //TODO
+  else if ( req.body.event_type == 'subscription_changed' ) {
+
   }
-  // other events to think about: subscription_changed + to reflect changes to customers in cin7: customer_changed
+  else if ( req.body.event_type == 'customer_changed' ) {
+
+    var customer_id = req.body.content.customer.id;
+    var customer = req.body.content.customer;
+
+    //  get cin7 member ID
+    var options = {
+      method: 'GET',
+      url: 'https://api.cin7.com/api/v1/Contacts',
+      qs: {
+        fields: 'id',
+        where: 'integrationRef=\'' + customer_id + '\''
+      },
+      headers: {
+        'cache-control': 'no-cache',
+        authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
+      },
+      json: true
+    };
+
+    request( options, function ( error, response, body ) {
+
+      if ( error ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+      }
+      else if ( body[ 0 ].success == false ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+      }
+      else {
+
+        //  update customer with changes in cin7 (waits a second to avoid rate limiting)
+        setTimeout( function () {
+
+          var update_options = {
+            method: 'PUT',
+            url: 'https://api.cin7.com/api/v1/Contacts',
+            headers: {
+              'cache-control': 'no-cache',
+              'content-type': 'application/json',
+              authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
+            },
+            body: [ {
+              id: body[ 0 ].id,
+              integrationRef: customer_id,
+              isActive: true,
+              type: 'Customer',
+              firstName: customer.first_name,
+              lastName: customer.last_name,
+              email: customer.email,
+              phone: customer.phone,
+              address1: customer.billing_address.line1,
+              address2: customer.billing_address.line2,
+              city: customer.billing_address.city,
+              postCode: customer.billing_address.postcode,
+              country: 'New Zealand'
+            } ],
+            json: true
+          };
+
+          request( update_options, function ( error, response, body ) {
+
+            if ( error ) {
+              logger.error( 'Failed to update customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+            }
+            else if ( body[ 0 ].success == false ) {
+              logger.error( 'Failed to update customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+            }
+
+            logger.info( 'Customer information updated for customer ' + body[ 0 ].id + '(cin7), ' + customer_id + '(Chargebee)' );
+
+          } );
+
+        }, 1000 );
+      }
+    } );
+  }
 } );
 
+
 server.listen( 443, function () {
+
   logger.info( 'Server started and listening' );
+
 } );
