@@ -14,11 +14,11 @@ var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
 var sslPath = '/etc/letsencrypt/live/redirect.wowzers.work/';
-var options = {
+/*var options = {
   key: fs.readFileSync( sslPath + 'privkey.pem' ),
   cert: fs.readFileSync( sslPath + 'fullchain.pem' )
 };
-var server = https.createServer( options, app );
+var server = https.createServer( options, app );*/
 
 //  set Chargebee creds
 chargebee.configure( {
@@ -151,7 +151,8 @@ app.post( '/', function ( req, res ) {
                     address2: subscription.shipping_address.line2,
                     city: subscription.shipping_address.city,
                     state: null,
-                    postCode: country: 'New Zealand',
+                    postCode: subscription.shipping_address.postcode,
+                    country: 'New Zealand',
                     group: null,
                     subGroup: null,
                     PriceColumn: 'RetailPrice'
@@ -334,9 +335,9 @@ app.post( '/', function ( req, res ) {
   }
 } );
 
-
-server.listen( 443, function () {
+app.listen( 8000 );
+/*server.listen( 443, function () {
 
   logger.info( 'Server started and listening' );
 
-} );
+} );*/
