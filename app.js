@@ -37,54 +37,54 @@ app.use( bodyparser.urlencoded( {
 app.get( '/', function ( req, res ) {
 
   //  handles typeform request
-  //if ( req.get( 'Referer' ) == 'https://stitchform.typeform.com/to/ZD6g1z' ) {
+  if ( req.get( 'Referer' ) == 'https://stitchform.typeform.com/to/qd4yns' ) {
 
-  logger.info( 'TMP DEBUG: request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + req.get( 'Referer' ) );
-  //  get a new checkout page from Chargebee
-  chargebee.hosted_page.checkout_new( {
+    logger.info( 'TMP DEBUG: request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + req.get( 'Referer' ) );
+    //  get a new checkout page from Chargebee
+    chargebee.hosted_page.checkout_new( {
 
-    subscription: {
-      plan_id: req.query.boxtype
-    },
-    customer: {
-      email: req.query.email,
-      first_name: req.query.fname,
-      last_name: req.query.lname,
-      phone: req.query.phone,
-      cf_gender: req.query.gender,
-      cf_childname: req.query.hername || req.query.hisname || req.query.theirname,
-      cf_childage: req.query.sheage || req.query.heage || req.query.theirage,
-      cf_size: req.query.size,
-      cf_outfits1: req.query.outfits1,
-      cf_outfits2: req.query.outfits2,
-      cf_palette: req.query.palette,
-      cf_looks: req.query.looks,
-      cf_dontwant: req.query.dontwant1 || req.query.dontwant2 || req.query.dontwant3,
-    },
-    billing_address: {
-      first_name: req.query.fname,
-      last_name: req.query.lname,
-      line1: req.query.streetaddress,
-      line2: req.query.suburb,
-      city: req.query.city,
-      country: "NZ",
-      phone: req.query.phone
-    }
-  } ).request( function ( error, result ) {
+      subscription: {
+        plan_id: req.query.boxtype
+      },
+      customer: {
+        email: req.query.email,
+        first_name: req.query.fname,
+        last_name: req.query.lname,
+        phone: req.query.phone,
+        cf_gender: req.query.gender,
+        cf_childname: req.query.hername || req.query.hisname || req.query.theirname,
+        cf_childage: req.query.sheage || req.query.heage || req.query.theirage,
+        cf_size: req.query.size,
+        cf_outfits1: req.query.outfits1,
+        cf_outfits2: req.query.outfits2,
+        cf_palette: req.query.palette,
+        cf_looks: req.query.looks,
+        cf_dontwant: req.query.dontwant1 || req.query.dontwant2 || req.query.dontwant3,
+      },
+      shipping_address: {
+        first_name: req.query.fname,
+        last_name: req.query.lname,
+        line1: req.query.streetaddress,
+        line2: req.query.suburb,
+        city: req.query.city,
+        country: "NZ",
+        phone: req.query.phone
+      }
+    } ).request( function ( error, result ) {
 
-    if ( error ) {
-      logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON.stringify( error ) );
-    }
-    else {
+      if ( error ) {
+        logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON.stringify( error ) );
+      }
+      else {
 
-      var hosted_page = result.hosted_page;
-      logger.info( 'Checkout page URL successfully got: ' + JSON.stringify( hosted_page ) );
+        var hosted_page = result.hosted_page;
+        logger.info( 'Checkout page URL successfully got: ' + JSON.stringify( hosted_page ) );
 
-      //  redirect the request to the new, shiny, checkout page
-      res.redirect( hosted_page.url );
-    }
-  } );
-  //}
+        //  redirect the request to the new, shiny, checkout page
+        res.redirect( hosted_page.url );
+      }
+    } );
+  }
 } );
 
 /*
@@ -131,15 +131,15 @@ app.post( '/', function ( req, res ) {
               integrationRef: customer_id,
               isActive: true,
               type: 'Customer',
-              firstName: customer.billing_address.first_name,
-              lastName: customer.billing_address.last_name,
+              firstName: customer.shipping_address.first_name,
+              lastName: customer.shipping_address.last_name,
               email: customer.email,
               phone: customer.phone,
-              address1: customer.billing_address.line1,
-              address2: customer.billing_address.line2,
-              city: customer.billing_address.city,
+              address1: customer.shipping_address.line1,
+              address2: customer.shipping_address.line2,
+              city: customer.shipping_address.city,
               state: null,
-              postCode: customer.billing_address.postcode,
+              postCode: customer.shipping_address.postcode,
               country: 'New Zealand',
               group: null,
               subGroup: null,
