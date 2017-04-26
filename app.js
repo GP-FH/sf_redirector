@@ -61,7 +61,7 @@ app.get( '/', function ( req, res ) {
       cf_looks: req.query.looks,
       cf_dontwant: req.query.dontwant1 || req.query.dontwant2 || req.query.dontwant3,
     },
-    shipping_address: {
+    billing_address: {
       first_name: req.query.fname,
       last_name: req.query.lname,
       line1: req.query.streetaddress,
@@ -95,9 +95,8 @@ app.post( '/', function ( req, res ) {
   //  send immediate 200OK to keep chargebee happy and prevent unneccessary retries
   res.status( 200 ).send();
 
+
   /*
-   *  Handle subscription_created events:
-   *
    *  On subscription creation, a new customer and a new sales order is created in Cin7
    */
   if ( req.body.event_type == 'subscription_created' ) {
@@ -131,15 +130,15 @@ app.post( '/', function ( req, res ) {
               integrationRef: customer_id,
               isActive: true,
               type: 'Customer',
-              firstName: customer.shipping_address.first_name,
-              lastName: customer.shipping_address.last_name,
+              firstName: customer.shipping_address.first_name || customer.billing_address.first_name,
+              lastName: customer.shipping_address.last_name || customer.billing_address.last_name,
               email: customer.email,
               phone: customer.phone,
-              address1: customer.shipping_address.line1,
-              address2: customer.shipping_address.line2,
-              city: customer.shipping_address.city,
+              address1: customer.shipping_address.line1 || customer.billing_address.line1,
+              address2: customer.shipping_address.line2 || customer.billing_address.line2,
+              city: customer.shipping_address.city || customer.billing_address.city,
               state: null,
-              postCode: customer.shipping_address.postcode,
+              postCode: customer.shipping_address.postcode || customer.billing_address.postcode,
               country: 'New Zealand',
               group: null,
               subGroup: null,
