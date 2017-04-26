@@ -14,11 +14,11 @@ var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
 var sslPath = '/etc/letsencrypt/live/redirect.wowzers.work/';
-/*var options = {
+var options = {
   key: fs.readFileSync( sslPath + 'privkey.pem' ),
   cert: fs.readFileSync( sslPath + 'fullchain.pem' )
 };
-var server = https.createServer( options, app );*/
+var server = https.createServer( options, app );
 
 //  set Chargebee creds
 chargebee.configure( {
@@ -335,9 +335,8 @@ app.post( '/', function ( req, res ) {
   }
 } );
 
-app.listen( 8000 );
-/*server.listen( 443, function () {
+server.listen( 443, function () {
 
   logger.info( 'Server started and listening' );
 
-} );*/
+} );
