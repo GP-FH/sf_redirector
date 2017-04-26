@@ -103,6 +103,7 @@ app.post( '/', function ( req, res ) {
 
     var customer_id = req.body.content.subscription.customer_id;
     var plan = req.body.content.subscription.plan_id;
+    var subscription = req.body.content.subscription;
     logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
 
     //  get customer data using id of newly created subscription from event
@@ -134,12 +135,12 @@ app.post( '/', function ( req, res ) {
               lastName: customer.last_name,
               email: customer.email,
               phone: customer.phone,
-              address1: ( customer.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.line1 : customer.billing_address.line1,
-              address2: ( customer.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.line2 : customer.billing_address.line2,
-              city: ( customer.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.city : customer.billing_address.city,
+              address1: subscription.shipping_address.line1, //( subscription.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.line1 : customer.billing_address.line1,
+              address2: subscription.shipping_address.line2, //( customer.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.line2 : customer.billing_address.line2,
+              city: subscription.shipping_address.city, //( customer.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.city : customer.billing_address.city,
               state: null,
-              postCode: ( customer.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.postcode : customer.billing_address.postcode,
-              country: 'New Zealand',
+              postCode: //( customer.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.postcode : customer.billing_address.postcode,
+                country: 'New Zealand',
               group: null,
               subGroup: null,
               PriceColumn: 'RetailPrice'
@@ -240,7 +241,7 @@ app.post( '/', function ( req, res ) {
   } //TODO
   else if ( req.body.event_type == 'subscription_changed' ) {
 
-  }
+  } // customer_changed event: either customer has edited their data in the customer portal or we have changed it. Update cin7
   else if ( req.body.event_type == 'customer_changed' ) {
 
     var customer_id = req.body.content.customer.id;
