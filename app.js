@@ -185,6 +185,12 @@ app.post( '/', function ( req, res ) {
   }
   else if ( req.body.event_type == 'subscription_renewed' ) {
 
+    /*
+     *  On subscription renewal check whether it's a delivery month. If so, create a sales order in cin7.
+     *  If not a delivery month, increment the subscription count in redis
+     *
+     */
+
     var customer_id = req.body.content.subscription.customer_id;
     var plan = req.body.content.subscription.plan_id;
 
@@ -250,6 +256,12 @@ app.post( '/', function ( req, res ) {
     );
   }
   else if ( req.body.event_type == 'subscription_shipping_address_updated' ) {
+
+    /*
+     *  If the customer (or us) updates their shipping adress details, pass the updates on to Cin7.
+     *  Note: this handler only handles shipping address updates.
+     *
+     */
 
     var customer_id = req.body.content.subscription.customer_id;
     var subscription = req.body.content.subscription;
@@ -326,6 +338,12 @@ app.post( '/', function ( req, res ) {
 
   }
   else if ( req.body.event_type == 'customer_changed' ) {
+
+    /*
+     *  If a customer (or us) changes their information (excl shipping info), update their Cin7 customer
+     *  record accordingly. 
+     *
+     */
 
     var customer_id = req.body.content.customer.id;
     var customer = req.body.content.customer;
