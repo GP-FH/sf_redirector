@@ -103,10 +103,10 @@ app.post( '/', function ( req, res ) {
 
     var customer_id = req.body.content.subscription.customer_id;
     var plan = req.body.content.subscription.plan_id;
-    var subscription = req.body.content.subscription;
+    var subscription_id = req.body.content.subscription.id;
     logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
 
-    //  get customer data using id of newly created subscription from event
+    //  get customer data using customer_id from newly created subscription event
     chargebee.customer.retrieve( customer_id ).request(
 
       function ( error, result ) {
@@ -118,57 +118,71 @@ app.post( '/', function ( req, res ) {
 
           var customer = result.customer;
 
-          //  create customer record in cin7
-          var req_options = {
-            method: 'POST',
-            url: 'https://api.cin7.com/api/v1/Contacts',
-            headers: {
-              'cache-control': 'no-cache',
-              'content-type': 'application/json',
-              authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
-            },
-            body: [ {
-              integrationRef: customer_id,
-              isActive: true,
-              type: 'Customer',
-              firstName: customer.first_name,
-              lastName: customer.last_name,
-              email: customer.email,
-              phone: customer.phone,
-              address1: subscription.shipping_address.line1, //( subscription.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.line1 : customer.billing_address.line1,
-              address2: subscription.shipping_address.line2, //( customer.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.line2 : customer.billing_address.line2,
-              city: subscription.shipping_address.city, //( customer.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.city : customer.billing_address.city,
-              state: null,
-              postCode: //( customer.hasOwnProperty( 'shipping_address' ) ) ? customer.shipping_address.postcode : customer.billing_address.postcode,
-                country: 'New Zealand',
-              group: null,
-              subGroup: null,
-              PriceColumn: 'RetailPrice'
-            } ],
-            json: true
-          };
+          //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
+          chargebee.subscription.retrieve( subscription_id ).request(
 
-          request( req_options, function ( error, response, body ) {
+            function ( error, result ) {
 
-            if ( error ) {
-              logger.error( 'Failed to create customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+              if ( error ) {
+                logger.error( 'Failed to retrieve subscription record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id + ' subscription_id: ' + subscription_id );
+              }
+              else {
+
+                var subscription = result.subscription;
+
+                //  create customer record in cin7
+                var req_options = {
+                  method: 'POST',
+                  url: 'https://api.cin7.com/api/v1/Contacts',
+                  headers: {
+                    'cache-control': 'no-cache',
+                    'content-type': 'application/json',
+                    authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
+                  },
+                  body: [ {
+                    integrationRef: customer_id,
+                    isActive: true,
+                    type: 'Customer',
+                    firstName: customer.first_name,
+                    lastName: customer.last_name,
+                    email: customer.email,
+                    phone: customer.phone,
+                    address1: subscription.shipping_address.line1,
+                    address2: subscription.shipping_address.line2,
+                    city: subscription.shipping_address.city,
+                    state: null,
+                    postCode: country: 'New Zealand',
+                    group: null,
+                    subGroup: null,
+                    PriceColumn: 'RetailPrice'
+                  } ],
+                  json: true
+                };
+
+                request( req_options, function ( error, response, body ) {
+
+                  if ( error ) {
+                    logger.error( 'Failed to create customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+                  }
+                  else if ( body[ 0 ].success == false ) {
+                    logger.error( 'Failed to create customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                  }
+                  else {
+
+                    logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + body[ 0 ].id );
+
+                    //  create a new sales order in cin7 (waits a second to avoid rate limiting)
+                    setTimeout( function () {
+                      order_manager.create( body[ 0 ].id, plan )
+                    }, 1000 );
+
+                    //  add count to subscription_counter for customer ID of 1
+                    subscription_counter.set( customer_id );
+                  }
+                } );
+              }
             }
-            else if ( body[ 0 ].success == false ) {
-              logger.error( 'Failed to create customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
-            }
-            else {
-
-              logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + body[ 0 ].id );
-
-              //  create a new sales order in cin7 (waits a second to avoid rate limiting)
-              setTimeout( function () {
-                order_manager.create( body[ 0 ].id, plan )
-              }, 1000 );
-
-              //  add count to subscription_counter for customer ID of 1
-              subscription_counter.set( customer_id );
-            }
-          } );
+          );
         }
       }
     );
