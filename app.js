@@ -430,7 +430,6 @@ app.post( '/', function ( req, res ) {
 
 server.listen( 443, function () {
 
-logger.info( 'Server started and listening' );
+  logger.info( 'Server started and listening' );
 
 } );
-);
