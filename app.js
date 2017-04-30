@@ -41,6 +41,13 @@ app.get( '/', function ( req, res ) {
   //  only bother with requests coming from the correct typeform
   if ( req.get( 'Referer' ).includes( 'https://stitchform.typeform.com/to/qd4yns' ) ) {
 
+    //  need to check for case where child is too old
+    logger.info( 'old_test: ' + req.query.tooold );
+
+    if ( !req.query.tooold ) {
+
+    }
+
     //  get a new checkout page from Chargebee
     chargebee.hosted_page.checkout_new( {
 
@@ -53,14 +60,15 @@ app.get( '/', function ( req, res ) {
         last_name: req.query.lname,
         phone: req.query.phone,
         cf_gender: req.query.gender,
-        cf_childname: req.query.hername || req.query.hisname || req.query.theirname,
-        cf_childage: req.query.sheage || req.query.heage || req.query.theirage,
+        cf_childname: req.query.hername || req.query.hisname,
+        cf_childage: req.query.sheage || req.query.heage,
         cf_size: req.query.size,
-        cf_outfits1: req.query.outfits1,
-        cf_outfits2: req.query.outfits2,
+        cf_jam: req.query.jam1 || req.query.jam2 || req.query.jam3 || req.query.jam4 || req.query.jam5 || req.query.jam6,
+        cf_doit: req.query.doit1 || req.query.doit2 || req.query.doit3 || req.query.doit4 || req.query.doit5 || req.query.doit6,
         cf_palette: req.query.palette,
-        cf_looks: req.query.looks,
-        cf_dontwant: req.query.dontwant1 || req.query.dontwant2 || req.query.dontwant3,
+        cf_fave: req.query.fav1 || req.query.fav2,
+        cf_keen: req.query.keen1 || req.query.keen2 || req.query.keen3,
+        cf_else: req.query.else
       },
       billing_address: {
         first_name: req.query.fname,
@@ -177,7 +185,7 @@ app.post( '/', function ( req, res ) {
                       order_manager.create( body[ 0 ].id, plan )
                     }, 1000 );
 
-                    //  add count to subscription_counter for customer ID of 1
+                    //  add count to subscription_counter for customer ID
                     subscription_counter.set( customer_id );
                   }
                 } );
@@ -192,8 +200,7 @@ app.post( '/', function ( req, res ) {
 
     /*
      *  On subscription renewal check whether it's a delivery month. If so, create a sales order in cin7.
-     *  If not a delivery month, increment the subscription count in redis
-     *
+     *  If not a delivery month, increment the subscription count in redis`
      */
 
     var customer_id = req.body.content.subscription.customer_id;
@@ -423,6 +430,7 @@ app.post( '/', function ( req, res ) {
 
 server.listen( 443, function () {
 
-  logger.info( 'Server started and listening' );
+logger.info( 'Server started and listening' );
 
 } );
+);
