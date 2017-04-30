@@ -9,6 +9,7 @@ var logger = require( './log_service.js' );
 var chargebee = require( 'chargebee' );
 var bodyparser = require( 'body-parser' );
 var subscription_counter = require( './subscription_counter.js' );
+var slack_notifier = require( './slack_notifier.js' );
 var order_manager = require( './order_manager.js' );
 var app = require( 'express' )();
 var https = require( 'https' );
@@ -40,13 +41,6 @@ app.get( '/', function ( req, res ) {
 
   //  only bother with requests coming from the correct typeform
   if ( req.get( 'Referer' ).includes( 'https://stitchform.typeform.com/to/qd4yns' ) ) {
-
-    //  need to check for case where child is too old
-    logger.info( 'old_test: ' + req.query.tooold );
-
-    if ( !req.query.tooold ) {
-
-    }
 
     //  get a new checkout page from Chargebee
     chargebee.hosted_page.checkout_new( {
@@ -188,6 +182,9 @@ app.post( '/', function ( req, res ) {
 
                     //  add count to subscription_counter for customer ID
                     subscription_counter.set( customer_id );
+
+                    //  notify Slack
+                    slack_notifier.send( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
                   }
                 } );
               }
