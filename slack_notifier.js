@@ -8,7 +8,7 @@ exports.send = function ( first_name, last_name, email, city, sub_plan ) {
     body: {
       channel: '#new-subscribers',
       username: 'Good-News-Bot',
-      icon_emoji: ':ta-da:',
+      icon_emoji: ':tada:',
       attachments: [ {
         text: 'Here are the details:',
         fallback: 'A new subscriber has joined!',
@@ -17,11 +17,11 @@ exports.send = function ( first_name, last_name, email, city, sub_plan ) {
         fields: [ {
           title: 'Name',
           value: first_name + ' ' + last_name,
-          short: false
+          short: true
         }, {
           title: 'email',
           value: email,
-          short: false
+          short: true
         }, {
           title: 'Location',
           value: city,
@@ -29,7 +29,7 @@ exports.send = function ( first_name, last_name, email, city, sub_plan ) {
         }, {
           title: 'Selected Plan',
           value: sub_plan,
-          short: false
+          short: true
         } ]
       } ]
     },
