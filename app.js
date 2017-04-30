@@ -83,6 +83,7 @@ app.get( '/', function ( req, res ) {
 
       if ( error ) {
         logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON.stringify( error ) );
+        res.redirect( 'https://stitchfox.co.nz/error' );
       }
       else {
 
