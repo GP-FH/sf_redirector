@@ -199,7 +199,7 @@ app.post( '/', function ( req, res ) {
 
     /*
      *  On subscription renewal check whether it's a delivery month. If so, create a sales order in cin7.
-     *  If not a delivery month, increment the subscription count in redis`
+     *  If not a delivery month, increment the subscription count in redis
      */
 
     var customer_id = req.body.content.subscription.customer_id;
