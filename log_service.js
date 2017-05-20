@@ -16,8 +16,8 @@ var logger = new winston.Logger( {
   transports: [
     winstonPapertrail
   ],
-
   exitOnError: false
+
 } );
 
 module.exports = logger;
