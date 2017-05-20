@@ -12,7 +12,7 @@ exports.create = function ( member_id, plan_id ) {
     headers: {
       'cache-control': 'no-cache',
       'content-type': 'application/json',
-      authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
+      authorization: process.env.CIN7_AUTH
     },
     body: [ {
       stage: 'New',
