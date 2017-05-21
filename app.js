@@ -4,7 +4,7 @@
  *
  */
 
-require( 'dotenv' ).config({path:'./config.env'});    
+require( 'dotenv' ).config();    
 var key_path = process.env.SSL_KEY_PATH;
 var cert_path = process.env.SSL_CERT_PATH;
 var request = require( 'request' );
