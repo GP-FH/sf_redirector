@@ -4,9 +4,9 @@
  *
  */
 
-require( 'dotenv' ).config();    
-var key_path = process.env.SSL_KEY_PATH;
-var cert_path = process.env.SSL_CERT_PATH;
+require( 'dotenv' ).config(function(obj){
+  logger.info(obj.parsed, obj.error);
+});
 var request = require( 'request' );
 var logger = require( './log_service.js' );
 var chargebee = require( 'chargebee' );
@@ -17,6 +17,8 @@ var order_manager = require( './order_manager.js' );
 var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
+var key_path = process.env.SSL_KEY_PATH;
+var cert_path = process.env.SSL_CERT_PATH;
 
 //debugging
 logger.info('DEBUG: '+key_path +' '+ cert_path + process.env.SSL_CERT_PATH + process.env.SSL_KEY_PATH + process.env.CHARGEBEE_SITE);
