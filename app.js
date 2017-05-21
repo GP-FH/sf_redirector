@@ -17,6 +17,10 @@ var order_manager = require( './order_manager.js' );
 var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
+
+//debugging
+logger.info('DEBUG: '+key_path +' '+ cert_path);
+
 var options = {
   key: fs.readFileSync( key_path ),
   cert: fs.readFileSync( cert_path )
