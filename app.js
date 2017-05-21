@@ -15,10 +15,11 @@ var order_manager = require( './order_manager.js' );
 var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
-var sslPath = process.env.SSL_PATH;
+var key_path = process.env.SSL_PATH + process.env.SSL_KEY;
+var cert_path = process.env.SSL_PATH + process.env.SSL_CERT;
 var options = {
-  key: fs.readFileSync( sslPath + process.env.SSL_KEY ),
-  cert: fs.readFileSync( sslPath + process.env.SSL_CERT )
+  key: fs.readFileSync( key_path ),
+  cert: fs.readFileSync( cert_path )
 };
 var server = https.createServer( options, app );
 
@@ -34,7 +35,7 @@ app.use( bodyparser.urlencoded( {
 } ) );
 
 /*
- *  listening for Typeform submits - todos: have firstname and lastname + fill state field with .
+ *  listening for Typeform submits
  */
 app.get( '/', function ( req, res ) {
 
