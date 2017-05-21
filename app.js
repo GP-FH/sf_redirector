@@ -4,9 +4,7 @@
  *
  */
 
-require( 'dotenv' ).config(function(obj){
-  logger.info(obj.parsed, obj.error);
-});
+require( 'dotenv' ).config({path:'config.env'});
 var request = require( 'request' );
 var logger = require( './log_service.js' );
 var chargebee = require( 'chargebee' );
