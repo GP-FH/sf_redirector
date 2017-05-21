@@ -5,8 +5,8 @@
  */
 
 require( 'dotenv' ).config( {path: 'config.env'} );
-var key_path = process.env.SSL_PATH + process.env.SSL_KEY;
-var cert_path = process.env.SSL_PATH + process.env.SSL_CERT;
+var key_path = process.env.SSL_KEY_PATH;
+var cert_path = process.env.SSL_CERT_PATH;
 var request = require( 'request' );
 var logger = require( './log_service.js' );
 var chargebee = require( 'chargebee' );
