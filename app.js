@@ -5,6 +5,8 @@
  */
 
 require( 'dotenv' ).config( {path: 'config.env'} );
+var key_path = process.env.SSL_PATH + process.env.SSL_KEY;
+var cert_path = process.env.SSL_PATH + process.env.SSL_CERT;
 var request = require( 'request' );
 var logger = require( './log_service.js' );
 var chargebee = require( 'chargebee' );
@@ -15,8 +17,6 @@ var order_manager = require( './order_manager.js' );
 var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
-var key_path = process.env.SSL_PATH + process.env.SSL_KEY;
-var cert_path = process.env.SSL_PATH + process.env.SSL_CERT;
 var options = {
   key: fs.readFileSync( key_path ),
   cert: fs.readFileSync( cert_path )
