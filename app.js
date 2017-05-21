@@ -19,7 +19,7 @@ var https = require( 'https' );
 var fs = require( 'fs' );
 
 //debugging
-logger.info('DEBUG: '+key_path +' '+ cert_path);
+logger.info('DEBUG: '+key_path +' '+ cert_path + process.env.SSL_CERT_PATH + process.env.SSL_KEY_PATH + process.env.CHARGEBEE_SITE);
 
 var options = {
   key: fs.readFileSync( key_path ),
