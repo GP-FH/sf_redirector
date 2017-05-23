@@ -16,8 +16,8 @@ var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
 var ssl_path = process.env.SSL_PATH;
-var key = process.env.SSL_KEY_PATH;
-var cert = process.env.SSL_CERT_PATH;
+var key = process.env.SSL_KEY;
+var cert = process.env.SSL_CERT;
 var options = {
   key: fs.readFileSync( ssl_path + key ),
   cert: fs.readFileSync( ssl_path + cert )
