@@ -4,7 +4,7 @@
  *
  */
 
-require( 'dotenv' ).config( {path: 'config.env'} );
+require( 'dotenv' ).config({path:'/home/dev/redirect_node/current/config/config.env'}); 
 var request = require( 'request' );
 var logger = require( './log_service.js' );
 var chargebee = require( 'chargebee' );
@@ -15,17 +15,19 @@ var order_manager = require( './order_manager.js' );
 var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
-var sslPath = '/etc/letsencrypt/live/redirect.wowzers.work/';
+var ssl_path = process.env.SSL_PATH;
+var key = process.env.SSL_KEY;
+var cert = process.env.SSL_CERT;
 var options = {
-  key: fs.readFileSync( sslPath + 'privkey.pem' ),
-  cert: fs.readFileSync( sslPath + 'fullchain.pem' )
+  key: fs.readFileSync( ssl_path + key ),
+  cert: fs.readFileSync( ssl_path + cert )
 };
 var server = https.createServer( options, app );
 
 //  set Chargebee creds
 chargebee.configure( {
-  site: "stitchfox-test",
-  api_key: "test_htql10oiHR3mKzcuH0QhjIVse2dcugghIf"
+  site: process.env.CHARGEBEE_SITE,
+  api_key: process.env.CHARGEBEE_API_KEY
 } );
 
 app.use( bodyparser.json() );
@@ -34,14 +36,14 @@ app.use( bodyparser.urlencoded( {
 } ) );
 
 /*
- *  listening for Typeform submits - todos: have firstname and lastname + fill state field with .
+ *  listening for Typeform submits
  */
 app.get( '/', function ( req, res ) {
 
   logger.info( 'TMP DEBUG: request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) );
 
-  //  only bother with requests coming from the correct typeform
-  if ( req.get( 'Referer' ).includes( 'https://stitchform.typeform.com/to/qd4yns' ) ) {
+  //  only bother with requests coming from the correct typeform TODO: will need to ditch this/add allowance for autopilot
+  if ( req.get( 'Referer' ).includes( process.env.TYPEFORM_REFERRING_URL ) ) {
 
     //  get a new checkout page from Chargebee
     chargebee.hosted_page.checkout_new( {
@@ -78,7 +80,7 @@ app.get( '/', function ( req, res ) {
 
       if ( error ) {
         logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON.stringify( error ) );
-        res.redirect( 'https://stitchfox.co.nz/error' );
+        res.redirect( process.env.BASE_URL + '/error' );
       }
       else {
 
@@ -141,7 +143,7 @@ app.post( '/', function ( req, res ) {
                   headers: {
                     'cache-control': 'no-cache',
                     'content-type': 'application/json',
-                    authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
+                    authorization: process.env.CIN7_AUTH
                   },
                   body: [ {
                     integrationRef: customer_id,
@@ -199,7 +201,7 @@ app.post( '/', function ( req, res ) {
 
     /*
      *  On subscription renewal check whether it's a delivery month. If so, create a sales order in cin7.
-     *  If not a delivery month, increment the subscription count in redis`
+     *  If not a delivery month, increment the subscription count in redis
      */
 
     var customer_id = req.body.content.subscription.customer_id;
@@ -238,7 +240,7 @@ app.post( '/', function ( req, res ) {
                   },
                   headers: {
                     'cache-control': 'no-cache',
-                    authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
+                    authorization: process.env.CIN7_AUTH
                   },
                   json: true
                 };
@@ -288,7 +290,7 @@ app.post( '/', function ( req, res ) {
       },
       headers: {
         'cache-control': 'no-cache',
-        authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
+        authorization: process.env.CIN7_AUTH
       },
       json: true
     };
@@ -312,7 +314,7 @@ app.post( '/', function ( req, res ) {
             headers: {
               'cache-control': 'no-cache',
               'content-type': 'application/json',
-              authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
+              authorization: process.env.CIN7_AUTH
             },
             body: [ {
               id: body[ 0 ].id,
@@ -369,7 +371,7 @@ app.post( '/', function ( req, res ) {
       },
       headers: {
         'cache-control': 'no-cache',
-        authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
+        authorization: process.env.CIN7_AUTH
       },
       json: true
     };
@@ -393,7 +395,7 @@ app.post( '/', function ( req, res ) {
             headers: {
               'cache-control': 'no-cache',
               'content-type': 'application/json',
-              authorization: 'Basic U3RpdGNoZm94Tlo6ZDczMzNmNmM5MTQxNDgxNjhlMmQ5NzIwNTYxYzQ2OTM='
+              authorization: process.env.CIN7_AUTH
             },
             body: [ {
               id: body[ 0 ].id,

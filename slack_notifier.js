@@ -4,7 +4,7 @@ exports.send = function ( first_name, last_name, email, city, sub_plan ) {
 
   var options = {
     method: 'POST',
-    url: 'https://hooks.slack.com/services/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',
+    url: process.env.SLACK_WEBHOOK,
     body: {
       channel: '#new-subscribers',
       username: 'Good-News-Bot',
