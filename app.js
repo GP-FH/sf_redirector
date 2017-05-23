@@ -4,7 +4,7 @@
  *
  */
 
-require( 'dotenv' ).config({path:'/home/dev/redirect_node/current/config/config.env'});
+require( 'dotenv' ).config({path:'/home/dev/redirect_node/current/config/config.env'}); 
 var request = require( 'request' );
 var logger = require( './log_service.js' );
 var chargebee = require( 'chargebee' );
