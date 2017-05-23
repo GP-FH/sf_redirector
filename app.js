@@ -4,7 +4,7 @@
  *
  */
 
-require( 'dotenv' ).config({path:'/home/dev/redirect_node/current/config/config.env'});   
+require( 'dotenv' ).config({path:'/home/dev/redirect_node/current/config/config.env'});
 var request = require( 'request' );
 var logger = require( './log_service.js' );
 var chargebee = require( 'chargebee' );
@@ -15,15 +15,12 @@ var order_manager = require( './order_manager.js' );
 var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
-var key_path = process.env.SSL_KEY_PATH;
-var cert_path = process.env.SSL_CERT_PATH;
-
-//debugging
-logger.info('DEBUG: '+key_path +' '+ cert_path + process.env.SSL_CERT_PATH + process.env.SSL_KEY_PATH + process.env.CHARGEBEE_SITE);
-
+var ssl_path = process.env.SSL_PATH;
+var key = process.env.SSL_KEY_PATH;
+var cert = process.env.SSL_CERT_PATH;
 var options = {
-  key: fs.readFileSync( key_path ),
-  cert: fs.readFileSync( cert_path )
+  key: fs.readFileSync( ssl_path + key ),
+  cert: fs.readFileSync( ssl_path + cert )
 };
 var server = https.createServer( options, app );
 
@@ -45,7 +42,7 @@ app.get( '/', function ( req, res ) {
 
   logger.info( 'TMP DEBUG: request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) );
 
-  //  only bother with requests coming from the correct typeform
+  //  only bother with requests coming from the correct typeform TODO: will need to ditch this/add allowance for autopilot
   if ( req.get( 'Referer' ).includes( process.env.TYPEFORM_REFERRING_URL ) ) {
 
     //  get a new checkout page from Chargebee
