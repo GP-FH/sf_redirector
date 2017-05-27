@@ -361,7 +361,7 @@ app.post( '/', function ( req, res ) {
     var customer_id = req.body.content.customer.id;
     var customer = req.body.content.customer;
 
-    logger.info('DEBUG: 'JSON.stringify(customer));
+    logger.info('DEBUG: '+JSON.stringify(customer));
 
     //  get cin7 member ID
     var options = {
