@@ -20,7 +20,7 @@ exports.create = function ( member_id, plan_id ) {
       currencyCode: 'NZD',
       taxStatus: 'Incl',
       taxRate: 0.15,
-      internalComments: plan_id
+      internalComments: plan_id //TODO need to add size here
     } ],
     json: true
   };

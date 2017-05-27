@@ -153,9 +153,8 @@ app.post( '/', function ( req, res ) {
               logger.error( 'Failed to check if user exists in Cin7 - reason: status code ' + response.statusCode + '. For customer_id: ' + customer_id );
             }
             else if ( body.length == 0 ) {
-              logger.info( 'DEBUG: request made to find user in cin7 - no user found. I should create one' );
+              logger.info( 'Request made to find user in cin7 - no user found. I should create one' );
 
-              /*
               //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
               chargebee.subscription.retrieve( subscription_id ).request(
 
@@ -216,7 +215,7 @@ app.post( '/', function ( req, res ) {
                         }, 1000 );
 
                         //  add count to subscription_counter for customer ID
-                        subscription_counter.set( customer_id );
+                        subscription_counter.set( customer_id, subscription_id );
 
                         //  notify Slack
                         slack_notifier.send( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
@@ -224,12 +223,10 @@ app.post( '/', function ( req, res ) {
                     } );
                   }
                 }
-              );*/
+              );
             }
             else {
-              logger.info( 'DEBUG: request made to find user in cin7 - found. member_id: ' + body[ 0 ].id + ' I should create a new order now' );
-
-              /*
+              logger.info( 'Request made to find user in cin7 - found. member_id: ' + body[ 0 ].id + ' I should create a new order now' );
 
               //  create a new sales order in cin7 (waits a second to avoid rate limiting)
               setTimeout( function () {
@@ -237,11 +234,11 @@ app.post( '/', function ( req, res ) {
               }, 1000 );
 
               //  add count to subscription_counter for customer ID
-              subscription_counter.set( customer_id );
+              subscription_counter.set( customer_id, subscription_id );
 
               //  notify Slack
               slack_notifier.send( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
-              */
+
             }
           } );
         }
@@ -257,6 +254,7 @@ app.post( '/', function ( req, res ) {
 
     var customer_id = req.body.content.subscription.customer_id;
     var plan = req.body.content.subscription.plan_id;
+    var subscription_id = req.body.content.subscription.id;
 
     //  get customer for renewed subscription
     chargebee.customer.retrieve( customer_id ).request(
@@ -271,7 +269,7 @@ app.post( '/', function ( req, res ) {
           var customer = result.customer;
 
           //  increment counter for customer_id + check if they are due a box
-          subscription_counter.increment_and_check( customer_id, function ( err, res ) {
+          subscription_counter.increment_and_check( customer_id, subscription_id, function ( err, res ) {
 
             if ( err ) {
               logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id );
@@ -493,6 +491,11 @@ app.post( '/', function ( req, res ) {
 } );
 
 server.listen( 443, function () {
+
+  logger.info( 'Server started and listening' );
+
+} );
+er.listen( 443, function () {
 
   logger.info( 'Server started and listening' );
 
