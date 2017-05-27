@@ -4,7 +4,9 @@
  *
  */
 
-require( 'dotenv' ).config({path:'/home/dev/redirect_node/current/config/config.env'});
+require( 'dotenv' ).config( {
+  path: '/home/dev/redirect_node/current/config/config.env'
+} );
 var request = require( 'request' );
 var logger = require( './log_service.js' );
 var chargebee = require( 'chargebee' );
@@ -360,8 +362,9 @@ app.post( '/', function ( req, res ) {
 
     var customer_id = req.body.content.customer.id;
     var customer = req.body.content.customer;
+    var archetype = req.body.content.customer.cf_archtype;
 
-    logger.info('DEBUG: '+JSON.stringify(customer));
+    logger.info( 'DEBUG: ' + archetype );
 
     //  get cin7 member ID
     var options = {
