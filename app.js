@@ -555,7 +555,8 @@ app.post( '/', function ( req, res ) {
                   },
                   body: [ {
                     id: body[ 0 ].id,
-                    internalComments: archetype + ' ' + subscription_id
+                    internalComments: archetype + ' ' + subscription_id,
+                    currencyCode: 'NZD'
                   } ],
                   json: true
                 };
@@ -571,8 +572,9 @@ app.post( '/', function ( req, res ) {
                   else if ( body[ 0 ].success == false ) {
                     logger.error( 'Failed to update sales order in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
                   }
-
-                  logger.info( 'Detected addition of archetype: ' + archetype + ' to subscription with ID: ' + subscription_id + '. Updated corresponding Cin7 Sales order' );
+                  else {
+                    logger.info( 'Detected addition of archetype: ' + archetype + ' to subscription with ID: ' + subscription_id + '. Updated corresponding Cin7 Sales order' );
+                  }
                 } );
               }, 1000 );
             }
