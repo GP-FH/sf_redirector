@@ -565,10 +565,10 @@ app.post( '/', function ( req, res ) {
               request( sales_put_options, function ( error, response, body ) {
 
                 if ( error ) {
-                  logger.error( 'Failed to update customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+                  logger.error( 'Failed to update sales order in Cin7 - reason: ' + error + '. For subscription_id: ' + subscription_id );
                 }
                 else if ( body[ 0 ].success == false ) {
-                  logger.error( 'Failed to update customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                  logger.error( 'Failed to update sales order in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
                 }
 
                 logger.info( 'Detected addition of archetype: ' + archetype + ' to subscription with ID: ' + subscription_id + '. Updated corresponding Cin7 Sales order' );
