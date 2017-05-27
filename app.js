@@ -386,6 +386,9 @@ app.post( '/', function ( req, res ) {
       if ( error ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
       }
+      else if ( !body ) {
+        logger.warn( 'Failed to retrieve member_id from Cin7 - reason: no results returned for customer_id: ' + customer_id );
+      }
       else if ( body[ 0 ].success == false ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
       }
