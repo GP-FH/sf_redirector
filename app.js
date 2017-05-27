@@ -542,10 +542,10 @@ app.post( '/', function ( req, res ) {
               logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
             }
             else {
-
+              //  update the sales order with the archetype
               var sales_put_options = {
                 method: 'PUT',
-                url: 'https://api.cin7.com/api/v1/Contacts',
+                url: 'https://api.cin7.com/api/v1/SalesOrders',
                 headers: {
                   'cache-control': 'no-cache',
                   'content-type': 'application/json',
