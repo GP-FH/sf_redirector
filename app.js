@@ -506,6 +506,9 @@ app.post( '/', function ( req, res ) {
       if ( error ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
       }
+      else if ( body.length == 0 ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+      }
       else if ( body[ 0 ].success == false ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
       }
@@ -530,10 +533,13 @@ app.post( '/', function ( req, res ) {
           request( sales_get_options, function ( error, response, body ) {
 
             if ( error ) {
-              logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+              logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+            }
+            else if ( body.length == 0 ) {
+              logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: sales order does not exist for subscription_id: ' + subscription_id );
             }
             else if ( body[ 0 ].success == false ) {
-              logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+              logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
             }
             else {
 
