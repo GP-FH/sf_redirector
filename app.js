@@ -553,11 +553,7 @@ app.post( '/', function ( req, res ) {
                 },
                 body: [ {
                   id: body[ 0 ].id,
-                  lineItems: [ {
-                    id: 1,
-                    name: archetype,
-                    qty: 1
-                  } ]
+                  internalComments: archetype + ' ' + subscription_id
                 } ],
                 json: true
               };
