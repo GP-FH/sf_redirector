@@ -382,7 +382,7 @@ app.post( '/', function ( req, res ) {
     };
 
     request( options, function ( error, response, body ) {
-
+      logger.info( 'DEBUG: error: ' + JSON.stringify( error ) + ' response: ' + JSON.stringify( response ) + ' body: ' + JSON.stringify( body ) );
       if ( error ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
       }
