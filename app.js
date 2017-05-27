@@ -559,7 +559,7 @@ app.post( '/', function ( req, res ) {
               };
 
               request( sales_put_options, function ( error, response, body ) {
-
+                logger.info( 'DEBUG: error: ' + JSON.stringify( error ) + ' response:' + JSON.stringify( response ) + ' body: ' + JSON.stringify );
                 if ( error ) {
                   logger.error( 'Failed to update sales order in Cin7 - reason: ' + error + '. For subscription_id: ' + subscription_id );
                 }
