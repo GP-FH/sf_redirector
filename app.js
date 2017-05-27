@@ -556,7 +556,9 @@ app.post( '/', function ( req, res ) {
                   body: [ {
                     id: body[ 0 ].id,
                     internalComments: archetype + ' ' + subscription_id,
-                    currencyCode: 'NZD'
+                    currencyCode: 'NZD',
+                    taxStatus: 'Incl',
+                    taxRate: 0.15
                   } ],
                   json: true
                 };
