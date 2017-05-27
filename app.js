@@ -126,6 +126,9 @@ app.post( '/', function ( req, res ) {
 
           var customer = result.customer;
 
+          // TODO: check to see if the customer already exists in cin7. if not, go ahead and create them. If yes,
+          //
+
           //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
           chargebee.subscription.retrieve( subscription_id ).request(
 
@@ -174,7 +177,7 @@ app.post( '/', function ( req, res ) {
                     logger.error( 'Failed to create customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
                   }
                   else if ( body[ 0 ].success == false ) {
-                    logger.error( 'Failed to create customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                    logger.error( 'Failed to create customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id + ' body:' + JSON.stringify( body ) );
                   }
                   else {
 
@@ -386,9 +389,6 @@ app.post( '/', function ( req, res ) {
       if ( error ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
       }
-      else if ( typeof body === 'undefined' ) {
-        logger.warn( 'Failed to retrieve member_id from Cin7 - reason: no results returned for customer_id: ' + customer_id );
-      }
       else if ( body[ 0 ].success == false ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
       }
@@ -434,6 +434,15 @@ app.post( '/', function ( req, res ) {
         }, 1000 );
       }
     } );
+  }
+  else if ( req.body.event_type == 'subscription_changed' ) {
+
+    /*
+     *  This is specifically for handling the adding of an archetype to a subscription. On receiving this event
+     *  the archtype is added to the sales order in Cin7
+     *
+     */
+
   }
 } );
 
