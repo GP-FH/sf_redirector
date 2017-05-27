@@ -521,7 +521,7 @@ app.post( '/', function ( req, res ) {
             url: 'https://api.cin7.com/api/v1/SalesOrders',
             qs: {
               fields: 'id',
-              where: 'internalComments=\'' + subscription_id + '\''
+              where: 'internalComments LIKE\'%' + subscription_id + '\''
             },
             headers: {
               'cache-control': 'no-cache',
