@@ -126,78 +126,124 @@ app.post( '/', function ( req, res ) {
 
           var customer = result.customer;
 
-          // TODO: check to see if the customer already exists in cin7. if not, go ahead and create them. If yes,
-          //
+          //  TODO: check to see if the customer already exists in cin7. if not, go ahead and create them. If yes,
+          //  skip stright to the create order bit
 
-          //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
-          chargebee.subscription.retrieve( subscription_id ).request(
+          //  check if customer record exists in cin7
+          var options = {
+            method: 'GET',
+            url: 'https://api.cin7.com/api/v1/Contacts',
+            qs: {
+              fields: 'id',
+              where: 'integrationRef=\'' + customer_id + '\''
+            },
+            headers: {
+              'cache-control': 'no-cache',
+              authorization: process.env.CIN7_AUTH
+            },
+            json: true
+          };
 
-            function ( error, result ) {
+          request( options, function ( error, response, body ) {
 
-              if ( error ) {
-                logger.error( 'Failed to retrieve subscription record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id + ' subscription_id: ' + subscription_id );
-              }
-              else {
+            if ( error ) {
+              logger.error( 'Failed to check if user exists in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+            }
+            else if ( response.statusCode != 200 ) {
+              logger.error( 'Failed to check if user exists in Cin7 - reason: status code ' + response.statusCode + '. For customer_id: ' + customer_id );
+            }
+            else if ( body.length == 0 ) {
+              logger.info( 'DEBUG: request made to find user in cin7 - no user found. I should create one' );
 
-                var subscription = result.subscription;
+              /*
+              //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
+              chargebee.subscription.retrieve( subscription_id ).request(
 
-                //  create customer record in cin7
-                var req_options = {
-                  method: 'POST',
-                  url: 'https://api.cin7.com/api/v1/Contacts',
-                  headers: {
-                    'cache-control': 'no-cache',
-                    'content-type': 'application/json',
-                    authorization: process.env.CIN7_AUTH
-                  },
-                  body: [ {
-                    integrationRef: customer_id,
-                    isActive: true,
-                    type: 'Customer',
-                    firstName: customer.first_name,
-                    lastName: customer.last_name,
-                    email: customer.email,
-                    phone: customer.phone,
-                    address1: subscription.shipping_address.line1,
-                    address2: subscription.shipping_address.line2,
-                    city: subscription.shipping_address.city,
-                    state: null,
-                    postCode: subscription.shipping_address.postcode,
-                    country: 'New Zealand',
-                    group: null,
-                    subGroup: null,
-                    PriceColumn: 'RetailPrice'
-                  } ],
-                  json: true
-                };
-
-                request( req_options, function ( error, response, body ) {
+                function ( error, result ) {
 
                   if ( error ) {
-                    logger.error( 'Failed to create customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
-                  }
-                  else if ( body[ 0 ].success == false ) {
-                    logger.error( 'Failed to create customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id + ' body:' + JSON.stringify( body ) );
+                    logger.error( 'Failed to retrieve subscription record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id + ' subscription_id: ' + subscription_id );
                   }
                   else {
 
-                    logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + body[ 0 ].id );
+                    var subscription = result.subscription;
 
-                    //  create a new sales order in cin7 (waits a second to avoid rate limiting)
-                    setTimeout( function () {
-                      order_manager.create( body[ 0 ].id, plan )
-                    }, 1000 );
+                    //  create customer record in cin7
+                    var req_options = {
+                      method: 'POST',
+                      url: 'https://api.cin7.com/api/v1/Contacts',
+                      headers: {
+                        'cache-control': 'no-cache',
+                        'content-type': 'application/json',
+                        authorization: process.env.CIN7_AUTH
+                      },
+                      body: [ {
+                        integrationRef: customer_id,
+                        isActive: true,
+                        type: 'Customer',
+                        firstName: customer.first_name,
+                        lastName: customer.last_name,
+                        email: customer.email,
+                        phone: customer.phone,
+                        address1: subscription.shipping_address.line1,
+                        address2: subscription.shipping_address.line2,
+                        city: subscription.shipping_address.city,
+                        state: null,
+                        postCode: subscription.shipping_address.postcode,
+                        country: 'New Zealand',
+                        group: null,
+                        subGroup: null,
+                        PriceColumn: 'RetailPrice'
+                      } ],
+                      json: true
+                    };
 
-                    //  add count to subscription_counter for customer ID
-                    subscription_counter.set( customer_id );
+                    request( req_options, function ( error, response, body ) {
 
-                    //  notify Slack
-                    slack_notifier.send( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
+                      if ( error ) {
+                        logger.error( 'Failed to create customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+                      }
+                      else if ( body[ 0 ].success == false ) {
+                        logger.error( 'Failed to create customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id + ' body:' + JSON.stringify( body ) );
+                      }
+                      else {
+
+                        logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + body[ 0 ].id );
+
+                        //  create a new sales order in cin7 (waits a second to avoid rate limiting)
+                        setTimeout( function () {
+                          order_manager.create( body[ 0 ].id, plan )
+                        }, 1000 );
+
+                        //  add count to subscription_counter for customer ID
+                        subscription_counter.set( customer_id );
+
+                        //  notify Slack
+                        slack_notifier.send( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
+                      }
+                    } );
                   }
-                } );
-              }
+                }
+              );*/
             }
-          );
+            else {
+              logger.info( 'DEBUG: request made to find user in cin7 - found. member_id: ' + body[ 0 ].id + ' I should create a new order now' );
+
+              /*
+
+              //  create a new sales order in cin7 (waits a second to avoid rate limiting)
+              setTimeout( function () {
+                order_manager.create( body[ 0 ].id, plan )
+              }, 1000 );
+
+              //  add count to subscription_counter for customer ID
+              subscription_counter.set( customer_id );
+
+              //  notify Slack
+              slack_notifier.send( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
+              */
+            }
+          } );
         }
       }
     );
