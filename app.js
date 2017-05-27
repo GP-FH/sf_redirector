@@ -126,9 +126,6 @@ app.post( '/', function ( req, res ) {
 
           var customer = result.customer;
 
-          //  TODO: check to see if the customer already exists in cin7. if not, go ahead and create them. If yes,
-          //  skip stright to the create order bit
-
           //  check if customer record exists in cin7
           var options = {
             method: 'GET',
@@ -211,7 +208,7 @@ app.post( '/', function ( req, res ) {
 
                         //  create a new sales order in cin7 (waits a second to avoid rate limiting)
                         setTimeout( function () {
-                          order_manager.create( body[ 0 ].id, plan )
+                          order_manager.create( body[ 0 ].id, plan, subscription_id );
                         }, 1000 );
 
                         //  add count to subscription_counter for customer ID
@@ -230,7 +227,7 @@ app.post( '/', function ( req, res ) {
 
               //  create a new sales order in cin7 (waits a second to avoid rate limiting)
               setTimeout( function () {
-                order_manager.create( body[ 0 ].id, plan )
+                order_manager.create( body[ 0 ].id, plan, subscription_id );
               }, 1000 );
 
               //  add count to subscription_counter for customer ID
@@ -272,7 +269,7 @@ app.post( '/', function ( req, res ) {
           subscription_counter.increment_and_check( customer_id, subscription_id, function ( err, res ) {
 
             if ( err ) {
-              logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id );
+              logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
             }
             else {
 
@@ -306,7 +303,7 @@ app.post( '/', function ( req, res ) {
 
                     //  create a new sales order in cin7 (waits a second to avoid rate limiting)
                     setTimeout( function () {
-                      order_manager.create( body[ 0 ].id, plan )
+                      order_manager.create( body[ 0 ].id, plan, subscription_id );
                     }, 1000 );
                   }
                 } );
@@ -409,9 +406,6 @@ app.post( '/', function ( req, res ) {
 
     var customer_id = req.body.content.customer.id;
     var customer = req.body.content.customer;
-    var archetype = req.body.content.customer.cf_archtype;
-
-    logger.info( 'DEBUG: ' + archetype );
 
     //  get cin7 member ID
     var options = {
@@ -429,7 +423,7 @@ app.post( '/', function ( req, res ) {
     };
 
     request( options, function ( error, response, body ) {
-      logger.info( 'DEBUG: error: ' + JSON.stringify( error ) + ' response: ' + JSON.stringify( response ) + ' body: ' + JSON.stringify( body ) );
+
       if ( error ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
       }
@@ -483,19 +477,105 @@ app.post( '/', function ( req, res ) {
 
     /*
      *  This is specifically for handling the adding of an archetype to a subscription. On receiving this event
-     *  the archtype is added to the sales order in Cin7
-     *
+     *  the archtype is added to the sales order in Cin7 ISSUE: need a way to know which cin7 salesorder this subscription
+     *  relates to.
      */
 
+    var customer_id = req.body.content.subscription.customer_id;
+    var plan = req.body.content.subscription.plan_id;
+    var subscription_id = req.body.content.subscription.id;
+    var archetype = req.body.content.subscription.cf_archetype;
+
+    //  get cin7 member ID
+    var options = {
+      method: 'GET',
+      url: 'https://api.cin7.com/api/v1/Contacts',
+      qs: {
+        fields: 'id',
+        where: 'integrationRef=\'' + customer_id + '\''
+      },
+      headers: {
+        'cache-control': 'no-cache',
+        authorization: process.env.CIN7_AUTH
+      },
+      json: true
+    };
+
+    request( options, function ( error, response, body ) {
+
+      if ( error ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+      }
+      else if ( body[ 0 ].success == false ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+      }
+      else {
+
+        setTimeout( function () {
+          //  get cin7 member ID
+          var sales_get_options = {
+            method: 'GET',
+            url: 'https://api.cin7.com/api/v1/SalesOrders',
+            qs: {
+              fields: 'id',
+              where: 'internalComments=\'' + subscription_id + '\''
+            },
+            headers: {
+              'cache-control': 'no-cache',
+              authorization: process.env.CIN7_AUTH
+            },
+            json: true
+          };
+
+          request( options, function ( error, response, body ) {
+
+            if ( error ) {
+              logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+            }
+            else if ( body[ 0 ].success == false ) {
+              logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+            }
+            else {
+
+              var sales_put_options = {
+                method: 'PUT',
+                url: 'https://api.cin7.com/api/v1/Contacts',
+                headers: {
+                  'cache-control': 'no-cache',
+                  'content-type': 'application/json',
+                  authorization: process.env.CIN7_AUTH
+                },
+                body: [ {
+                  id: body[ 0 ].id,
+                  lineItems: [ {
+                    id: 1,
+                    name: archetype,
+                    qty: 1
+                  } ]
+                } ],
+                json: true
+              };
+
+              request( update_options, function ( error, response, body ) {
+
+                if ( error ) {
+                  logger.error( 'Failed to update customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+                }
+                else if ( body[ 0 ].success == false ) {
+                  logger.error( 'Failed to update customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                }
+
+                logger.info( 'Detected addition of archetype: ' + archetype + ' to subscription with ID: ' + subscription_id + '. Updated corresponding Cin7 Sales order' );
+              } );
+            }
+          } );
+        }, 1000 );
+      }
+    } );
   }
 } );
 
 server.listen( 443, function () {
-
-  logger.info( 'Server started and listening' );
-
-} );
-er.listen( 443, function () {
 
   logger.info( 'Server started and listening' );
 
