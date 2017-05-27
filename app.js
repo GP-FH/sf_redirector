@@ -237,7 +237,7 @@ app.post( '/', function ( req, res ) {
               subscription_counter.set( customer_id, subscription_id );
 
               //  notify Slack
-              slack_notifier.send( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
+              // slack_notifier.send( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
 
             }
           } );
