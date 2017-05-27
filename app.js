@@ -512,7 +512,7 @@ app.post( '/', function ( req, res ) {
       else {
 
         setTimeout( function () {
-          //  get cin7 member ID
+          //  get sales order ID
           var sales_get_options = {
             method: 'GET',
             url: 'https://api.cin7.com/api/v1/SalesOrders',
@@ -527,7 +527,7 @@ app.post( '/', function ( req, res ) {
             json: true
           };
 
-          request( options, function ( error, response, body ) {
+          request( sales_get_options, function ( error, response, body ) {
 
             if ( error ) {
               logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
@@ -556,7 +556,7 @@ app.post( '/', function ( req, res ) {
                 json: true
               };
 
-              request( update_options, function ( error, response, body ) {
+              request( sales_put_options, function ( error, response, body ) {
 
                 if ( error ) {
                   logger.error( 'Failed to update customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
