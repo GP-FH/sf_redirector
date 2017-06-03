@@ -51,13 +51,7 @@ app.get( '/', function ( req, res ) {
     chargebee.hosted_page.checkout_new( {
 
       subscription: {
-        plan_id: req.query.boxtype
-      },
-      customer: {
-        email: req.query.email,
-        first_name: req.query.fname,
-        last_name: req.query.lname,
-        phone: req.query.phone,
+        plan_id: req.query.boxtype,
         cf_gender: req.query.gender,
         cf_childname: req.query.hername || req.query.hisname,
         cf_childage: req.query.sheage || req.query.heage,
@@ -69,6 +63,12 @@ app.get( '/', function ( req, res ) {
         cf_fave: req.query.fav1 || req.query.fav2,
         cf_keen: req.query.keen1 || req.query.keen2 || req.query.keen3,
         cf_else: req.query.else
+      },
+      customer: {
+        email: req.query.email,
+        first_name: req.query.fname,
+        last_name: req.query.lname,
+        phone: req.query.phone,
       },
       billing_address: {
         first_name: req.query.fname,
@@ -113,6 +113,7 @@ app.post( '/', function ( req, res ) {
     var customer_id = req.body.content.subscription.customer_id;
     var plan = req.body.content.subscription.plan_id;
     var subscription_id = req.body.content.subscription.id;
+    var webhook_sub_object = req.body.content.subscription;
     logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
 
     //  get customer data using customer_id from newly created subscription event
@@ -209,7 +210,7 @@ app.post( '/', function ( req, res ) {
 
                         //  create a new sales order in cin7 (waits a second to avoid rate limiting)
                         setTimeout( function () {
-                          order_manager.create( body[ 0 ].id, plan, subscription_id, customer.cf_topsize, customer.cf_bottomsize );
+                          order_manager.create( body[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize );
                         }, 1000 );
 
                         //  add count to subscription_counter for customer ID
@@ -228,7 +229,7 @@ app.post( '/', function ( req, res ) {
 
               //  create a new sales order in cin7 (waits a second to avoid rate limiting)
               setTimeout( function () {
-                order_manager.create( body[ 0 ].id, plan, subscription_id, customer.cf_topsize, customer.cf_bottomsize );
+                order_manager.create( body[ 0 ].id, plan, subscription_id, webhook_sub_object.cf_topsize, webhook_sub_object.cf_bottomsize );
               }, 1000 );
 
               //  add count to subscription_counter for customer ID
@@ -298,6 +299,12 @@ app.post( '/', function ( req, res ) {
                   if ( error ) {
                     logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
                   }
+                  else if ( response.statusCode != 200 ) {
+                    logger.error( 'Failed to retrieve member_id from Cin7 - status code: ' + response.statusCode + '. For customer_id: ' + customer_id );
+                  }
+                  else if ( body.length == 0 ) {
+                    logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+                  }
                   else if ( body[ 0 ].success == false ) {
                     logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
                   }
@@ -305,7 +312,7 @@ app.post( '/', function ( req, res ) {
 
                     //  create a new sales order in cin7 (waits a second to avoid rate limiting)
                     setTimeout( function () {
-                      order_manager.create( body[ 0 ].id, plan, subscription_id, customer.cf_topsize, customer.cf_bottomsize, subscription.cf_archetype );
+                      order_manager.create( body[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, subscription.cf_archetype );
                     }, 1000 );
                   }
                 } );
@@ -347,6 +354,12 @@ app.post( '/', function ( req, res ) {
 
       if ( error ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+      }
+      else if ( response.statusCode != 200 ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - status code: ' + response.statusCode + '. For customer_id: ' + customer_id );
+      }
+      else if ( body.length == 0 ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
       }
       else if ( body[ 0 ].success == false ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
@@ -428,6 +441,12 @@ app.post( '/', function ( req, res ) {
 
       if ( error ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+      }
+      else if ( response.statusCode != 200 ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - status code: ' + response.statusCode + '. For customer_id: ' + customer_id );
+      }
+      else if ( body.length == 0 ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
       }
       else if ( body[ 0 ].success == false ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
