@@ -253,6 +253,7 @@ app.post( '/', function ( req, res ) {
     var customer_id = req.body.content.subscription.customer_id;
     var plan = req.body.content.subscription.plan_id;
     var subscription_id = req.body.content.subscription.id;
+    var subscription = req.body.content.subscription;
 
     //  get customer for renewed subscription
     chargebee.customer.retrieve( customer_id ).request(
@@ -304,7 +305,7 @@ app.post( '/', function ( req, res ) {
 
                     //  create a new sales order in cin7 (waits a second to avoid rate limiting)
                     setTimeout( function () {
-                      order_manager.create( body[ 0 ].id, plan, subscription_id, customer.cf_topsize, customer.cf_bottomsize, customer.cf_archetype );
+                      order_manager.create( body[ 0 ].id, plan, subscription_id, customer.cf_topsize, customer.cf_bottomsize, subscription.cf_archetype );
                     }, 1000 );
                   }
                 } );
