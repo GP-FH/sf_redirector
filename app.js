@@ -304,7 +304,7 @@ app.post( '/', function ( req, res ) {
 
                     //  create a new sales order in cin7 (waits a second to avoid rate limiting)
                     setTimeout( function () {
-                      order_manager.create( body[ 0 ].id, plan, subscription_id );
+                      order_manager.create( body[ 0 ].id, plan, subscription_id, customer.cf_topsize, customer.cf_bottomsize );
                     }, 1000 );
                   }
                 } );
