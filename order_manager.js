@@ -4,7 +4,7 @@ var logger = require( './log_service.js' );
 /*
  *  Creates a sales order in Cin7 for the given member and subscription plan
  */
-exports.create = function ( member_id, plan_id, subscription_id, size_top, size_bottom ) {
+exports.create = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET' ) {
 
   var options = {
     method: 'POST',
@@ -20,7 +20,7 @@ exports.create = function ( member_id, plan_id, subscription_id, size_top, size_
       currencyCode: 'NZD',
       taxStatus: 'Incl',
       taxRate: 0.15,
-      internalComments: 'top size: ' + size_top + ' bottom size: ' + size_bottom + ' subscription: ' + subscription_id
+      internalComments: 'archetype: ' + archetype + ' top size: ' + size_top + ' bottom size: ' + size_bottom + ' subscription: ' + subscription_id
     } ],
     json: true
   };
