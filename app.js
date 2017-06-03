@@ -256,8 +256,6 @@ app.post( '/', function ( req, res ) {
     var subscription_id = req.body.content.subscription.id;
     var subscription = req.body.content.subscription;
 
-    logger.info( 'DEBUG: subscription object: ' + JSON.stringify( subscription ) )
-
     //  get customer for renewed subscription
     chargebee.customer.retrieve( customer_id ).request(
 
@@ -357,6 +355,12 @@ app.post( '/', function ( req, res ) {
       if ( error ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
       }
+      else if ( response.statusCode != 200 ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - status code: ' + response.statusCode + '. For customer_id: ' + customer_id );
+      }
+      else if ( body.length == 0 ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+      }
       else if ( body[ 0 ].success == false ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
       }
@@ -437,6 +441,12 @@ app.post( '/', function ( req, res ) {
 
       if ( error ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+      }
+      else if ( response.statusCode != 200 ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - status code: ' + response.statusCode + '. For customer_id: ' + customer_id );
+      }
+      else if ( body.length == 0 ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
       }
       else if ( body[ 0 ].success == false ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
