@@ -209,7 +209,7 @@ app.post( '/', function ( req, res ) {
 
                         //  create a new sales order in cin7 (waits a second to avoid rate limiting)
                         setTimeout( function () {
-                          order_manager.create( body[ 0 ].id, plan, subscription_id );
+                          order_manager.create( body[ 0 ].id, plan, subscription_id, customer.cf_topsize, customer.cf_bottomsize );
                         }, 1000 );
 
                         //  add count to subscription_counter for customer ID
@@ -228,7 +228,7 @@ app.post( '/', function ( req, res ) {
 
               //  create a new sales order in cin7 (waits a second to avoid rate limiting)
               setTimeout( function () {
-                order_manager.create( body[ 0 ].id, plan, subscription_id );
+                order_manager.create( body[ 0 ].id, plan, subscription_id, customer.cf_topsize, customer.cf_bottomsize );
               }, 1000 );
 
               //  add count to subscription_counter for customer ID
@@ -253,6 +253,7 @@ app.post( '/', function ( req, res ) {
     var customer_id = req.body.content.subscription.customer_id;
     var plan = req.body.content.subscription.plan_id;
     var subscription_id = req.body.content.subscription.id;
+    var subscription = req.body.content.subscription;
 
     //  get customer for renewed subscription
     chargebee.customer.retrieve( customer_id ).request(
@@ -304,7 +305,7 @@ app.post( '/', function ( req, res ) {
 
                     //  create a new sales order in cin7 (waits a second to avoid rate limiting)
                     setTimeout( function () {
-                      order_manager.create( body[ 0 ].id, plan, subscription_id );
+                      order_manager.create( body[ 0 ].id, plan, subscription_id, customer.cf_topsize, customer.cf_bottomsize, subscription.cf_archetype );
                     }, 1000 );
                   }
                 } );
@@ -478,8 +479,7 @@ app.post( '/', function ( req, res ) {
 
     /*
      *  This is specifically for handling the adding of an archetype to a subscription. On receiving this event
-     *  the archtype is added to the sales order in Cin7 ISSUE: need a way to know which cin7 salesorder this subscription
-     *  relates to.
+     *  the archtype is added to the sales order in Cin7
      */
 
     var customer_id = req.body.content.subscription.customer_id;
@@ -524,7 +524,7 @@ app.post( '/', function ( req, res ) {
             method: 'GET',
             url: 'https://api.cin7.com/api/v1/SalesOrders',
             qs: {
-              fields: 'id',
+              fields: 'id,internalComments',
               where: 'internalComments LIKE\'%' + subscription_id + '\''
             },
             headers: {
@@ -562,7 +562,7 @@ app.post( '/', function ( req, res ) {
                   },
                   body: [ {
                     id: body[ 0 ].id,
-                    internalComments: 'archetype: ' + archetype + ' Subscription_id: ' + subscription_id,
+                    internalComments: 'archetype: ' + archetype + ' ' + body[ 0 ].internalComments, // add change here
                     currencyCode: 'NZD',
                     taxStatus: 'Incl',
                     taxRate: 0.15
