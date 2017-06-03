@@ -164,7 +164,7 @@ app.post( '/', function ( req, res ) {
                   else {
 
                     var subscription = result.subscription;
-                    logger.info( 'DEBUG: subscription object: ' + JSON.stringify( subscription ) );
+                    logger.info( 'DEBUG: customer object: ' + JSON.stringify( customer ) );
 
                     //  create customer record in cin7
                     var req_options = {
