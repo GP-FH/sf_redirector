@@ -549,8 +549,6 @@ app.post( '/', function ( req, res ) {
             }
             else {
 
-              logger.info( 'DEBUG: sales order data returned from cin7: ' + JSON.stringify( body[ 0 ] ) );
-
               setTimeout( function () {
                 //  update the sales order with the archetype
                 var sales_put_options = {
@@ -563,7 +561,7 @@ app.post( '/', function ( req, res ) {
                   },
                   body: [ {
                     id: body[ 0 ].id,
-                    internalComments: 'archetype: ' + archetype + ' Subscription_id: ' + subscription_id, // add change here
+                    internalComments: 'archetype: ' + archetype + ' ' + body[ 0 ].internalComments, // add change here
                     currencyCode: 'NZD',
                     taxStatus: 'Incl',
                     taxRate: 0.15
