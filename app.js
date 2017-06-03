@@ -52,6 +52,7 @@ app.get( '/', function ( req, res ) {
 
       subscription: {
         plan_id: req.query.boxtype
+
       },
       customer: {
         email: req.query.email,
