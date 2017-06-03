@@ -255,8 +255,6 @@ app.post( '/', function ( req, res ) {
     var subscription_id = req.body.content.subscription.id;
     var subscription = req.body.content.subscription;
 
-    logger.info( 'DEBUG: archetype value on renewal: ' + subscription.cf_archetype );
-
     //  get customer for renewed subscription
     chargebee.customer.retrieve( customer_id ).request(
 
