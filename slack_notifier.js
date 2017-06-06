@@ -1,6 +1,19 @@
 var request = require( 'request' );
 
-exports.send = function ( first_name, last_name, email, city, sub_plan ) {
+exports.send = function ( reason, first_name, last_name, email, city, sub_plan ) {
+
+  var channel_name = '';
+
+  switch ( reason ) {
+  case 'subscription_created':
+    channel_name = '#new-subscribers';
+    break;
+  case 'subscription_cancelled':
+    channel_name = '#cancelled-subs';
+    break;
+  default:
+    return;
+  }
 
   var options = {
     method: 'POST',
