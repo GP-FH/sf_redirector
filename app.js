@@ -618,11 +618,11 @@ app.post( '/', function ( req, res ) {
      */
 
     logger.info( 'DEBUG: sub cancelled payload: ' + JSON.stringify( req.body ) );
+    var customer = req.body.content.customer;
+    var subscription = req.body.content.subscription;
 
     //  notify Slack
-    //slack_notifier.send( 'subscription_cancelled', customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
-
-
+    slack_notifier.send( 'subscription_cancelled', customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
 
   }
 } );
