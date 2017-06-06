@@ -617,7 +617,7 @@ app.post( '/', function ( req, res ) {
      *  For notifying in Slack when a subscription has been cancelled
      */
 
-    logger.info( 'DEBUG: sub cancelled payload: ' + JSON.stringify( req.body.content ) );
+    logger.info( 'DEBUG: sub cancelled payload: ' + JSON.stringify( req.body ) );
 
     //  notify Slack
     //slack_notifier.send( 'subscription_cancelled', customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
