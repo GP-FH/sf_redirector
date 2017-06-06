@@ -90,10 +90,6 @@ function local_send_cancelled_subscription( first_name, last_name, email, city, 
           title: 'Selected Plan',
           value: sub_plan,
           short: true
-        }, {
-          title: 'Reason',
-          value: sub_plan,
-          short: true
         } ]
       } ]
     },

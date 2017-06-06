@@ -218,7 +218,7 @@ app.post( '/', function ( req, res ) {
                         subscription_counter.set( customer_id, subscription_id );
 
                         //  notify Slack
-                        slack_notifier.send( 'subscription_created', customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
+                        slack_notifier.send( 'subscription_created', customer, subscription );
                       }
                     } );
                   }
@@ -237,7 +237,7 @@ app.post( '/', function ( req, res ) {
               subscription_counter.set( customer_id, subscription_id );
 
               //  notify Slack
-              // slack_notifier.send( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
+              slack_notifier.send( 'subscription_created', customer, webhook_sub_object );
 
             }
           } );
@@ -617,7 +617,6 @@ app.post( '/', function ( req, res ) {
      *  For notifying in Slack when a subscription has been cancelled
      */
 
-    logger.info( 'DEBUG: sub cancelled payload: ' + JSON.stringify( req.body ) );
     var customer = req.body.content.customer;
     var subscription = req.body.content.subscription;
 
