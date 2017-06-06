@@ -622,7 +622,7 @@ app.post( '/', function ( req, res ) {
     var subscription = req.body.content.subscription;
 
     //  notify Slack
-    slack_notifier.send( 'subscription_cancelled', customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, plan );
+    slack_notifier.send( 'subscription_cancelled', customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, subscription.plan_id );
 
   }
 } );
