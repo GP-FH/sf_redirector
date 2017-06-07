@@ -20,7 +20,7 @@ exports.create = function ( member_id, plan_id, subscription_id, size_top, size_
       currencyCode: 'NZD',
       taxStatus: 'Incl',
       taxRate: 0.15,
-      internalComments: 'plan: ' + plan_id + 'archetype: ' + archetype + ' top size: ' + size_top + ' bottom size: ' + size_bottom + ' subscription: ' + subscription_id
+      internalComments: 'plan: ' + plan_id + ' archetype: ' + archetype + ' top size: ' + size_top + ' bottom size: ' + size_bottom + ' subscription: ' + subscription_id
     } ],
     json: true
   };
