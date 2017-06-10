@@ -1,5 +1,5 @@
 var request = require( 'request' );
-var logger = require( './log_service.js' );
+var logger = require( './libs/lib_logger.js' );
 
 /*
  *  Creates a sales order in Cin7 for the given member and subscription plan

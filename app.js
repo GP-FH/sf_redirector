@@ -7,7 +7,7 @@
 require( 'dotenv' ).config( {
   path: '/home/dev/redirect_node/current/config/config.env'
 } );
-var logger = require( './log_service.js' );
+var logger = require( './libs/lib_logger.js' );
 var chargebee = require( 'chargebee' );
 var bodyparser = require( 'body-parser' );
 var app = require( 'express' )();
@@ -49,9 +49,7 @@ app.use( '/profile_hook', profile_hook );
  *  start the engine
  */
 server.listen( 443, function () {
-
   logger.info( 'Server started and listening' );
-
 } );
 
 module.exports = app;
