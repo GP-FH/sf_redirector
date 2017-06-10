@@ -7,13 +7,9 @@
 require( 'dotenv' ).config( {
   path: '/home/dev/redirect_node/current/config/config.env'
 } );
-var request = require( 'request' );
 var logger = require( './log_service.js' );
 var chargebee = require( 'chargebee' );
 var bodyparser = require( 'body-parser' );
-var subscription_counter = require( './subscription_counter.js' );
-var slack_notifier = require( './slack_notifier.js' );
-var order_manager = require( './order_manager.js' );
 var app = require( 'express' )();
 var https = require( 'https' );
 var fs = require( 'fs' );
@@ -30,7 +26,6 @@ chargebee.configure( {
   site: process.env.CHARGEBEE_SITE,
   api_key: process.env.CHARGEBEE_API_KEY
 } );
-
 exports.chargebee = chargebee;
 
 app.use( bodyparser.json() );
