@@ -224,3 +224,8 @@ var create_customer_record = function ( customer_details, callback ) {
 };
 
 exports.create_sales_order = create_sales_order;
+exports.get_sales_order = get_sales_order;
+exports.update_sales_order = update_sales_order;
+exports.get_customer_record = get_customer_record;
+exports.update_customer_record = update_customer_record;
+exports.create_customer_record = create_customer_record;
