@@ -115,7 +115,6 @@ router.post( '/', function ( req, res ) {
                             slack_notifier.send( 'subscription_created', customer, subscription );
 
                           }
-
                         } );
                       }
                     } );

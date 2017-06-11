@@ -28,7 +28,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
   };
 
   request( options, function ( error, response, body ) {
-
+    logger.info( 'DEBUG: ' + JSON.stringify( response ) );
     if ( error ) {
       return callback( error );
     }
@@ -236,3 +236,4 @@ exports.update_sales_order = update_sales_order;
 exports.get_customer_record = get_customer_record;
 exports.update_customer_record = update_customer_record;
 exports.create_customer_record = create_customer_record;
+er_record;
