@@ -98,7 +98,7 @@ router.post( '/', function ( req, res ) {
                         cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
                           logger.info( 'DEBUG: ret: ' + JSON.stringify( ret ) );
                           if ( err || !ret.ok ) {
-                            logger.error( 'Failed to create sales order in Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
+                            logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
                           }
                           else if ( util.isEmpty( ret.fields ) ) {
                             logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
