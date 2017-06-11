@@ -29,7 +29,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
 
   setTimeout( function () {
     request( options, function ( error, response, body ) {
-      logger.info( 'DEBUG: response:' + JSON.stringify( response ) + ' error: ' + error );
+
       if ( error ) {
         return callback( error );
       }
