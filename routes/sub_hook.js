@@ -94,15 +94,30 @@ router.post( '/', function ( req, res ) {
                       else {
 
                         logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + ret.fields[ 0 ].id );
-                        cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize );
 
-                        //  add count to subscription_counter for customer ID
-                        subscription_counter.set( customer_id, subscription_id );
+                        cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, function ( err, ret ) {
 
-                        //  notify Slack
-                        slack_notifier.send( 'subscription_created', customer, subscription );
+                          if ( err || !ret.ok ) {
+                            logger.error( 'Failed to create sales order in Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
+                          }
+                          else if ( util.isEmpty( ret.fields ) ) {
+                            logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                          }
+                          else if ( ret.fields[ 0 ].success == false ) {
+                            logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                          }
+                          else {
+
+                            //  add count to subscription_counter for customer ID
+                            subscription_counter.set( customer_id, subscription_id );
+
+                            //  notify Slack
+                            slack_notifier.send( 'subscription_created', customer, subscription );
+
+                          }
+
+                        } );
                       }
-
                     } );
                   }
                 }
@@ -113,13 +128,27 @@ router.post( '/', function ( req, res ) {
               logger.info( 'Request made to find user in cin7 - found. member_id: ' + ret.fields[ 0 ].id + ' I should create a new order now' );
 
               //  create a new sales order in cin7
-              cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, webhook_sub_object.cf_topsize, webhook_sub_object.cf_bottomsize );
+              cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, webhook_sub_object.cf_topsize, webhook_sub_object.cf_bottomsize, function ( err, ret ) {
 
-              //  add count to subscription_counter for customer ID
-              subscription_counter.set( customer_id, subscription_id );
+                if ( err || !ret.ok ) {
+                  logger.error( 'Failed to create sales order in Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
+                }
+                else if ( util.isEmpty( ret.fields ) ) {
+                  logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                }
+                else if ( ret.fields[ 0 ].success == false ) {
+                  logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                }
+                else {
 
-              //  notify Slack
-              slack_notifier.send( 'subscription_created', customer, webhook_sub_object );
+                  //  add count to subscription_counter for customer ID
+                  subscription_counter.set( customer_id, subscription_id );
+
+                  //  notify Slack
+                  slack_notifier.send( 'subscription_created', customer, webhook_sub_object );
+
+                }
+              } );
             }
           } );
         }
@@ -173,9 +202,20 @@ router.post( '/', function ( req, res ) {
                     logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
                   }
                   else {
-                    cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, subscription.cf_archetype );
-                  }
+                    cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, subscription.cf_archetype, function ( err, ret ) {
 
+                      if ( err || !ret.ok ) {
+                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
+                      }
+                      else if ( util.isEmpty( ret.fields ) ) {
+                        logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                      }
+                      else if ( ret.fields[ 0 ].success == false ) {
+                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                      }
+
+                    } );
+                  }
                 } );
               }
             }

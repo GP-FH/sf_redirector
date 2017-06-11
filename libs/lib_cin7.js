@@ -6,7 +6,7 @@ var logger = require( './lib_logger.js' );
 /*
  *  Creates a sales order in Cin7 for the given member and subscription plan
  */
-var create_sales_order = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET' ) {
+var create_sales_order = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET', callback ) {
 
   var options = {
     method: 'POST',
@@ -30,15 +30,22 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
   request( options, function ( error, response, body ) {
 
     if ( error ) {
-      logger.error( 'Failed to create sales order in Cin7 - reason: ' + error + '. For member_id: ' + member_id );
+      return callback( error );
     }
-    else if ( body[ 0 ].success == false ) {
-      logger.error( 'Failed to create sales order in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For member_id: ' + member_id + ' and plan_id: ' + plan_id );
+    else if ( response.statusCode != 200 ) {
+      return callback( null, {
+        ok: false,
+        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
+      } );
     }
     else {
-      logger.info( 'Successfully created sales order for member_id: ' + member_id );
+      return callback( null, {
+        ok: true,
+        fields: body
+      } )
     }
   } );
+
 };
 
 var get_sales_order = function ( field_wanted, filter, callback ) {
