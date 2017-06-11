@@ -1,6 +1,8 @@
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
 
+/*********************************************Sales Order Actions***********************************************/
+
 /*
  *  Creates a sales order in Cin7 for the given member and subscription plan
  */
@@ -39,6 +41,80 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
   } );
 };
 
+var get_sales_order = function ( field_wanted, filter, callback ) {
+
+  var options = {
+    method: 'GET',
+    url: 'https://api.cin7.com/api/v1/SalesOrders',
+    qs: {
+      fields: field_wanted,
+      where: filter
+    },
+    headers: {
+      'cache-control': 'no-cache',
+      authorization: process.env.CIN7_AUTH
+    },
+    json: true
+  };
+
+  request( options, function ( error, response, body ) {
+
+    if ( error ) {
+      return callback( error );
+    }
+    else if ( response.statusCode != 200 ) {
+      return callback( null, {
+        ok: false,
+        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
+      } );
+    }
+    else {
+      return callback( null, {
+        ok: true,
+        fields: body
+      } )
+    }
+  } );
+
+};
+
+var update_sales_order = function ( update_details, callback ) {
+
+  var options = {
+    method: 'PUT',
+    url: 'https://api.cin7.com/api/v1/SalesOrders',
+    headers: {
+      'cache-control': 'no-cache',
+      'content-type': 'application/json',
+      authorization: process.env.CIN7_AUTH
+    },
+    body: update_details,
+    json: true
+  };
+
+  request( options, function ( error, response, body ) {
+
+    if ( error ) {
+      return callback( error );
+    }
+    else if ( response.statusCode != 200 ) {
+      return callback( null, {
+        ok: false,
+        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
+      } );
+    }
+    else {
+      return callback( null, {
+        ok: true,
+        fields: body
+      } )
+    }
+  } );
+
+};
+
+/*********************************************Customer Record Actions***********************************************/
+
 var get_customer_record = function ( field_wanted, filter, callback ) {
 
   //  check if customer record exists in cin7
@@ -65,7 +141,7 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
     else if ( response.statusCode != 200 ) {
       return callback( null, {
         ok: false,
-        msg: 'status code ' + response.statusCode
+        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
       } );
     }
     else {
@@ -78,7 +154,38 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
 
 };
 
-var update_customer_record = function () {
+var update_customer_record = function ( update_details, callback ) {
+
+  var options = {
+    method: 'PUT',
+    url: 'https://api.cin7.com/api/v1/Contacts',
+    headers: {
+      'cache-control': 'no-cache',
+      'content-type': 'application/json',
+      authorization: process.env.CIN7_AUTH
+    },
+    body: update_details,
+    json: true
+  };
+
+  request( options, function ( error, response, body ) {
+
+    if ( error ) {
+      return callback( error );
+    }
+    else if ( response.statusCode != 200 ) {
+      return callback( null, {
+        ok: false,
+        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
+      } );
+    }
+    else {
+      return callback( null, {
+        ok: true,
+        fields: body
+      } )
+    }
+  } );
 
 };
 
@@ -104,7 +211,7 @@ var create_customer_record = function ( customer_details, callback ) {
     else if ( response.statusCode != 200 ) {
       return callback( null, {
         ok: false,
-        msg: 'status code ' + response.statusCode
+        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
       } );
     }
     else {
@@ -114,7 +221,6 @@ var create_customer_record = function ( customer_details, callback ) {
       } )
     }
   } );
-
 };
 
 exports.create_sales_order = create_sales_order;

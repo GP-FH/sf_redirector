@@ -161,42 +161,21 @@ router.post( '/', function ( req, res ) {
               //  if true create order
               if ( res ) {
 
-                //  get cin7 member ID
-                var options = {
-                  method: 'GET',
-                  url: 'https://api.cin7.com/api/v1/Contacts',
-                  qs: {
-                    fields: 'id',
-                    where: 'integrationRef=\'' + customer_id + '\''
-                  },
-                  headers: {
-                    'cache-control': 'no-cache',
-                    authorization: process.env.CIN7_AUTH
-                  },
-                  json: true
-                };
+                cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
 
-                request( options, function ( error, response, body ) {
-
-                  if ( error ) {
-                    logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+                  if ( err || !ret.ok ) {
+                    logger.error( 'Failed to check if user exists in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
                   }
-                  else if ( response.statusCode != 200 ) {
-                    logger.error( 'Failed to retrieve member_id from Cin7 - status code: ' + response.statusCode + '. For customer_id: ' + customer_id );
-                  }
-                  else if ( body.length == 0 ) {
+                  else if ( util.isEmpty( ret.fields ) ) {
                     logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
                   }
-                  else if ( body[ 0 ].success == false ) {
-                    logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                  else if ( ret.fields[ 0 ].success == false ) {
+                    logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
                   }
                   else {
-
-                    //  create a new sales order in cin7 (waits a second to avoid rate limiting)
-                    setTimeout( function () {
-                      cin7.create_sales_order( body[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, subscription.cf_archetype );
-                    }, 1000 );
+                    cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, subscription.cf_archetype );
                   }
+
                 } );
               }
             }
@@ -217,78 +196,48 @@ router.post( '/', function ( req, res ) {
     var subscription = req.body.content.subscription;
     var customer = req.body.content.customer;
 
-    //  get cin7 member ID
-    var options = {
-      method: 'GET',
-      url: 'https://api.cin7.com/api/v1/Contacts',
-      qs: {
-        fields: 'id',
-        where: 'integrationRef=\'' + customer_id + '\''
-      },
-      headers: {
-        'cache-control': 'no-cache',
-        authorization: process.env.CIN7_AUTH
-      },
-      json: true
-    };
+    cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
 
-    request( options, function ( error, response, body ) {
-
-      if ( error ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+      if ( err || !ret.ok ) {
+        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
       }
-      else if ( response.statusCode != 200 ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - status code: ' + response.statusCode + '. For customer_id: ' + customer_id );
-      }
-      else if ( body.length == 0 ) {
+      else if ( util.isEmpty( ret.fields ) ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
       }
-      else if ( body[ 0 ].success == false ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+      else if ( ret.fields[ 0 ].success == false ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
       }
       else {
 
-        //  update customer with changes in cin7 (waits a second to avoid rate limiting)
-        setTimeout( function () {
+        var customer_updates = [ {
+          id: ret.fields[ 0 ].id,
+          integrationRef: customer_id,
+          isActive: true,
+          type: 'Customer',
+          firstName: customer.first_name,
+          address1: subscription.shipping_address.line1,
+          address2: subscription.shipping_address.line2,
+          city: subscription.shipping_address.city,
+          state: null,
+          postCode: subscription.shipping_address.postcode,
+          country: 'New Zealand',
+        } ]
 
-          var update_options = {
-            method: 'PUT',
-            url: 'https://api.cin7.com/api/v1/Contacts',
-            headers: {
-              'cache-control': 'no-cache',
-              'content-type': 'application/json',
-              authorization: process.env.CIN7_AUTH
-            },
-            body: [ {
-              id: body[ 0 ].id,
-              integrationRef: customer_id,
-              isActive: true,
-              type: 'Customer',
-              firstName: customer.first_name,
-              address1: subscription.shipping_address.line1,
-              address2: subscription.shipping_address.line2,
-              city: subscription.shipping_address.city,
-              state: null,
-              postCode: subscription.shipping_address.postcode,
-              country: 'New Zealand',
-            } ],
-            json: true
-          };
+        cin7.update_customer_record( customer_updates, function ( err, ret ) {
 
-          request( update_options, function ( error, response, body ) {
-
-            if ( error ) {
-              logger.error( 'Failed to update customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
-            }
-            else if ( body[ 0 ].success == false ) {
-              logger.error( 'Failed to update customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
-            }
-
-            logger.info( 'Customer information updated for customer ' + body[ 0 ].id + '(cin7), ' + customer_id + '(Chargebee)' );
-
-          } );
-
-        }, 1000 );
+          if ( err || !ret.ok ) {
+            logger.error( 'Failed to update user in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
+          }
+          else if ( util.isEmpty( ret.fields ) ) {
+            logger.error( 'Failed to update user in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+          }
+          else if ( ret.fields[ 0 ].success == false ) {
+            logger.error( 'Failed to update user in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+          }
+          else {
+            logger.info( 'Customer information updated for customer ' + ret.fields[ 0 ].id + '(cin7), ' + customer_id + '(Chargebee)' );
+          }
+        } );
       }
     } );
 
@@ -304,77 +253,49 @@ router.post( '/', function ( req, res ) {
     var customer_id = req.body.content.customer.id;
     var customer = req.body.content.customer;
 
-    //  get cin7 member ID
-    var options = {
-      method: 'GET',
-      url: 'https://api.cin7.com/api/v1/Contacts',
-      qs: {
-        fields: 'id',
-        where: 'integrationRef=\'' + customer_id + '\''
-      },
-      headers: {
-        'cache-control': 'no-cache',
-        authorization: process.env.CIN7_AUTH
-      },
-      json: true
-    };
+    cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
 
-    request( options, function ( error, response, body ) {
-
-      if ( error ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+      if ( err || !ret.ok ) {
+        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
       }
-      else if ( response.statusCode != 200 ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - status code: ' + response.statusCode + '. For customer_id: ' + customer_id );
-      }
-      else if ( body.length == 0 ) {
+      else if ( util.isEmpty( ret.fields ) ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
       }
-      else if ( body[ 0 ].success == false ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+      else if ( ret.fields[ 0 ].success == false ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
       }
       else {
 
-        //  update customer with changes in cin7 (waits a second to avoid rate limiting)
-        setTimeout( function () {
+        var customer_updates = [ {
+          id: ret.fields[ 0 ].id,
+          integrationRef: customer_id,
+          isActive: true,
+          type: 'Customer',
+          firstName: customer.first_name,
+          lastName: customer.last_name,
+          email: customer.email,
+          phone: customer.phone
+        } ];
 
-          var update_options = {
-            method: 'PUT',
-            url: 'https://api.cin7.com/api/v1/Contacts',
-            headers: {
-              'cache-control': 'no-cache',
-              'content-type': 'application/json',
-              authorization: process.env.CIN7_AUTH
-            },
-            body: [ {
-              id: body[ 0 ].id,
-              integrationRef: customer_id,
-              isActive: true,
-              type: 'Customer',
-              firstName: customer.first_name,
-              lastName: customer.last_name,
-              email: customer.email,
-              phone: customer.phone
-            } ],
-            json: true
-          };
+        cin7.update_customer_record( customer_updates, function ( err, ret ) {
 
-          request( update_options, function ( error, response, body ) {
+          if ( err || !ret.ok ) {
+            logger.error( 'Failed to update user in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
+          }
+          else if ( util.isEmpty( ret.fields ) ) {
+            logger.error( 'Failed to update user in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+          }
+          else if ( ret.fields[ 0 ].success == false ) {
+            logger.error( 'Failed to update user in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+          }
+          else {
+            logger.info( 'Customer information updated for customer ' + ret.fields[ 0 ].id + '(cin7), ' + customer_id + '(Chargebee)' );
+          }
+        } );
 
-            if ( error ) {
-              logger.error( 'Failed to update customer in Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
-            }
-            else if ( body[ 0 ].success == false ) {
-              logger.error( 'Failed to update customer in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
-            }
-
-            logger.info( 'Customer information updated for customer ' + body[ 0 ].id + '(cin7), ' + customer_id + '(Chargebee)' );
-
-          } );
-
-        }, 1000 );
       }
     } );
+
   }
   else if ( req.body.event_type == 'subscription_changed' ) {
 
@@ -388,107 +309,57 @@ router.post( '/', function ( req, res ) {
     var subscription_id = req.body.content.subscription.id;
     var archetype = req.body.content.subscription.cf_archetype;
 
-    //  get cin7 member ID
-    var options = {
-      method: 'GET',
-      url: 'https://api.cin7.com/api/v1/Contacts',
-      qs: {
-        fields: 'id',
-        where: 'integrationRef=\'' + customer_id + '\''
-      },
-      headers: {
-        'cache-control': 'no-cache',
-        authorization: process.env.CIN7_AUTH
-      },
-      json: true
-    };
+    cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
 
-    request( options, function ( error, response, body ) {
-
-      if ( error ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + error + '. For customer_id: ' + customer_id );
+      if ( err || !ret.ok ) {
+        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
       }
-      else if ( response.statusCode != 200 ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - status code: ' + response.statusCode + '. For customer_id: ' + customer_id );
-      }
-      else if ( body.length == 0 ) {
+      else if ( util.isEmpty( ret.fields ) ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
       }
-      else if ( body[ 0 ].success == false ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+      else if ( ret.fields[ 0 ].success == false ) {
+        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
       }
       else {
 
-        setTimeout( function () {
-          //  get sales order ID
-          var sales_get_options = {
-            method: 'GET',
-            url: 'https://api.cin7.com/api/v1/SalesOrders',
-            qs: {
-              fields: 'id,internalComments',
-              where: 'internalComments LIKE\'%' + subscription_id + '\''
-            },
-            headers: {
-              'cache-control': 'no-cache',
-              authorization: process.env.CIN7_AUTH
-            },
-            json: true
-          };
+        cin7.get_sales_order( 'id,internalComments', 'internalComments LIKE\'%' + subscription_id + '\'', function ( err, ret ) {
 
-          request( sales_get_options, function ( error, response, body ) {
+          if ( err || !ret.ok ) {
+            logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
+          }
+          else if ( util.isEmpty( ret.fields ) ) {
+            logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: sales order does not exist for subscription_id: ' + subscription_id );
+          }
+          else if ( ret.fields[ 0 ].success == false ) {
+            logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+          }
+          else {
 
-            if ( error ) {
-              logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + error + '. For subscription_id: ' + subscription_id );
-            }
-            else if ( response.statusCode != 200 ) {
-              logger.error( 'Failed to retrieve sales order ID in Cin7 - status code: ' + response.statusCode + '. For subscription_id: ' + subscription_id );
-            }
-            else if ( body.length == 0 ) {
-              logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: sales order does not exist for subscription_id: ' + subscription_id );
-            }
-            else if ( body[ 0 ].success == false ) {
-              logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
-            }
-            else {
+            var sales_order_updates = [ {
+              id: ret.fields[ 0 ].id,
+              internalComments: 'archetype: ' + archetype + ' ' + ret.fields[ 0 ].internalComments, // add change here
+              currencyCode: 'NZD',
+              taxStatus: 'Incl',
+              taxRate: 0.15
+            } ];
 
-              setTimeout( function () {
-                //  update the sales order with the archetype
-                var sales_put_options = {
-                  method: 'PUT',
-                  url: 'https://api.cin7.com/api/v1/SalesOrders',
-                  headers: {
-                    'cache-control': 'no-cache',
-                    'content-type': 'application/json',
-                    authorization: process.env.CIN7_AUTH
-                  },
-                  body: [ {
-                    id: body[ 0 ].id,
-                    internalComments: 'archetype: ' + archetype + ' ' + body[ 0 ].internalComments, // add change here
-                    currencyCode: 'NZD',
-                    taxStatus: 'Incl',
-                    taxRate: 0.15
-                  } ],
-                  json: true
-                };
+            cin7.update_sales_order( sales_order_updates, function ( err, ret ) {
 
-                request( sales_put_options, function ( error, response, body ) {
-                  if ( error ) {
-                    logger.error( 'Failed to update sales order in Cin7 - reason: ' + error + '. For subscription_id: ' + subscription_id );
-                  }
-                  else if ( response.statusCode != 200 ) {
-                    logger.error( 'Failed to update sales order in Cin7 - status code: ' + response.statusCode + '. For subscription_id: ' + subscription_id );
-                  }
-                  else if ( body[ 0 ].success == false ) {
-                    logger.error( 'Failed to update sales order in Cin7 - reason: ' + body[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
-                  }
-                  else {
-                    logger.info( 'Detected addition of archetype: ' + archetype + ' to subscription with ID: ' + subscription_id + '. Updated corresponding Cin7 Sales order' );
-                  }
-                } );
-              }, 1000 );
-            }
-          } );
-        }, 1000 );
+              if ( err || !ret.ok ) {
+                logger.error( 'Failed to update sales order in Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
+              }
+              else if ( util.isEmpty( ret.fields ) ) {
+                logger.error( 'Failed to update sales order in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+              }
+              else if ( ret.fields[ 0 ].success == false ) {
+                logger.error( 'Failed to update sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+              }
+              else {
+                logger.info( 'Detected addition of archetype: ' + archetype + ' to subscription with ID: ' + subscription_id + '. Updated corresponding Cin7 Sales order' );
+              }
+            } );
+          }
+        } );
       }
     } );
   }
