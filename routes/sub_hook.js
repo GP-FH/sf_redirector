@@ -95,7 +95,7 @@ router.post( '/', function ( req, res ) {
 
                         logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + ret.fields[ 0 ].id );
 
-                        cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, function ( err, ret ) {
+                        cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
 
                           if ( err || !ret.ok ) {
                             logger.error( 'Failed to create sales order in Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
@@ -128,7 +128,7 @@ router.post( '/', function ( req, res ) {
               logger.info( 'Request made to find user in cin7 - found. member_id: ' + ret.fields[ 0 ].id + ' I should create a new order now' );
 
               //  create a new sales order in cin7
-              cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, webhook_sub_object.cf_topsize, webhook_sub_object.cf_bottomsize, function ( err, ret ) {
+              cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, webhook_sub_object.cf_topsize, webhook_sub_object.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
 
                 if ( err || !ret.ok ) {
                   logger.error( 'Failed to create sales order in Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
