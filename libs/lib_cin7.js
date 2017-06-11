@@ -35,7 +35,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
     else if ( response.statusCode != 200 ) {
       return callback( null, {
         ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
+        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
       } );
     }
     else {
@@ -72,7 +72,7 @@ var get_sales_order = function ( field_wanted, filter, callback ) {
     else if ( response.statusCode != 200 ) {
       return callback( null, {
         ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
+        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
       } );
     }
     else {
@@ -107,7 +107,7 @@ var update_sales_order = function ( update_details, callback ) {
     else if ( response.statusCode != 200 ) {
       return callback( null, {
         ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
+        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
       } );
     }
     else {
@@ -148,7 +148,7 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
     else if ( response.statusCode != 200 ) {
       return callback( null, {
         ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
+        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
       } );
     }
     else {
@@ -183,7 +183,7 @@ var update_customer_record = function ( update_details, callback ) {
     else if ( response.statusCode != 200 ) {
       return callback( null, {
         ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
+        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
       } );
     }
     else {
@@ -218,7 +218,7 @@ var create_customer_record = function ( customer_details, callback ) {
     else if ( response.statusCode != 200 ) {
       return callback( null, {
         ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + body.message
+        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
       } );
     }
     else {
