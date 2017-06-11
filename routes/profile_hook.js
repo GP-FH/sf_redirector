@@ -8,7 +8,7 @@
 var express = require( 'express' );
 var router = express.Router();
 var chargebee = require( '../app.js' ).chargebee;
-var logger = require( '../log_service.js' );
+var logger = require( '../libs/lib_logger.js' );
 
 router.get( '/', function ( req, res ) {
 

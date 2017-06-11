@@ -7,7 +7,7 @@
 //client.hset(customer_id, subscription_id, count);
 
 var redis = require( 'redis' );
-var logger = require( './log_service.js' );
+var logger = require( './libs/lib_logger.js' );
 
 /*
  *  creates count for customer with passed id
