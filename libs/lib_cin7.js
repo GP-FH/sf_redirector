@@ -28,7 +28,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
   };
 
   request( options, function ( error, response, body ) {
-    logger.info( 'DEBUG: ' + JSON.stringify( response ) );
+    logger.info( 'DEBUG: response:' + JSON.stringify( response ) + ' error: ' + error );
     if ( error ) {
       return callback( error );
     }

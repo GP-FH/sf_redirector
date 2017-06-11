@@ -96,7 +96,7 @@ router.post( '/', function ( req, res ) {
                         logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + ret.fields[ 0 ].id );
 
                         cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
-
+                          logger.info( 'DEBUG: ret: ' + JSON.stringify( ret ) );
                           if ( err || !ret.ok ) {
                             logger.error( 'Failed to create sales order in Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
                           }
