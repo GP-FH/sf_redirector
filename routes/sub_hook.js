@@ -17,7 +17,7 @@ var chargebee = require( '../app.js' ).chargebee;
 var logger = require( '../libs/lib_logger.js' );
 var subscription_counter = require( '../subscription_counter.js' );
 var slack_notifier = require( '../libs/lib_slack.js' );
-var cin7 = require( '../libs/cin7.js' );
+var cin7 = require( '../libs/lib_cin7.js' );
 var util = require( 'underscore' );
 
 
