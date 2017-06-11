@@ -27,24 +27,26 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
     json: true
   };
 
-  request( options, function ( error, response, body ) {
-    logger.info( 'DEBUG: response:' + JSON.stringify( response ) + ' error: ' + error );
-    if ( error ) {
-      return callback( error );
-    }
-    else if ( response.statusCode != 200 ) {
-      return callback( null, {
-        ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-      } );
-    }
-    else {
-      return callback( null, {
-        ok: true,
-        fields: body
-      } )
-    }
-  } );
+  setTimeout(
+    request( options, function ( error, response, body ) {
+      logger.info( 'DEBUG: response:' + JSON.stringify( response ) + ' error: ' + error );
+      if ( error ) {
+        return callback( error );
+      }
+      else if ( response.statusCode != 200 ) {
+        return callback( null, {
+          ok: false,
+          msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+        } );
+      }
+      else {
+        return callback( null, {
+          ok: true,
+          fields: body
+        } )
+      }
+    } ), 1000 );
+
 
 };
 
@@ -64,24 +66,26 @@ var get_sales_order = function ( field_wanted, filter, callback ) {
     json: true
   };
 
-  request( options, function ( error, response, body ) {
+  setTimeout(
+    request( options, function ( error, response, body ) {
 
-    if ( error ) {
-      return callback( error );
-    }
-    else if ( response.statusCode != 200 ) {
-      return callback( null, {
-        ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-      } );
-    }
-    else {
-      return callback( null, {
-        ok: true,
-        fields: body
-      } )
-    }
-  } );
+      if ( error ) {
+        return callback( error );
+      }
+      else if ( response.statusCode != 200 ) {
+        return callback( null, {
+          ok: false,
+          msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+        } );
+      }
+      else {
+        return callback( null, {
+          ok: true,
+          fields: body
+        } )
+      }
+    } ), 1000 );
+
 
 };
 
@@ -99,24 +103,25 @@ var update_sales_order = function ( update_details, callback ) {
     json: true
   };
 
-  request( options, function ( error, response, body ) {
+  setTimeout(
+    request( options, function ( error, response, body ) {
 
-    if ( error ) {
-      return callback( error );
-    }
-    else if ( response.statusCode != 200 ) {
-      return callback( null, {
-        ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-      } );
-    }
-    else {
-      return callback( null, {
-        ok: true,
-        fields: body
-      } )
-    }
-  } );
+      if ( error ) {
+        return callback( error );
+      }
+      else if ( response.statusCode != 200 ) {
+        return callback( null, {
+          ok: false,
+          msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+        } );
+      }
+      else {
+        return callback( null, {
+          ok: true,
+          fields: body
+        } )
+      }
+    } ), 1000 );
 
 };
 
@@ -140,24 +145,26 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
   };
 
   //TODO missing an error case here (success:false)
-  request( options, function ( error, response, body ) {
 
-    if ( error ) {
-      return callback( error );
-    }
-    else if ( response.statusCode != 200 ) {
-      return callback( null, {
-        ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-      } );
-    }
-    else {
-      return callback( null, {
-        ok: true,
-        fields: body
-      } )
-    }
-  } );
+  setTimeout(
+    request( options, function ( error, response, body ) {
+
+      if ( error ) {
+        return callback( error );
+      }
+      else if ( response.statusCode != 200 ) {
+        return callback( null, {
+          ok: false,
+          msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+        } );
+      }
+      else {
+        return callback( null, {
+          ok: true,
+          fields: body
+        } )
+      }
+    } ), 1000 );
 
 };
 
@@ -175,24 +182,26 @@ var update_customer_record = function ( update_details, callback ) {
     json: true
   };
 
-  request( options, function ( error, response, body ) {
+  setTimeout(
+    request( options, function ( error, response, body ) {
 
-    if ( error ) {
-      return callback( error );
-    }
-    else if ( response.statusCode != 200 ) {
-      return callback( null, {
-        ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-      } );
-    }
-    else {
-      return callback( null, {
-        ok: true,
-        fields: body
-      } )
-    }
-  } );
+      if ( error ) {
+        return callback( error );
+      }
+      else if ( response.statusCode != 200 ) {
+        return callback( null, {
+          ok: false,
+          msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+        } );
+      }
+      else {
+        return callback( null, {
+          ok: true,
+          fields: body
+        } )
+      }
+    } ), 1000 );
+
 
 };
 
@@ -210,24 +219,26 @@ var create_customer_record = function ( customer_details, callback ) {
     json: true
   };
 
-  request( options, function ( error, response, body ) {
+  setTimeout(
+    request( options, function ( error, response, body ) {
 
-    if ( error ) {
-      return callback( error );
-    }
-    else if ( response.statusCode != 200 ) {
-      return callback( null, {
-        ok: false,
-        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-      } );
-    }
-    else {
-      return callback( null, {
-        ok: true,
-        fields: body
-      } )
-    }
-  } );
+      if ( error ) {
+        return callback( error );
+      }
+      else if ( response.statusCode != 200 ) {
+        return callback( null, {
+          ok: false,
+          msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+        } );
+      }
+      else {
+        return callback( null, {
+          ok: true,
+          fields: body
+        } )
+      }
+    } ), 1000 );
+
 };
 
 exports.create_sales_order = create_sales_order;

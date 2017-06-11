@@ -52,7 +52,7 @@ router.post( '/', function ( req, res ) {
           cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
 
             if ( err || !ret.ok ) {
-              logger.error( 'Failed to check if user exists in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
+              logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
             }
             else if ( util.isEmpty( ret.fields ) ) {
               logger.info( 'Request made to find user in cin7 - no user found. I should create one' );
@@ -89,7 +89,7 @@ router.post( '/', function ( req, res ) {
                     cin7.create_customer_record( customer_details, function ( err, ret ) {
 
                       if ( error || !ret.ok ) {
-                        logger.error( 'Failed to create customer in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
+                        logger.error( 'Failed to create customer in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
                       }
                       else {
 
@@ -130,7 +130,7 @@ router.post( '/', function ( req, res ) {
               cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, webhook_sub_object.cf_topsize, webhook_sub_object.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
 
                 if ( err || !ret.ok ) {
-                  logger.error( 'Failed to create sales order in Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
+                  logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
                 }
                 else if ( util.isEmpty( ret.fields ) ) {
                   logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
@@ -192,7 +192,7 @@ router.post( '/', function ( req, res ) {
                 cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
 
                   if ( err || !ret.ok ) {
-                    logger.error( 'Failed to check if user exists in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
+                    logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
                   }
                   else if ( util.isEmpty( ret.fields ) ) {
                     logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
@@ -204,7 +204,7 @@ router.post( '/', function ( req, res ) {
                     cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, subscription.cf_archetype, function ( err, ret ) {
 
                       if ( err || !ret.ok ) {
-                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
+                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
                       }
                       else if ( util.isEmpty( ret.fields ) ) {
                         logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
@@ -238,7 +238,7 @@ router.post( '/', function ( req, res ) {
     cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
 
       if ( err || !ret.ok ) {
-        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
+        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
       }
       else if ( util.isEmpty( ret.fields ) ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
@@ -265,7 +265,7 @@ router.post( '/', function ( req, res ) {
         cin7.update_customer_record( customer_updates, function ( err, ret ) {
 
           if ( err || !ret.ok ) {
-            logger.error( 'Failed to update user in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
+            logger.error( 'Failed to update user in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
           }
           else if ( util.isEmpty( ret.fields ) ) {
             logger.error( 'Failed to update user in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
@@ -295,7 +295,7 @@ router.post( '/', function ( req, res ) {
     cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
 
       if ( err || !ret.ok ) {
-        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
+        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
       }
       else if ( util.isEmpty( ret.fields ) ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
@@ -319,7 +319,7 @@ router.post( '/', function ( req, res ) {
         cin7.update_customer_record( customer_updates, function ( err, ret ) {
 
           if ( err || !ret.ok ) {
-            logger.error( 'Failed to update user in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
+            logger.error( 'Failed to update user in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
           }
           else if ( util.isEmpty( ret.fields ) ) {
             logger.error( 'Failed to update user in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
@@ -351,7 +351,7 @@ router.post( '/', function ( req, res ) {
     cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
 
       if ( err || !ret.ok ) {
-        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + error || ret.msg + '. For customer_id: ' + customer_id );
+        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
       }
       else if ( util.isEmpty( ret.fields ) ) {
         logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
@@ -364,7 +364,7 @@ router.post( '/', function ( req, res ) {
         cin7.get_sales_order( 'id,internalComments', 'internalComments LIKE\'%' + subscription_id + '\'', function ( err, ret ) {
 
           if ( err || !ret.ok ) {
-            logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
+            logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
           }
           else if ( util.isEmpty( ret.fields ) ) {
             logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: sales order does not exist for subscription_id: ' + subscription_id );
@@ -385,7 +385,7 @@ router.post( '/', function ( req, res ) {
             cin7.update_sales_order( sales_order_updates, function ( err, ret ) {
 
               if ( err || !ret.ok ) {
-                logger.error( 'Failed to update sales order in Cin7 - reason: ' + error || ret.msg + '. For subscription_id: ' + subscription_id );
+                logger.error( 'Failed to update sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
               }
               else if ( util.isEmpty( ret.fields ) ) {
                 logger.error( 'Failed to update sales order in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
