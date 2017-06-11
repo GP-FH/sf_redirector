@@ -27,7 +27,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
     json: true
   };
 
-  setTimeout(
+  setTimeout( function () {
     request( options, function ( error, response, body ) {
       logger.info( 'DEBUG: response:' + JSON.stringify( response ) + ' error: ' + error );
       if ( error ) {
@@ -45,7 +45,8 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
           fields: body
         } )
       }
-    } ), 1000 );
+    } );
+  }, 1000 );
 
 
 };
@@ -66,7 +67,7 @@ var get_sales_order = function ( field_wanted, filter, callback ) {
     json: true
   };
 
-  setTimeout(
+  setTimeout( function () {
     request( options, function ( error, response, body ) {
 
       if ( error ) {
@@ -84,7 +85,8 @@ var get_sales_order = function ( field_wanted, filter, callback ) {
           fields: body
         } )
       }
-    } ), 1000 );
+    } );
+  }, 1000 );
 
 
 };
@@ -103,7 +105,7 @@ var update_sales_order = function ( update_details, callback ) {
     json: true
   };
 
-  setTimeout(
+  setTimeout( function () {
     request( options, function ( error, response, body ) {
 
       if ( error ) {
@@ -121,7 +123,8 @@ var update_sales_order = function ( update_details, callback ) {
           fields: body
         } )
       }
-    } ), 1000 );
+    } );
+  }, 1000 );
 
 };
 
@@ -146,7 +149,7 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
 
   //TODO missing an error case here (success:false)
 
-  setTimeout(
+  setTimeout( function () {
     request( options, function ( error, response, body ) {
 
       if ( error ) {
@@ -164,7 +167,8 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
           fields: body
         } )
       }
-    } ), 1000 );
+    } );
+  }, 1000 );
 
 };
 
@@ -182,7 +186,7 @@ var update_customer_record = function ( update_details, callback ) {
     json: true
   };
 
-  setTimeout(
+  setTimeout( function () {
     request( options, function ( error, response, body ) {
 
       if ( error ) {
@@ -200,7 +204,8 @@ var update_customer_record = function ( update_details, callback ) {
           fields: body
         } )
       }
-    } ), 1000 );
+    } );
+  }, 1000 );
 
 
 };
@@ -219,7 +224,7 @@ var create_customer_record = function ( customer_details, callback ) {
     json: true
   };
 
-  setTimeout(
+  setTimeout( function () {
     request( options, function ( error, response, body ) {
 
       if ( error ) {
@@ -237,7 +242,8 @@ var create_customer_record = function ( customer_details, callback ) {
           fields: body
         } )
       }
-    } ), 1000 );
+    } );
+  }, 1000 );
 
 };
 
