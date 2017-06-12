@@ -14,8 +14,8 @@ router.get( '/', function ( req, res ) {
 
   logger.info( 'TMP DEBUG: request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) );
 
-  //  only bother with requests coming from the correct typeform TODO: will need to ditch this/add allowance for autopilot
-  if ( req.get( 'Referer' ).includes( process.env.TYPEFORM_REFERRING_URL ) ) {
+  //  check for valid source token
+  if ( req.query.token = process.env.VERIFICATION_TOKEN ) {
 
     //  get a new checkout page from Chargebee
     chargebee.hosted_page.checkout_new( {
@@ -64,6 +64,10 @@ router.get( '/', function ( req, res ) {
         res.redirect( hosted_page.url );
       }
     } );
+  }
+  else {
+    logger.error( 'Incorrect token passed' );
+    res.redirect( process.env.BASE_URL + '/error' )
   }
 } );
 
