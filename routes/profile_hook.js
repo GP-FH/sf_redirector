@@ -65,6 +65,10 @@ router.get( '/', function ( req, res ) {
       }
     } );
   }
+  else {
+    logger.error( 'Incorrect token passed' );
+    res.redirect( process.env.BASE_URL + '/error' )
+  }
 } );
 
 module.exports = router;
