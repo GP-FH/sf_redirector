@@ -9,6 +9,9 @@ var express = require( 'express' );
 var router = express.Router();
 var chargebee = require( '../app.js' ).chargebee;
 var logger = require( '../libs/lib_logger.js' );
+var mixpanel = require( 'mixpanel' );
+var mp = mixpanel.init( process.env.MIXPANEL_TOKEN );
+var stylist_campaigns = [ 'mandy_cam_attr', 'hannah_cam_attr' ];
 
 router.get( '/', function ( req, res ) {
 
@@ -16,6 +19,18 @@ router.get( '/', function ( req, res ) {
 
   //  check for valid source token
   if ( req.query.token = process.env.VERIFICATION_TOKEN ) {
+
+    //  trigger event in mixpanel to track user
+    mixpanel.track( process.env.MIXPANEL_EVENT, {
+      distinct_id: req.query.mp_id
+    } );
+
+    //  check for stylist campaign Q param: indicates we should attribute the customer to the stylist
+    var stylist_idx = stylist_campaigns.indexOf( req.query.utm_campaign );
+    var stylist_attr = ' ';
+    if ( stylist_idx != -1 ) {
+      stylist_attr = stylist_campaigns[ stylist_idx ];
+    }
 
     //  get a new checkout page from Chargebee
     chargebee.hosted_page.checkout_new( {
@@ -39,6 +54,7 @@ router.get( '/', function ( req, res ) {
         first_name: req.query.fname,
         last_name: req.query.lname,
         phone: req.query.phone,
+        cf_stylist_attr: stylist_attr
       },
       billing_address: {
         first_name: req.query.fname,
