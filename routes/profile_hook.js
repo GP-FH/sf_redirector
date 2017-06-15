@@ -21,7 +21,7 @@ router.get( '/', function ( req, res ) {
   if ( req.query.token = process.env.VERIFICATION_TOKEN ) {
 
     //  trigger event in mixpanel to track user
-    mixpanel.track( process.env.MIXPANEL_EVENT, {
+    mp.track( process.env.MIXPANEL_EVENT, {
       distinct_id: req.query.mp_id
     } );
 
