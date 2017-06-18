@@ -11,7 +11,7 @@ var chargebee = require( '../app.js' ).chargebee;
 var logger = require( '../libs/lib_logger.js' );
 var mixpanel = require( 'mixpanel' );
 var mp = mixpanel.init( process.env.MIXPANEL_TOKEN );
-var stylist_campaigns = [ 'test1_cam_attr', 'test2_cam_attr' ];
+var stylist_campaigns = [ 'HW-01-ATTR', 'MD-01-ATTR' ];
 
 router.get( '/', function ( req, res ) {
 
