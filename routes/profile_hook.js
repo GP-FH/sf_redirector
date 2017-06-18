@@ -11,7 +11,7 @@ var chargebee = require( '../app.js' ).chargebee;
 var logger = require( '../libs/lib_logger.js' );
 var mixpanel = require( 'mixpanel' );
 var mp = mixpanel.init( process.env.MIXPANEL_TOKEN );
-var stylist_campaigns = [ 'mandy_cam_attr', 'hannah_cam_attr' ];
+var stylist_campaigns = [ 'test1_cam_attr', 'test2_cam_attr' ];
 
 router.get( '/', function ( req, res ) {
 
@@ -26,18 +26,11 @@ router.get( '/', function ( req, res ) {
         } );
 
         //  check for stylist campaign Q param: indicates we should attribute the customer to the stylist
-
-        //debugging
-
-        logger.info( 'DEBUG: campaign qs: ' + req.query.campaign );
         var stylist_idx = stylist_campaigns.indexOf( req.query.campaign );
-        logger.info( 'DEBUG: campaign index: ' + stylist_idx );
         var stylist_attr = '';
         if ( stylist_idx != -1 ) {
             stylist_attr = stylist_campaigns[ stylist_idx ];
         }
-
-        logger.info( 'DEBUG: stylist: ' + stylist_attr );
 
         //  get a new checkout page from Chargebee
         chargebee.hosted_page.checkout_new( {
