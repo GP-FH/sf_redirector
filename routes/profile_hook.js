@@ -18,7 +18,7 @@ router.get( '/', function ( req, res ) {
     logger.info( 'TMP DEBUG: request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) );
 
     //  check for valid source token
-    if ( req.query.token = process.env.VERIFICATION_TOKEN ) {
+    if ( req.query.token == process.env.VERIFICATION_TOKEN ) {
 
         //  trigger event in mixpanel to track user
         mp.track( process.env.MIXPANEL_EVENT, {
