@@ -1,3 +1,12 @@
+/*
+ *
+ *  lib_cin7: this lib provides an interface for interacting with Cin7. Currently it allows us to
+ *  create/get/update Sales Orders and Customer records. This is V0.1 of this lib and it still
+ *  needs some refactoring to make it a bit more flexible/take some of the implementation burden
+ *  away from the calling parties.
+ *
+ */
+
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
 
