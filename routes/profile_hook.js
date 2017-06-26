@@ -47,7 +47,7 @@ router.get( '/', function ( req, res ) {
                 logger.error( 'Failed to check chargebee customer existence - reason: ' + JSON.stringify( error ) );
                 res.redirect( process.env.BASE_URL + '/error' );
             }
-            else if ( util.isEmpty( result.list.length ) ) {
+            else if ( util.isEmpty( result.list ) ) {
 
                 //  get a new checkout page from Chargebee
                 chargebee.hosted_page.checkout_new( {
