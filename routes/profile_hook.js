@@ -18,7 +18,7 @@ router.get( '/', function ( req, res ) {
     logger.info( 'TMP DEBUG: request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) );
 
     //  check for valid source token
-    if ( req.query.token = process.env.VERIFICATION_TOKEN ) {
+    if ( req.query.token == process.env.VERIFICATION_TOKEN ) {
 
         //  trigger event in mixpanel to track user
         mp.track( process.env.MIXPANEL_EVENT, {
@@ -53,8 +53,8 @@ router.get( '/', function ( req, res ) {
                 email: req.query.email,
                 first_name: req.query.fname,
                 last_name: req.query.lname,
-                phone: req.query.phone,
-                cf_stylist_attr: stylist_attr
+                phone: req.query.phone //,
+                //cf_stylist_attr: stylist_attr
             },
             billing_address: {
                 first_name: req.query.fname,

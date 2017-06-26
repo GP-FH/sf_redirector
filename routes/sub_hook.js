@@ -23,398 +23,398 @@ var util = require( 'underscore' );
 
 router.post( '/', function ( req, res ) {
 
-  //  send immediate 200OK to keep chargebee happy and prevent unneccessary retries
-  res.status( 200 ).send();
+    //  send immediate 200OK to keep chargebee happy and prevent unneccessary retries
+    res.status( 200 ).send();
 
-  /*
-   *  On subscription creation, a new customer and a new sales order is created in Cin7
-   */
-  if ( req.body.event_type == 'subscription_created' ) {
+    /*
+     *  On subscription creation, a new customer and a new sales order is created in Cin7
+     */
+    if ( req.body.event_type == 'subscription_created' ) {
 
-    var customer_id = req.body.content.subscription.customer_id;
-    var plan = req.body.content.subscription.plan_id;
-    var subscription_id = req.body.content.subscription.id;
-    var webhook_sub_object = req.body.content.subscription;
-    logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
+        var customer_id = req.body.content.subscription.customer_id;
+        var plan = req.body.content.subscription.plan_id;
+        var subscription_id = req.body.content.subscription.id;
+        var webhook_sub_object = req.body.content.subscription;
+        logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
 
-    //  get customer data using customer_id from newly created subscription event
-    chargebee.customer.retrieve( customer_id ).request(
+        //  get customer data using customer_id from newly created subscription event
+        chargebee.customer.retrieve( customer_id ).request(
 
-      function ( error, result ) {
+            function ( error, result ) {
 
-        if ( error ) {
-          logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
-        }
-        else {
-
-          var customer = result.customer;
-
-          cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
-
-            if ( err || !ret.ok ) {
-              logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
-            }
-            else if ( util.isEmpty( ret.fields ) ) {
-              logger.info( 'Request made to find user in cin7 - no user found. I should create one' );
-
-              //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
-              chargebee.subscription.retrieve( subscription_id ).request(
-
-                function ( error, result ) {
-
-                  if ( error ) {
-                    logger.error( 'Failed to retrieve subscription record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id + ' subscription_id: ' + subscription_id );
-                  }
-                  else {
-                    var subscription = result.subscription;
-                    var customer_details = [ {
-                      integrationRef: customer_id,
-                      isActive: true,
-                      type: 'Customer',
-                      firstName: customer.first_name,
-                      lastName: customer.last_name,
-                      email: customer.email,
-                      phone: customer.phone,
-                      address1: subscription.shipping_address.line1,
-                      address2: subscription.shipping_address.line2,
-                      city: subscription.shipping_address.city,
-                      state: null,
-                      postCode: subscription.shipping_address.postcode,
-                      country: 'New Zealand',
-                      group: null,
-                      subGroup: null,
-                      PriceColumn: 'RetailPrice'
-                    } ];
-
-                    cin7.create_customer_record( customer_details, function ( err, ret ) {
-
-                      if ( error || !ret.ok ) {
-                        logger.error( 'Failed to create customer in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
-                      }
-                      else {
-
-                        logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + ret.fields[ 0 ].id );
-
-                        cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
-
-                          if ( err || !ret.ok ) {
-                            logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
-                          }
-                          else if ( util.isEmpty( ret.fields ) ) {
-                            logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
-                          }
-                          else if ( ret.fields[ 0 ].success == false ) {
-                            logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
-                          }
-                          else {
-
-                            //  add count to subscription_counter for customer ID
-                            subscription_counter.set( customer_id, subscription_id );
-
-                            //  notify Slack
-                            slack_notifier.send( 'subscription_created', customer, subscription );
-
-                          }
-                        } );
-                      }
-                    } );
-                  }
-                }
-              );
-
-            }
-            else {
-              logger.info( 'Request made to find user in cin7 - found. member_id: ' + ret.fields[ 0 ].id + ' I should create a new order now' );
-
-              //  create a new sales order in cin7
-              cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, webhook_sub_object.cf_topsize, webhook_sub_object.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
-
-                if ( err || !ret.ok ) {
-                  logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
-                }
-                else if ( util.isEmpty( ret.fields ) ) {
-                  logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
-                }
-                else if ( ret.fields[ 0 ].success == false ) {
-                  logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                if ( error ) {
+                    logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
                 }
                 else {
 
-                  //  add count to subscription_counter for customer ID
-                  subscription_counter.set( customer_id, subscription_id );
+                    var customer = result.customer;
 
-                  //  notify Slack
-                  slack_notifier.send( 'subscription_created', customer, webhook_sub_object );
+                    cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
 
+                        if ( err || !ret.ok ) {
+                            logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                        }
+                        else if ( util.isEmpty( ret.fields ) ) {
+                            logger.info( 'Request made to find user in cin7 - no user found. I should create one' );
+
+                            //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
+                            chargebee.subscription.retrieve( subscription_id ).request(
+
+                                function ( error, result ) {
+
+                                    if ( error ) {
+                                        logger.error( 'Failed to retrieve subscription record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id + ' subscription_id: ' + subscription_id );
+                                    }
+                                    else {
+                                        var subscription = result.subscription;
+                                        var customer_details = [ {
+                                            integrationRef: customer_id,
+                                            isActive: true,
+                                            type: 'Customer',
+                                            firstName: customer.first_name,
+                                            lastName: customer.last_name,
+                                            email: customer.email,
+                                            phone: customer.phone,
+                                            address1: subscription.shipping_address.line1,
+                                            address2: subscription.shipping_address.line2,
+                                            city: subscription.shipping_address.city,
+                                            state: null,
+                                            postCode: subscription.shipping_address.postcode,
+                                            country: 'New Zealand',
+                                            group: null,
+                                            subGroup: null,
+                                            PriceColumn: 'RetailPrice'
+                                        } ];
+
+                                        cin7.create_customer_record( customer_details, function ( err, ret ) {
+
+                                            if ( error || !ret.ok ) {
+                                                logger.error( 'Failed to create customer in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                                            }
+                                            else {
+
+                                                logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + ret.fields[ 0 ].id );
+
+                                                cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
+
+                                                    if ( err || !ret.ok ) {
+                                                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                                                    }
+                                                    else if ( util.isEmpty( ret.fields ) ) {
+                                                        logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                                                    }
+                                                    else if ( ret.fields[ 0 ].success == false ) {
+                                                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                                                    }
+                                                    else {
+
+                                                        //  add count to subscription_counter for customer ID
+                                                        subscription_counter.set( customer_id, subscription_id );
+
+                                                        //  notify Slack
+                                                        slack_notifier.send( 'subscription_created', customer, subscription );
+
+                                                    }
+                                                } );
+                                            }
+                                        } );
+                                    }
+                                }
+                            );
+
+                        }
+                        else {
+                            logger.info( 'Request made to find user in cin7 - found. member_id: ' + ret.fields[ 0 ].id + ' I should create a new order now' );
+
+                            //  create a new sales order in cin7
+                            cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, webhook_sub_object.cf_topsize, webhook_sub_object.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
+
+                                if ( err || !ret.ok ) {
+                                    logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                                }
+                                else if ( util.isEmpty( ret.fields ) ) {
+                                    logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                                }
+                                else if ( ret.fields[ 0 ].success == false ) {
+                                    logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                                }
+                                else {
+
+                                    //  add count to subscription_counter for customer ID
+                                    subscription_counter.set( customer_id, subscription_id );
+
+                                    //  notify Slack
+                                    slack_notifier.send( 'subscription_created', customer, webhook_sub_object );
+
+                                }
+                            } );
+                        }
+                    } );
                 }
-              } );
             }
-          } );
-        }
-      }
-    );
-  }
-  else if ( req.body.event_type == 'subscription_renewed' ) {
+        );
+    }
+    else if ( req.body.event_type == 'subscription_renewed' ) {
 
-    /*
-     *  On subscription renewal check whether it's a delivery month. If so, create a sales order in cin7.
-     *  If not a delivery month, increment the subscription count in redis
-     */
+        /*
+         *  On subscription renewal check whether it's a delivery month. If so, create a sales order in cin7.
+         *  If not a delivery month, increment the subscription count in redis
+         */
 
-    var customer_id = req.body.content.subscription.customer_id;
-    var plan = req.body.content.subscription.plan_id;
-    var subscription_id = req.body.content.subscription.id;
-    var subscription = req.body.content.subscription;
+        var customer_id = req.body.content.subscription.customer_id;
+        var plan = req.body.content.subscription.plan_id;
+        var subscription_id = req.body.content.subscription.id;
+        var subscription = req.body.content.subscription;
 
-    //  get customer for renewed subscription
-    chargebee.customer.retrieve( customer_id ).request(
+        //  get customer for renewed subscription
+        chargebee.customer.retrieve( customer_id ).request(
 
-      function ( error, result ) {
+            function ( error, result ) {
 
-        if ( error ) {
-          logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
-        }
-        else {
+                if ( error ) {
+                    logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
+                }
+                else {
 
-          var customer = result.customer;
+                    var customer = result.customer;
 
-          //  increment counter for customer_id + check if they are due a box
-          subscription_counter.increment_and_check( customer_id, subscription_id, function ( err, res ) {
+                    //  increment counter for customer_id + check if they are due a box
+                    subscription_counter.increment_and_check( customer_id, subscription_id, function ( err, res ) {
 
-            if ( err ) {
-              logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+                        if ( err ) {
+                            logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+                        }
+                        else {
+
+                            //  if true create order
+                            if ( res ) {
+
+                                cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+
+                                    if ( err || !ret.ok ) {
+                                        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                                    }
+                                    else if ( util.isEmpty( ret.fields ) ) {
+                                        logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+                                    }
+                                    else if ( ret.fields[ 0 ].success == false ) {
+                                        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                                    }
+                                    else {
+                                        cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, subscription.cf_archetype, function ( err, ret ) {
+
+                                            if ( err || !ret.ok ) {
+                                                logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                                            }
+                                            else if ( util.isEmpty( ret.fields ) ) {
+                                                logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                                            }
+                                            else if ( ret.fields[ 0 ].success == false ) {
+                                                logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                                            }
+
+                                        } );
+                                    }
+                                } );
+                            }
+                        }
+                    } );
+                }
+            }
+        );
+    }
+    else if ( req.body.event_type == 'subscription_shipping_address_updated' ) {
+
+        /*
+         *  If the customer (or us) updates their shipping adress details, pass the updates on to Cin7.
+         *  Note: this handler only handles shipping address updates.
+         *
+         */
+
+        var customer_id = req.body.content.subscription.customer_id;
+        var subscription = req.body.content.subscription;
+        var customer = req.body.content.customer;
+
+        cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+
+            if ( err || !ret.ok ) {
+                logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+            }
+            else if ( util.isEmpty( ret.fields ) ) {
+                logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+            }
+            else if ( ret.fields[ 0 ].success == false ) {
+                logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
             }
             else {
 
-              //  if true create order
-              if ( res ) {
+                var customer_updates = [ {
+                    id: ret.fields[ 0 ].id,
+                    integrationRef: customer_id,
+                    isActive: true,
+                    type: 'Customer',
+                    firstName: customer.first_name,
+                    address1: subscription.shipping_address.line1,
+                    address2: subscription.shipping_address.line2,
+                    city: subscription.shipping_address.city,
+                    state: null,
+                    postCode: subscription.shipping_address.postcode,
+                    country: 'New Zealand',
+                } ]
 
-                cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+                cin7.update_customer_record( customer_updates, function ( err, ret ) {
 
-                  if ( err || !ret.ok ) {
-                    logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
-                  }
-                  else if ( util.isEmpty( ret.fields ) ) {
-                    logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
-                  }
-                  else if ( ret.fields[ 0 ].success == false ) {
-                    logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
-                  }
-                  else {
-                    cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, subscription.cf_archetype, function ( err, ret ) {
-
-                      if ( err || !ret.ok ) {
-                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
-                      }
-                      else if ( util.isEmpty( ret.fields ) ) {
-                        logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
-                      }
-                      else if ( ret.fields[ 0 ].success == false ) {
-                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
-                      }
-
-                    } );
-                  }
+                    if ( err || !ret.ok ) {
+                        logger.error( 'Failed to update user in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                    }
+                    else if ( util.isEmpty( ret.fields ) ) {
+                        logger.error( 'Failed to update user in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+                    }
+                    else if ( ret.fields[ 0 ].success == false ) {
+                        logger.error( 'Failed to update user in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                    }
+                    else {
+                        logger.info( 'Customer information updated for customer ' + ret.fields[ 0 ].id + '(cin7), ' + customer_id + '(Chargebee)' );
+                    }
                 } );
-              }
             }
-          } );
-        }
-      }
-    );
-  }
-  else if ( req.body.event_type == 'subscription_shipping_address_updated' ) {
-
-    /*
-     *  If the customer (or us) updates their shipping adress details, pass the updates on to Cin7.
-     *  Note: this handler only handles shipping address updates.
-     *
-     */
-
-    var customer_id = req.body.content.subscription.customer_id;
-    var subscription = req.body.content.subscription;
-    var customer = req.body.content.customer;
-
-    cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
-
-      if ( err || !ret.ok ) {
-        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
-      }
-      else if ( util.isEmpty( ret.fields ) ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
-      }
-      else if ( ret.fields[ 0 ].success == false ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
-      }
-      else {
-
-        var customer_updates = [ {
-          id: ret.fields[ 0 ].id,
-          integrationRef: customer_id,
-          isActive: true,
-          type: 'Customer',
-          firstName: customer.first_name,
-          address1: subscription.shipping_address.line1,
-          address2: subscription.shipping_address.line2,
-          city: subscription.shipping_address.city,
-          state: null,
-          postCode: subscription.shipping_address.postcode,
-          country: 'New Zealand',
-        } ]
-
-        cin7.update_customer_record( customer_updates, function ( err, ret ) {
-
-          if ( err || !ret.ok ) {
-            logger.error( 'Failed to update user in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
-          }
-          else if ( util.isEmpty( ret.fields ) ) {
-            logger.error( 'Failed to update user in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
-          }
-          else if ( ret.fields[ 0 ].success == false ) {
-            logger.error( 'Failed to update user in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
-          }
-          else {
-            logger.info( 'Customer information updated for customer ' + ret.fields[ 0 ].id + '(cin7), ' + customer_id + '(Chargebee)' );
-          }
-        } );
-      }
-    } );
-
-  }
-  else if ( req.body.event_type == 'customer_changed' ) {
-
-    /*
-     *  If a customer (or us) changes their information (excl shipping info), update their Cin7 customer
-     *  record accordingly.
-     *
-     */
-
-    var customer_id = req.body.content.customer.id;
-    var customer = req.body.content.customer;
-
-    cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
-
-      if ( err || !ret.ok ) {
-        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
-      }
-      else if ( util.isEmpty( ret.fields ) ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
-      }
-      else if ( ret.fields[ 0 ].success == false ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
-      }
-      else {
-
-        var customer_updates = [ {
-          id: ret.fields[ 0 ].id,
-          integrationRef: customer_id,
-          isActive: true,
-          type: 'Customer',
-          firstName: customer.first_name,
-          lastName: customer.last_name,
-          email: customer.email,
-          phone: customer.phone
-        } ];
-
-        cin7.update_customer_record( customer_updates, function ( err, ret ) {
-
-          if ( err || !ret.ok ) {
-            logger.error( 'Failed to update user in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
-          }
-          else if ( util.isEmpty( ret.fields ) ) {
-            logger.error( 'Failed to update user in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
-          }
-          else if ( ret.fields[ 0 ].success == false ) {
-            logger.error( 'Failed to update user in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
-          }
-          else {
-            logger.info( 'Customer information updated for customer ' + ret.fields[ 0 ].id + '(cin7), ' + customer_id + '(Chargebee)' );
-          }
         } );
 
-      }
-    } );
+    }
+    else if ( req.body.event_type == 'customer_changed' ) {
 
-  }
-  else if ( req.body.event_type == 'subscription_changed' ) {
+        /*
+         *  If a customer (or us) changes their information (excl shipping info), update their Cin7 customer
+         *  record accordingly.
+         *
+         */
 
-    /*
-     *  This is specifically for handling the adding of an archetype to a subscription. On receiving this event
-     *  the archtype is added to the sales order in Cin7
-     */
+        var customer_id = req.body.content.customer.id;
+        var customer = req.body.content.customer;
 
-    var customer_id = req.body.content.subscription.customer_id;
-    var plan = req.body.content.subscription.plan_id;
-    var subscription_id = req.body.content.subscription.id;
-    var archetype = req.body.content.subscription.cf_archetype;
+        cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
 
-    cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+            if ( err || !ret.ok ) {
+                logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+            }
+            else if ( util.isEmpty( ret.fields ) ) {
+                logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+            }
+            else if ( ret.fields[ 0 ].success == false ) {
+                logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+            }
+            else {
 
-      if ( err || !ret.ok ) {
-        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
-      }
-      else if ( util.isEmpty( ret.fields ) ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
-      }
-      else if ( ret.fields[ 0 ].success == false ) {
-        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
-      }
-      else {
+                var customer_updates = [ {
+                    id: ret.fields[ 0 ].id,
+                    integrationRef: customer_id,
+                    isActive: true,
+                    type: 'Customer',
+                    firstName: customer.first_name,
+                    lastName: customer.last_name,
+                    email: customer.email,
+                    phone: customer.phone
+                } ];
 
-        cin7.get_sales_order( 'id,internalComments', 'internalComments LIKE\'%' + subscription_id + '\'', function ( err, ret ) {
+                cin7.update_customer_record( customer_updates, function ( err, ret ) {
 
-          if ( err || !ret.ok ) {
-            logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
-          }
-          else if ( util.isEmpty( ret.fields ) ) {
-            logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: sales order does not exist for subscription_id: ' + subscription_id );
-          }
-          else if ( ret.fields[ 0 ].success == false ) {
-            logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
-          }
-          else {
+                    if ( err || !ret.ok ) {
+                        logger.error( 'Failed to update user in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                    }
+                    else if ( util.isEmpty( ret.fields ) ) {
+                        logger.error( 'Failed to update user in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+                    }
+                    else if ( ret.fields[ 0 ].success == false ) {
+                        logger.error( 'Failed to update user in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                    }
+                    else {
+                        logger.info( 'Customer information updated for customer ' + ret.fields[ 0 ].id + '(cin7), ' + customer_id + '(Chargebee)' );
+                    }
+                } );
 
-            var sales_order_updates = [ {
-              id: ret.fields[ 0 ].id,
-              internalComments: 'archetype: ' + archetype + ' ' + ret.fields[ 0 ].internalComments, // add change here
-              currencyCode: 'NZD',
-              taxStatus: 'Incl',
-              taxRate: 0.15
-            } ];
-
-            cin7.update_sales_order( sales_order_updates, function ( err, ret ) {
-
-              if ( err || !ret.ok ) {
-                logger.error( 'Failed to update sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
-              }
-              else if ( util.isEmpty( ret.fields ) ) {
-                logger.error( 'Failed to update sales order in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
-              }
-              else if ( ret.fields[ 0 ].success == false ) {
-                logger.error( 'Failed to update sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
-              }
-              else {
-                logger.info( 'Detected addition of archetype: ' + archetype + ' to subscription with ID: ' + subscription_id + '. Updated corresponding Cin7 Sales order' );
-              }
-            } );
-          }
+            }
         } );
-      }
-    } );
-  }
-  else if ( req.body.event_type == 'subscription_cancelled' ) {
 
-    /*
-     *  For notifying in Slack when a subscription has been cancelled
-     */
+    }
+    else if ( req.body.event_type == 'subscription_changed' ) {
 
-    var customer = req.body.content.customer;
-    var subscription = req.body.content.subscription;
+        /*
+         *  This is specifically for handling the adding of an archetype to a subscription. On receiving this event
+         *  the archtype is added to the sales order in Cin7
+         */
 
-    //  notify Slack
-    slack_notifier.send( 'subscription_cancelled', customer, subscription );
+        var customer_id = req.body.content.subscription.customer_id;
+        var plan = req.body.content.subscription.plan_id;
+        var subscription_id = req.body.content.subscription.id;
+        var archetype = req.body.content.subscription.cf_archetype;
 
-  }
+        cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+
+            if ( err || !ret.ok ) {
+                logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+            }
+            else if ( util.isEmpty( ret.fields ) ) {
+                logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+            }
+            else if ( ret.fields[ 0 ].success == false ) {
+                logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+            }
+            else {
+
+                cin7.get_sales_order( 'id,internalComments', 'internalComments LIKE\'%' + subscription_id + '\'', function ( err, ret ) {
+
+                    if ( err || !ret.ok ) {
+                        logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                    }
+                    else if ( util.isEmpty( ret.fields ) ) {
+                        logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: sales order does not exist for subscription_id: ' + subscription_id );
+                    }
+                    else if ( ret.fields[ 0 ].success == false ) {
+                        logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                    }
+                    else {
+
+                        var sales_order_updates = [ {
+                            id: ret.fields[ 0 ].id,
+                            internalComments: 'archetype: ' + archetype + ' ' + ret.fields[ 0 ].internalComments, // add change here
+                            currencyCode: 'NZD',
+                            taxStatus: 'Incl',
+                            taxRate: 0.15
+                        } ];
+
+                        cin7.update_sales_order( sales_order_updates, function ( err, ret ) {
+
+                            if ( err || !ret.ok ) {
+                                logger.error( 'Failed to update sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                            }
+                            else if ( util.isEmpty( ret.fields ) ) {
+                                logger.error( 'Failed to update sales order in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+                            }
+                            else if ( ret.fields[ 0 ].success == false ) {
+                                logger.error( 'Failed to update sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                            }
+                            else {
+                                logger.info( 'Detected addition of archetype: ' + archetype + ' to subscription with ID: ' + subscription_id + '. Updated corresponding Cin7 Sales order' );
+                            }
+                        } );
+                    }
+                } );
+            }
+        } );
+    }
+    else if ( req.body.event_type == 'subscription_cancelled' ) {
+
+        /*
+         *  For notifying in Slack when a subscription has been cancelled
+         */
+
+        var customer = req.body.content.customer;
+        var subscription = req.body.content.subscription;
+
+        //  notify Slack
+        slack_notifier.send( 'subscription_cancelled', customer, subscription );
+
+    }
 } );
 
 module.exports = router;
