@@ -12,6 +12,7 @@ var logger = require( '../libs/lib_logger.js' );
 var mixpanel = require( 'mixpanel' );
 var mp = mixpanel.init( process.env.MIXPANEL_TOKEN );
 var stylist_campaigns = [ 'HW-01-ATTR', 'MD-01-ATTR' ];
+var util = require( 'underscore' );
 
 router.get( '/', function ( req, res ) {
 
@@ -32,52 +33,91 @@ router.get( '/', function ( req, res ) {
             stylist_attr = stylist_campaigns[ stylist_idx ];
         }
 
-        //  get a new checkout page from Chargebee
-        chargebee.hosted_page.checkout_new( {
+        //  TODO: check if customer with received email exists in Chargebee -> if no, carry on. If yes,
+        //  don't push through payment setup again, but ask to review & confirm payment details
 
-            subscription: {
-                plan_id: req.query.boxtype,
-                cf_gender: req.query.gender,
-                cf_childname: req.query.hername || req.query.hisname,
-                cf_childage: req.query.sheage || req.query.heage,
-                cf_topsize: req.query.shetopsize || req.query.hetopsize,
-                cf_bottomsize: req.query.shebottomsize || req.query.hebottomsize,
-                cf_jam: req.query.jam1 || req.query.jam2 || req.query.jam3 || req.query.jam4 || req.query.jam5 || req.query.jam6,
-                cf_doit: req.query.doit1 || req.query.doit2 || req.query.doit3 || req.query.doit4 || req.query.doit5 || req.query.doit6,
-                cf_palette: req.query.palette,
-                cf_fave: req.query.fav1 || req.query.fav2,
-                cf_keen: req.query.keen1 || req.query.keen2 || req.query.keen3,
-                cf_else: req.query.else
-            },
-            customer: {
-                email: req.query.email,
-                first_name: req.query.fname,
-                last_name: req.query.lname,
-                phone: req.query.phone //,
-                //cf_stylist_attr: stylist_attr
-            },
-            billing_address: {
-                first_name: req.query.fname,
-                last_name: req.query.lname,
-                line1: req.query.streetaddress,
-                line2: req.query.suburb,
-                city: req.query.city,
-                country: "NZ",
-                phone: req.query.phone
-            }
+        chargebee.customer.list( {
+
+            limit: 1,
+            "email[is]": req.query.email
+
         } ).request( function ( error, result ) {
 
             if ( error ) {
-                logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON.stringify( error ) );
+                logger.error( 'Failed to check chargebee customer existence - reason: ' + JSON.stringify( error ) );
                 res.redirect( process.env.BASE_URL + '/error' );
             }
+            else if ( util.isEmpty( result.list.length ) ) {
+
+                //  get a new checkout page from Chargebee
+                chargebee.hosted_page.checkout_new( {
+
+                    subscription: {
+                        plan_id: req.query.boxtype,
+                        cf_gender: req.query.gender,
+                        cf_childname: req.query.hername || req.query.hisname,
+                        cf_childage: req.query.sheage || req.query.heage,
+                        cf_topsize: req.query.shetopsize || req.query.hetopsize,
+                        cf_bottomsize: req.query.shebottomsize || req.query.hebottomsize,
+                        cf_jam: req.query.jam1 || req.query.jam2 || req.query.jam3 || req.query.jam4 || req.query.jam5 || req.query.jam6,
+                        cf_doit: req.query.doit1 || req.query.doit2 || req.query.doit3 || req.query.doit4 || req.query.doit5 || req.query.doit6,
+                        cf_palette: req.query.palette,
+                        cf_fave: req.query.fav1 || req.query.fav2,
+                        cf_keen: req.query.keen1 || req.query.keen2 || req.query.keen3,
+                        cf_else: req.query.else
+                    },
+                    customer: {
+                        email: req.query.email,
+                        first_name: req.query.fname,
+                        last_name: req.query.lname,
+                        phone: req.query.phone //,
+                        //cf_stylist_attr: stylist_attr
+                    },
+                    billing_address: {
+                        first_name: req.query.fname,
+                        last_name: req.query.lname,
+                        line1: req.query.streetaddress,
+                        line2: req.query.suburb,
+                        city: req.query.city,
+                        country: "NZ",
+                        phone: req.query.phone
+                    }
+                } ).request( function ( error, result ) {
+
+                    if ( error ) {
+                        logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON.stringify( error ) );
+                        res.redirect( process.env.BASE_URL + '/error' );
+                    }
+                    else {
+
+                        var hosted_page = result.hosted_page;
+                        logger.info( 'Checkout page URL successfully got: ' + JSON.stringify( hosted_page ) );
+
+                        //  redirect the request to the new, shiny, checkout page
+                        res.redirect( hosted_page.url );
+                    }
+                } );
+            }
             else {
+                chargebee.hosted_page.update_payment_method( {
 
-                var hosted_page = result.hosted_page;
-                logger.info( 'Checkout page URL successfully got: ' + JSON.stringify( hosted_page ) );
+                    customer: {
+                        id: result.list[ 0 ].customer.id
+                    }
 
-                //  redirect the request to the new, shiny, checkout page
-                res.redirect( hosted_page.url );
+                } ).request( function ( error, result ) {
+                    if ( error ) {
+                        logger.error( 'Failed to get chargebee payment update page on form completion - reason: ' + JSON.stringify( error ) );
+                        res.redirect( process.env.BASE_URL + '/error' );
+                    }
+                    else {
+                        var hosted_page = result.hosted_page;
+                        logger.info( 'Payment update page URL successfully got: ' + JSON.stringify( hosted_page ) );
+
+                        //  redirect the request to the payment update/review page
+                        res.redirect( hosted_page.url );
+                    }
+                } );
             }
         } );
     }
