@@ -91,6 +91,9 @@ router.post( '/', function ( req, res ) {
                                             if ( error || !ret.ok ) {
                                                 logger.error( 'Failed to create customer in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
                                             }
+                                            else if ( ret.fields[ 0 ].success == false ) {
+                                                logger.error( 'Failed to create customer in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                                            }
                                             else {
 
                                                 logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + ret.fields[ 0 ].id );
