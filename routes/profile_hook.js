@@ -54,8 +54,8 @@ router.get( '/', function ( req, res ) {
                 email: req.query.email,
                 first_name: req.query.fname,
                 last_name: req.query.lname,
-                phone: req.query.phone //,
-                //cf_stylist_attr: stylist_attr
+                phone: req.query.phone,
+                cf_stylist_attr: stylist_attr
             },
             billing_address: {
                 first_name: req.query.fname,
