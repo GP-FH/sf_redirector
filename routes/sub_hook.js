@@ -192,7 +192,7 @@ router.post( '/', function ( req, res ) {
                             //  if true create order
                             if ( res ) {
 
-                                cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+                                cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
 
                                     if ( err || !ret.ok ) {
                                         logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
@@ -238,7 +238,7 @@ router.post( '/', function ( req, res ) {
         var subscription = req.body.content.subscription;
         var customer = req.body.content.customer;
 
-        cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+        cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
 
             if ( err || !ret.ok ) {
                 logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
@@ -295,7 +295,7 @@ router.post( '/', function ( req, res ) {
         var customer_id = req.body.content.customer.id;
         var customer = req.body.content.customer;
 
-        cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+        cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
 
             if ( err || !ret.ok ) {
                 logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
@@ -349,9 +349,10 @@ router.post( '/', function ( req, res ) {
         var customer_id = req.body.content.subscription.customer_id;
         var plan = req.body.content.subscription.plan_id;
         var subscription_id = req.body.content.subscription.id;
+        var customer = req.body.content.customer;
         var archetype = req.body.content.subscription.cf_archetype;
 
-        cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+        cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
 
             if ( err || !ret.ok ) {
                 logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
