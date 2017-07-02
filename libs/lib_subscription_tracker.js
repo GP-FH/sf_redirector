@@ -41,7 +41,7 @@ exports.set = function ( customer_id, subscription_id ) {
 };
 
 /*
- *  increments counter for given customer_id
+ *  increments counter for given customer_id - NOT USED REALLY
  */
 exports.increment = function ( customer_id, subscription_id ) {
 
@@ -82,6 +82,8 @@ exports.increment_and_check = function ( customer_id, subscription_id, callback 
             return callback( err );
 
         }
+
+        logger.info( 'DEBUG: value post-increment' );
 
         //  if reply is 4, reset the counter to 1
         if ( reply == 4 ) {
