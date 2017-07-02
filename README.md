@@ -30,3 +30,13 @@ Every month the Chargebee webhook fires off a `subscription_renewed` event which
 **We provide a customer portal to users which allows them to modify address and CC details:**
 
 While Chargebee is currently our customer source of truth, we also store customer info in Cin7 (so that we can send things to people). As a result if any changes occur to a customer record in Chargebee they need to be reflected in Cin7. To do this we listen for the `customer_changed` & `subscription_shipping_address_updated` Chargebee webhook events. These contain the new customer info. We then update the corresponding Cin7 customer record via the API. **It's important that we only ever update customer info IN CHARGEBEE**
+
+### Archetype addition
+
+### User mapping between Chargebee & Cin7
+
+### Planned improvements
+
+### Tracking stylist customer attribution
+
+### Mixpanel event firing for funnel tracking

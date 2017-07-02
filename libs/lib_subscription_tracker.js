@@ -83,8 +83,6 @@ exports.increment_and_check = function ( customer_id, subscription_id, callback 
 
         }
 
-        logger.info( 'DEBUG: value post-increment: ' + reply );
-
         //  if reply is 4, reset the counter to 1
         if ( reply == 4 ) {
 
