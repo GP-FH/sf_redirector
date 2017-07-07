@@ -1,6 +1,7 @@
 var request = require( 'request' );
+var logger = require( './lib_logger.js' );
 
-var autopilot_move_contact_to_new_list = function ( from, to, email, callback ) {
+var autopilot_move_contact_to_new_list = function ( from, to, email ) {
 
     //  check if the current user is on the 'from' list
     var options = {
@@ -16,52 +17,39 @@ var autopilot_move_contact_to_new_list = function ( from, to, email, callback ) 
     request( options, function ( error, response, body ) {
 
         if ( error ) {
-            return callback( error );
+            logger.error( 'Failed to check list for contact - reason: ' + error );
         }
         else if ( response.statusCode != 200 || response.statusCode != 404 ) {
-            return callback( null, {
-                ok: false,
-                msg: 'status code ' + response.statusCode + ' reason: ' + body.error
-            } );
+            logger.error( 'Failed to check list for contact - status code ' + response.statusCode + ' reason: ' + body.error );
         }
         else if ( response.statusCode == 200 ) {
             //  if the user is found, we need to remove them from the 'from' list
             local_autopilot_remove_list_contact( email, from, function ( err, result ) {
                 if ( err ) {
-                    return callback( err );
+                    logger.error( 'Failed to remove contact from list - reason: ' + error );
                 }
                 else if ( !result.ok ) {
-                    return callback( null, {
-                        ok: false,
-                        msg: result.msg
-                    } );
+                    logger.error( 'Failed to remove contact from list - reason: ' + result.msg );
                 }
                 else {
 
                     //  then add them to the 'to' list.
                     local_autopilot_add_list_user( email, to, function ( err, result ) {
                         if ( err ) {
-                            return callback( err );
+                            logger.error( 'Failed to add contact to list - reason: ' + error );
                         }
                         else if ( !result.ok ) {
-                            return callback( null, {
-                                ok: false,
-                                msg: result.msg
-                            } );
+                            logger.error( 'Failed to add contact to list - reason: ' + result.msg );
                         }
                         else {
-                            return callback( null, {
-                                ok: true
-                            } );
+                            logger.info( 'Successfully moved user with email: ' + email + ' from autopilot list: ' + from + ' to ' + to );
                         }
                     } );
                 }
             } );
         }
         else {
-            return callback( null, {
-                ok: true
-            } );
+            logger.info( 'No autopilot list move necessary' );
         }
     } );
 };
@@ -133,4 +121,3 @@ function local_autopilot_add_list_user( email, list_id, callback ) {
 }
 
 exports.autopilot_move_user_to_new_list = autopilot_move_user_to_new_list;
-r_to_new_list;
