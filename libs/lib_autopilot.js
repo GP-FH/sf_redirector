@@ -120,4 +120,4 @@ function local_autopilot_add_list_user( email, list_id, callback ) {
 
 }
 
-exports.autopilot_move_user_to_new_list = autopilot_move_user_to_new_list;
+exports.autopilot_move_contact_to_new_list = autopilot_move_contact_to_new_list;

@@ -41,7 +41,7 @@ router.post( '/', function ( req, res ) {
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
 
         //  move them from the completers list to the subscribers list in autopilot
-        autopilot.autopilot_move_user_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
+        autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
 
         //  get customer data using customer_id from newly created subscription event
         chargebee.customer.retrieve( customer_id ).request(
