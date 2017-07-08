@@ -104,7 +104,7 @@ function local_autopilot_add_list_user( email, list_id, callback ) {
         if ( error ) {
             return callback( 'Error adding user to list: ' + error );
         }
-        else if ( response.statusCode != 200 ) {
+        else if ( response.statusCode != '200' ) {
             return callback( null, {
                 ok: false,
                 msg: 'status code ' + response.statusCode + ' reason: ' + body.error
