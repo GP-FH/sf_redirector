@@ -41,7 +41,7 @@ exports.set = function ( customer_id, subscription_id ) {
 };
 
 /*
- *  increments counter for given customer_id
+ *  increments counter for given customer_id - NOT USED REALLY
  */
 exports.increment = function ( customer_id, subscription_id ) {
 

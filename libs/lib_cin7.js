@@ -171,7 +171,6 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
                 } );
             }
             else {
-                logger.info( 'DEBUG: cin7 get customer: ' + JSON.stringify( response ) );
                 return callback( null, {
                     ok: true,
                     fields: body

@@ -12,6 +12,7 @@ var logger = require( '../libs/lib_logger.js' );
 var mixpanel = require( 'mixpanel' );
 var mp = mixpanel.init( process.env.MIXPANEL_TOKEN );
 var stylist_campaigns = [ 'HW-01-ATTR', 'MD-01-ATTR' ];
+var util = require( 'underscore' );
 
 router.get( '/', function ( req, res ) {
 
@@ -53,8 +54,8 @@ router.get( '/', function ( req, res ) {
                 email: req.query.email,
                 first_name: req.query.fname,
                 last_name: req.query.lname,
-                phone: req.query.phone //,
-                //cf_stylist_attr: stylist_attr
+                phone: req.query.phone,
+                cf_stylist_attr: stylist_attr
             },
             billing_address: {
                 first_name: req.query.fname,

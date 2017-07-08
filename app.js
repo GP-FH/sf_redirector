@@ -1,6 +1,6 @@
 /*
  *
- *  Stitchfox Redirector: This service bridges typeform->cin7-chargebee. 
+ *  Stitchfox Redirector: This service bridges typeform->cin7->chargebee. 
  *  See README for more detailed information
  *
  */

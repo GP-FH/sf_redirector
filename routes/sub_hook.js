@@ -18,6 +18,7 @@ var logger = require( '../libs/lib_logger.js' );
 var subscription_counter = require( '../libs/lib_subscription_tracker.js' );
 var slack_notifier = require( '../libs/lib_slack.js' );
 var cin7 = require( '../libs/lib_cin7.js' );
+var autopilot = require( '../libs/lib_autopilot.js' );
 var util = require( 'underscore' );
 
 
@@ -25,6 +26,7 @@ router.post( '/', function ( req, res ) {
 
     //  send immediate 200OK to keep chargebee happy and prevent unneccessary retries
     res.status( 200 ).send();
+
 
     /*
      *  On subscription creation, a new customer and a new sales order is created in Cin7
@@ -35,7 +37,11 @@ router.post( '/', function ( req, res ) {
         var plan = req.body.content.subscription.plan_id;
         var subscription_id = req.body.content.subscription.id;
         var webhook_sub_object = req.body.content.subscription;
+        var email = req.body.content.customer.email;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
+
+        //  move them from the completers list to the subscribers list in autopilot
+        autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
 
         //  get customer data using customer_id from newly created subscription event
         chargebee.customer.retrieve( customer_id ).request(
@@ -49,7 +55,7 @@ router.post( '/', function ( req, res ) {
 
                     var customer = result.customer;
 
-                    cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+                    cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
 
                         if ( err || !ret.ok ) {
                             logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
@@ -90,6 +96,9 @@ router.post( '/', function ( req, res ) {
 
                                             if ( error || !ret.ok ) {
                                                 logger.error( 'Failed to create customer in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                                            }
+                                            else if ( ret.fields[ 0 ].success == false ) {
+                                                logger.error( 'Failed to create customer in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
                                             }
                                             else {
 
@@ -189,7 +198,7 @@ router.post( '/', function ( req, res ) {
                             //  if true create order
                             if ( res ) {
 
-                                cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+                                cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
 
                                     if ( err || !ret.ok ) {
                                         logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
@@ -235,7 +244,7 @@ router.post( '/', function ( req, res ) {
         var subscription = req.body.content.subscription;
         var customer = req.body.content.customer;
 
-        cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+        cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
 
             if ( err || !ret.ok ) {
                 logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
@@ -292,7 +301,7 @@ router.post( '/', function ( req, res ) {
         var customer_id = req.body.content.customer.id;
         var customer = req.body.content.customer;
 
-        cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+        cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
 
             if ( err || !ret.ok ) {
                 logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
@@ -346,9 +355,10 @@ router.post( '/', function ( req, res ) {
         var customer_id = req.body.content.subscription.customer_id;
         var plan = req.body.content.subscription.plan_id;
         var subscription_id = req.body.content.subscription.id;
+        var customer = req.body.content.customer;
         var archetype = req.body.content.subscription.cf_archetype;
 
-        cin7.get_customer_record( 'id', 'integrationRef=\'' + customer_id + '\'', function ( err, ret ) {
+        cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
 
             if ( err || !ret.ok ) {
                 logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
