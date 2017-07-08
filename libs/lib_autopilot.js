@@ -19,10 +19,10 @@ var autopilot_move_contact_to_new_list = function ( from, to, email ) {
         if ( error ) {
             logger.error( 'Failed to check list for contact - reason: ' + error );
         }
-        else if ( response.statusCode != 200 || response.statusCode != 404 ) {
+        else if ( response.statusCode != '200' && response.statusCode != '404' ) {
             logger.error( 'Failed to check list for contact - status code ' + response.statusCode + ' reason: ' + body.error );
         }
-        else if ( response.statusCode == 200 ) {
+        else if ( response.statusCode == '200' ) {
             //  if the user is found, we need to remove them from the 'from' list
             local_autopilot_remove_list_contact( email, from, function ( err, result ) {
                 if ( err ) {
@@ -71,7 +71,7 @@ function local_autopilot_remove_list_contact( email, list_id, callback ) {
         if ( error ) {
             return callback( 'Error removing user from list: ' + error );
         }
-        else if ( response.statusCode != 200 ) {
+        else if ( response.statusCode != '200' ) {
             return callback( null, {
                 ok: false,
                 msg: 'status code ' + response.statusCode + ' reason: ' + body.error
