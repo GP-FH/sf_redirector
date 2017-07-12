@@ -162,6 +162,7 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
     setTimeout( function () {
         request( options, function ( error, response, body ) {
 
+            logger.info( 'DEBUG: response: ' + JSON.stringify( response ) );
             if ( error ) {
                 return callback( error );
             }
