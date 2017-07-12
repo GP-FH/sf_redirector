@@ -10,15 +10,6 @@
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
 
-// temp code for recording
-var nock = require( 'nock' );
-nock.recorder.rec( {
-    dont_print: true
-} );
-
-var nock_calls = nock.recorder.play();
-
-logger.info( nock_calls );
 
 /*********************************************Sales Order Actions***********************************************/
 

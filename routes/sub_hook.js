@@ -21,6 +21,14 @@ var cin7 = require( '../libs/lib_cin7.js' );
 var autopilot = require( '../libs/lib_autopilot.js' );
 var util = require( 'underscore' );
 
+// temp code for recording
+var nock = require( 'nock' );
+nock.recorder.rec( {
+    dont_print: true
+} );
+
+
+
 
 router.post( '/', function ( req, res ) {
 
@@ -122,6 +130,8 @@ router.post( '/', function ( req, res ) {
 
                                                         //  notify Slack
                                                         slack_notifier.send( 'subscription_created', customer, subscription );
+
+                                                        var nock_calls = nock.recorder.play();
 
                                                     }
                                                 } );
