@@ -23,9 +23,7 @@ var util = require( 'underscore' );
 
 // temp code for recording
 var nock = require( 'nock' );
-nock.recorder.rec( {
-    dont_print: true
-} );
+nock.recorder.rec();
 
 
 
@@ -130,8 +128,6 @@ router.post( '/', function ( req, res ) {
 
                                                         //  notify Slack
                                                         slack_notifier.send( 'subscription_created', customer, subscription );
-
-                                                        var nock_calls = nock.recorder.play();
 
                                                     }
                                                 } );
