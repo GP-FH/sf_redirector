@@ -5,14 +5,18 @@
   "main": "app.js",
   "dependencies": {
     "body-parser": "^1.17.1",
+    "chai": "^4.1.0",
     "chargebee": "^2.2.0",
     "dotenv": "^4.0.0",
     "express": "^4.15.2",
     "fs": "0.0.1-security",
     "https": "^1.0.0",
     "mixpanel": "^0.7.0",
+    "mocha": "^3.4.2",
+    "nock": "^9.0.13",
     "redis": "^2.7.1",
     "request": "^2.81.0",
+    "supertest": "^3.0.0",
     "underscore": "^1.8.3",
     "winston": "^2.3.1",
     "winston-papertrail": "^1.0.4"
