@@ -47,7 +47,7 @@ router.post( '/', function ( req, res ) {
         chargebee.coupon.create( {
 
             id: customer_id,
-            name: "Refer A Friend",
+            name: customer_id,
             discount_type: "fixed_amount",
             discount_amount: 1000,
             apply_on: "invoice_amount",
