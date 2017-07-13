@@ -32,13 +32,12 @@ router.post( '/', function ( req, res ) {
      */
     if ( req.body.event_type == 'subscription_created' ) {
 
-        logger.info( 'DEBUG: ' + JSON.stringify( req.body.content ) );
-
         var customer_id = req.body.content.subscription.customer_id;
         var plan = req.body.content.subscription.plan_id;
         var subscription_id = req.body.content.subscription.id;
         var webhook_sub_object = req.body.content.subscription;
         var email = req.body.content.customer.email;
+        var coupon = req.body.content.subscription.coupon || false;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
 
         //  move them from the completers list to the subscribers list in autopilot
@@ -139,6 +138,20 @@ router.post( '/', function ( req, res ) {
                                                                 //  add count to subscription_counter for customer ID
                                                                 subscription_counter.set( customer_id, subscription_id );
 
+                                                                //  check if they used a refer_a_friend coupon code. If so, credit the referrer
+                                                                if ( coupon ) {
+
+                                                                    chargebee.customer.add_promotional_credits( customer_id, {
+                                                                        amount: 1000,
+                                                                        description: "refer_a_friend credits",
+                                                                        credit_type: referral_rewards
+                                                                    } ).request( function ( error, result ) {
+                                                                        if ( error ) {
+                                                                            logger.error( 'Failed to give referral credits to customer in Chargebee with ID: ' + customer_id );
+                                                                        }
+                                                                    } );
+                                                                }
+
                                                                 //  notify Slack
                                                                 slack_notifier.send( 'subscription_created', customer, subscription );
 
@@ -170,6 +183,20 @@ router.post( '/', function ( req, res ) {
 
                                             //  add count to subscription_counter for customer ID
                                             subscription_counter.set( customer_id, subscription_id );
+
+                                            //  check if they used a refer_a_friend coupon code. If so, credit the referrer
+                                            if ( coupon ) {
+
+                                                chargebee.customer.add_promotional_credits( customer_id, {
+                                                    amount: 1000,
+                                                    description: "refer_a_friend credits",
+                                                    credit_type: referral_rewards
+                                                } ).request( function ( error, result ) {
+                                                    if ( error ) {
+                                                        logger.error( 'Failed to give referral credits to customer in Chargebee with ID: ' + customer_id );
+                                                    }
+                                                } );
+                                            }
 
                                             //  notify Slack
                                             slack_notifier.send( 'subscription_created', customer, webhook_sub_object );
