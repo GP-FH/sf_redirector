@@ -32,6 +32,8 @@ router.post( '/', function ( req, res ) {
      */
     if ( req.body.event_type == 'subscription_created' ) {
 
+        logger.info( 'DEBUG: ' + JSON.stringify( req.body.content ) );
+
         var customer_id = req.body.content.subscription.customer_id;
         var plan = req.body.content.subscription.plan_id;
         var subscription_id = req.body.content.subscription.id;
@@ -42,125 +44,147 @@ router.post( '/', function ( req, res ) {
         //  move them from the completers list to the subscribers list in autopilot
         autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
 
-        //  get customer data using customer_id from newly created subscription event
-        chargebee.customer.retrieve( customer_id ).request(
+        //  create coupon for customer
+        chargebee.coupon.create( {
 
-            function ( error, result ) {
+            id: customer_id,
+            name: "Refer A Friend",
+            discount_type: "fixed_amount",
+            discount_amount: 1000,
+            apply_on: "invoice_amount",
+            duration_type: "forever",
+            max_redemptions: 1
 
-                if ( error ) {
-                    logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
-                }
-                else {
+        } ).request( function ( error, result ) {
 
-                    var customer = result.customer;
+            if ( error ) {
+                logger.error( 'Failed to create coupon in chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
+            }
+            else {
 
-                    cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
+                //  get customer data using customer_id from newly created subscription event
+                chargebee.customer.retrieve( customer_id ).request(
 
-                        if ( err || !ret.ok ) {
-                            logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                    function ( error, result ) {
+
+                        if ( error ) {
+                            logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
                         }
-                        else if ( util.isEmpty( ret.fields ) ) {
-                            logger.info( 'Request made to find user in cin7 - no user found. I should create one' );
+                        else {
 
-                            //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
-                            chargebee.subscription.retrieve( subscription_id ).request(
+                            var customer = result.customer;
 
-                                function ( error, result ) {
+                            cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
 
-                                    if ( error ) {
-                                        logger.error( 'Failed to retrieve subscription record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id + ' subscription_id: ' + subscription_id );
-                                    }
-                                    else {
-                                        var subscription = result.subscription;
-                                        var customer_details = [ {
-                                            integrationRef: customer_id,
-                                            isActive: true,
-                                            type: 'Customer',
-                                            firstName: customer.first_name,
-                                            lastName: customer.last_name,
-                                            email: customer.email,
-                                            phone: customer.phone,
-                                            address1: subscription.shipping_address.line1,
-                                            address2: subscription.shipping_address.line2,
-                                            city: subscription.shipping_address.city,
-                                            state: null,
-                                            postCode: subscription.shipping_address.postcode,
-                                            country: 'New Zealand',
-                                            group: null,
-                                            subGroup: null,
-                                            PriceColumn: 'RetailPrice'
-                                        } ];
+                                if ( err || !ret.ok ) {
+                                    logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                                }
+                                else if ( util.isEmpty( ret.fields ) ) {
+                                    logger.info( 'Request made to find user in cin7 - no user found. I should create one' );
 
-                                        cin7.create_customer_record( customer_details, function ( err, ret ) {
+                                    //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
+                                    chargebee.subscription.retrieve( subscription_id ).request(
 
-                                            if ( error || !ret.ok ) {
-                                                logger.error( 'Failed to create customer in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
-                                            }
-                                            else if ( ret.fields[ 0 ].success == false ) {
-                                                logger.error( 'Failed to create customer in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                                        function ( error, result ) {
+
+                                            if ( error ) {
+                                                logger.error( 'Failed to retrieve subscription record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id + ' subscription_id: ' + subscription_id );
                                             }
                                             else {
+                                                var subscription = result.subscription;
+                                                var customer_details = [ {
+                                                    integrationRef: customer_id,
+                                                    isActive: true,
+                                                    type: 'Customer',
+                                                    firstName: customer.first_name,
+                                                    lastName: customer.last_name,
+                                                    email: customer.email,
+                                                    phone: customer.phone,
+                                                    address1: subscription.shipping_address.line1,
+                                                    address2: subscription.shipping_address.line2,
+                                                    city: subscription.shipping_address.city,
+                                                    state: null,
+                                                    postCode: subscription.shipping_address.postcode,
+                                                    country: 'New Zealand',
+                                                    group: null,
+                                                    subGroup: null,
+                                                    PriceColumn: 'RetailPrice'
+                                                } ];
 
-                                                logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + ret.fields[ 0 ].id );
+                                                cin7.create_customer_record( customer_details, function ( err, ret ) {
 
-                                                cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
-
-                                                    if ( err || !ret.ok ) {
-                                                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
-                                                    }
-                                                    else if ( util.isEmpty( ret.fields ) ) {
-                                                        logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                                                    if ( error || !ret.ok ) {
+                                                        logger.error( 'Failed to create customer in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
                                                     }
                                                     else if ( ret.fields[ 0 ].success == false ) {
-                                                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                                                        logger.error( 'Failed to create customer in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
                                                     }
                                                     else {
 
-                                                        //  add count to subscription_counter for customer ID
-                                                        subscription_counter.set( customer_id, subscription_id );
+                                                        logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + ret.fields[ 0 ].id );
 
-                                                        //  notify Slack
-                                                        slack_notifier.send( 'subscription_created', customer, subscription );
+                                                        cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
 
+                                                            if ( err || !ret.ok ) {
+                                                                logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                                                            }
+                                                            else if ( util.isEmpty( ret.fields ) ) {
+                                                                logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                                                            }
+                                                            else if ( ret.fields[ 0 ].success == false ) {
+                                                                logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                                                            }
+                                                            else {
+
+                                                                //  add count to subscription_counter for customer ID
+                                                                subscription_counter.set( customer_id, subscription_id );
+
+                                                                //  notify Slack
+                                                                slack_notifier.send( 'subscription_created', customer, subscription );
+
+                                                            }
+                                                        } );
                                                     }
                                                 } );
                                             }
-                                        } );
-                                    }
-                                }
-                            );
+                                        }
+                                    );
 
-                        }
-                        else {
-                            logger.info( 'Request made to find user in cin7 - found. member_id: ' + ret.fields[ 0 ].id + ' I should create a new order now' );
-
-                            //  create a new sales order in cin7
-                            cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, webhook_sub_object.cf_topsize, webhook_sub_object.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
-
-                                if ( err || !ret.ok ) {
-                                    logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
-                                }
-                                else if ( util.isEmpty( ret.fields ) ) {
-                                    logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
-                                }
-                                else if ( ret.fields[ 0 ].success == false ) {
-                                    logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
                                 }
                                 else {
+                                    logger.info( 'Request made to find user in cin7 - found. member_id: ' + ret.fields[ 0 ].id + ' I should create a new order now' );
 
-                                    //  add count to subscription_counter for customer ID
-                                    subscription_counter.set( customer_id, subscription_id );
+                                    //  create a new sales order in cin7
+                                    cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, webhook_sub_object.cf_topsize, webhook_sub_object.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
 
-                                    //  notify Slack
-                                    slack_notifier.send( 'subscription_created', customer, webhook_sub_object );
+                                        if ( err || !ret.ok ) {
+                                            logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                                        }
+                                        else if ( util.isEmpty( ret.fields ) ) {
+                                            logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                                        }
+                                        else if ( ret.fields[ 0 ].success == false ) {
+                                            logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                                        }
+                                        else {
 
+                                            //  add count to subscription_counter for customer ID
+                                            subscription_counter.set( customer_id, subscription_id );
+
+                                            //  notify Slack
+                                            slack_notifier.send( 'subscription_created', customer, webhook_sub_object );
+
+                                        }
+                                    } );
                                 }
                             } );
                         }
-                    } );
-                }
+                    }
+                );
             }
-        );
+        } );
+
+
     }
     else if ( req.body.event_type == 'subscription_renewed' ) {
 
