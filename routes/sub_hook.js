@@ -142,8 +142,7 @@ router.post( '/', function ( req, res ) {
 
                                                                 chargebee.customer.add_promotional_credits( customer_id, {
                                                                     amount: 1000,
-                                                                    description: "refer_a_friend credits",
-                                                                    credit_type: 'referral_rewards'
+                                                                    description: "refer_a_friend credits"
                                                                 } ).request( function ( error, result ) {
                                                                     if ( error ) {
                                                                         logger.error( 'Failed to give referral credits to customer in Chargebee with ID: ' + customer_id );
@@ -188,8 +187,7 @@ router.post( '/', function ( req, res ) {
 
                                             chargebee.customer.add_promotional_credits( customer_id, {
                                                 amount: 1000,
-                                                description: "refer_a_friend credits",
-                                                credit_type: 'referral_rewards'
+                                                description: "refer_a_friend credits"
                                             } ).request( function ( error, result ) {
                                                 if ( error ) {
                                                     logger.error( 'Failed to give referral credits to customer in Chargebee with ID: ' + customer_id );
