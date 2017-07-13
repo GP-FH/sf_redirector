@@ -10,6 +10,7 @@
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
 
+
 /*********************************************Sales Order Actions***********************************************/
 
 /*
@@ -215,8 +216,6 @@ var update_customer_record = function ( update_details, callback ) {
             }
         } );
     }, 1000 );
-
-
 };
 
 var create_customer_record = function ( customer_details, callback ) {

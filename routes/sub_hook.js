@@ -27,7 +27,6 @@ router.post( '/', function ( req, res ) {
     //  send immediate 200OK to keep chargebee happy and prevent unneccessary retries
     res.status( 200 ).send();
 
-
     /*
      *  On subscription creation, a new customer and a new sales order is created in Cin7
      */
