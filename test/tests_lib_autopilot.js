@@ -1,3 +1,7 @@
+/*
+ *  lib_autopilot.js test suite: unit tests to make sure lib functions are returning expected values
+ */
+
 var nock = require( 'nock' );
 
 //  mock call - check list for user

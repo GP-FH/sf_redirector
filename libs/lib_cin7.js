@@ -162,17 +162,20 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
     setTimeout( function () {
         request( options, function ( error, response, body ) {
 
-            logger.info( 'DEBUG: response: ' + JSON.stringify( response ) );
+
             if ( error ) {
+                logger.info( 'DEBUG: error: ' + error );
                 return callback( error );
             }
             else if ( response.statusCode != 200 ) {
+                logger.info( 'DEBUG: non-200' );
                 return callback( null, {
                     ok: false,
                     msg: 'status code ' + response.statusCode + ' reason: ' + response.body
                 } );
             }
             else {
+                logger.info( 'DEBUG: 200' );
                 return callback( null, {
                     ok: true,
                     fields: body
@@ -217,8 +220,6 @@ var update_customer_record = function ( update_details, callback ) {
             }
         } );
     }, 1000 );
-
-
 };
 
 var create_customer_record = function ( customer_details, callback ) {

@@ -21,18 +21,11 @@ var cin7 = require( '../libs/lib_cin7.js' );
 var autopilot = require( '../libs/lib_autopilot.js' );
 var util = require( 'underscore' );
 
-// temp code for recording
-var nock = require( 'nock' );
-nock.recorder.rec();
-
-
-
 
 router.post( '/', function ( req, res ) {
 
     //  send immediate 200OK to keep chargebee happy and prevent unneccessary retries
     res.status( 200 ).send();
-
 
     /*
      *  On subscription creation, a new customer and a new sales order is created in Cin7
