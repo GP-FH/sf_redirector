@@ -10,7 +10,6 @@ var cin7 = require( '../libs/lib_cin7.js' );
 nock( 'https://api.cin7.com:443', {
         "encodedQueryParams": true
     } )
-    .log( console.log )
     .get( '/api/v1/Contacts' ) //   get -> doesn't exist
     .query( {
         "fields": "id",
