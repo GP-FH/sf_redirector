@@ -33,6 +33,6 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: yarn global add mocha
+      - run: npm install -g mocha
       # run tests!
       - run: mocha
