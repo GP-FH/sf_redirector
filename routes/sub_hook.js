@@ -39,7 +39,6 @@ router.post( '/', function ( req, res ) {
         var email = req.body.content.customer.email;
         var coupon = req.body.content.subscription.coupon || false;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
-        logger.info( 'DEBUG: ' + JSON.stringify( req.body.content ) );
 
         //  move them from the completers list to the subscribers list in autopilot
         autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
@@ -138,19 +137,23 @@ router.post( '/', function ( req, res ) {
                                                             //  add count to subscription_counter for customer ID
                                                             subscription_counter.set( customer_id, subscription_id );
 
-                                                            //  check if they used a refer_a_friend coupon code. If so, credit the referrer
+                                                            //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
                                                             if ( coupon ) {
 
-                                                                logger.info( 'Referral refer a friend coupon detected!' );
+                                                                if ( coupon.length > 8 ) {
 
-                                                                chargebee.customer.add_promotional_credits( coupon, {
-                                                                    amount: 1000,
-                                                                    description: "refer_a_friend credits"
-                                                                } ).request( function ( error, result ) {
-                                                                    if ( error ) {
-                                                                        logger.error( 'Failed to give referral credits to customer in Chargebee with ID: ' + customer_id );
-                                                                    }
-                                                                } );
+                                                                    logger.info( 'Referral refer a friend coupon received - adding promotional credits to giver' );
+
+                                                                    chargebee.customer.add_promotional_credits( coupon, {
+                                                                        amount: 1000,
+                                                                        description: "refer_a_friend credits"
+                                                                    } ).request( function ( error, result ) {
+                                                                        if ( error ) {
+                                                                            logger.error( 'Failed to give referral credits to customer in Chargebee with ID: ' + customer_id );
+                                                                        }
+                                                                    } );
+
+                                                                }
                                                             }
 
                                                             //  notify Slack
@@ -185,17 +188,22 @@ router.post( '/', function ( req, res ) {
                                         //  add count to subscription_counter for customer ID
                                         subscription_counter.set( customer_id, subscription_id );
 
-                                        //  check if they used a refer_a_friend coupon code. If so, credit the referrer
+                                        //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
                                         if ( coupon ) {
 
-                                            chargebee.customer.add_promotional_credits( coupon, {
-                                                amount: 1000,
-                                                description: "refer_a_friend credits"
-                                            } ).request( function ( error, result ) {
-                                                if ( error ) {
-                                                    logger.error( 'Failed to give referral credits to customer in Chargebee with ID: ' + customer_id );
-                                                }
-                                            } );
+                                            if ( coupon.length > 8 ) {
+
+                                                logger.info( 'Referral refer a friend coupon received - adding promotional credits to giver' );
+
+                                                chargebee.customer.add_promotional_credits( coupon, {
+                                                    amount: 1000,
+                                                    description: "refer_a_friend credits"
+                                                } ).request( function ( error, result ) {
+                                                    if ( error ) {
+                                                        logger.error( 'Failed to give referral credits to customer in Chargebee with ID: ' + customer_id );
+                                                    }
+                                                } );
+                                            }
                                         }
 
                                         //  notify Slack
