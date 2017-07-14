@@ -6,7 +6,7 @@ var expect = require( 'chai' ).expect;
 var nock = require( 'nock' );
 var cin7 = require( '../libs/lib_cin7.js' );
 
-//  mock call - customer records
+//  mock calls - customer records
 nock( 'https://api.cin7.com:443', {
         "encodedQueryParams": true
     } )
@@ -81,7 +81,7 @@ nock( 'https://api.cin7.com:443', {
 
 
 
-//  mock request - create sales order TODO
+//  mock calls - sales orders TODO
 nock( 'https://api.cin7.com:443', {
         "encodedQueryParams": true
     } ).post( '/api/v1/SalesOrders' )
