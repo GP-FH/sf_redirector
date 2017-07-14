@@ -156,8 +156,10 @@ router.post( '/', function ( req, res ) {
                                                                 }
                                                             }
 
-                                                            //  notify Slack
-                                                            slack_notifier.send( 'subscription_created', customer, subscription );
+                                                            if ( process.env.ENVIRONMENT = 'prod' ) {
+                                                                //  notify Slack
+                                                                slack_notifier.send( 'subscription_created', customer, subscription );
+                                                            }
 
                                                         }
                                                     } );
