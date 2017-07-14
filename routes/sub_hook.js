@@ -39,6 +39,7 @@ router.post( '/', function ( req, res ) {
         var email = req.body.content.customer.email;
         var coupon = req.body.content.subscription.coupon || false;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
+        logger.info( 'Coupon value receved? ' + coupon );
 
         //  move them from the completers list to the subscribers list in autopilot
         autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
