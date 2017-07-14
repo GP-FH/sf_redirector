@@ -139,10 +139,10 @@ router.post( '/', function ( req, res ) {
                                                             subscription_counter.set( customer_id, subscription_id );
 
                                                             //  check if they used a refer_a_friend coupon code. If so, credit the referrer
-                                                            if ( coupon == customer_id ) {
+                                                            if ( coupon ) {
                                                                 logger.info( 'DEBUG: refer a friend coupon detected!' );
 
-                                                                chargebee.customer.add_promotional_credits( customer_id, {
+                                                                chargebee.customer.add_promotional_credits( coupon, {
                                                                     amount: 1000,
                                                                     description: "refer_a_friend credits"
                                                                 } ).request( function ( error, result ) {
@@ -185,9 +185,9 @@ router.post( '/', function ( req, res ) {
                                         subscription_counter.set( customer_id, subscription_id );
 
                                         //  check if they used a refer_a_friend coupon code. If so, credit the referrer
-                                        if ( coupon == customer_id ) {
+                                        if ( coupon ) {
 
-                                            chargebee.customer.add_promotional_credits( customer_id, {
+                                            chargebee.customer.add_promotional_credits( coupon, {
                                                 amount: 1000,
                                                 description: "refer_a_friend credits"
                                             } ).request( function ( error, result ) {
