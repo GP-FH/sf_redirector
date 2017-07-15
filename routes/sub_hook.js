@@ -156,7 +156,7 @@ router.post( '/', function ( req, res ) {
                                                                 }
                                                             }
 
-                                                            if ( process.env.ENVIRONMENT = 'prod' ) {
+                                                            if ( process.env.ENVIRONMENT == 'prod' ) {
                                                                 //  notify Slack
                                                                 slack_notifier.send( 'subscription_created', customer, subscription );
                                                             }
@@ -208,8 +208,10 @@ router.post( '/', function ( req, res ) {
                                             }
                                         }
 
-                                        //  notify Slack
-                                        slack_notifier.send( 'subscription_created', customer, webhook_sub_object );
+                                        if ( process.env.ENVIRONMENT == 'prod' ) {
+                                            //  notify Slack
+                                            slack_notifier.send( 'subscription_created', customer, webhook_sub_object );
+                                        }
 
                                     }
                                 } );
@@ -481,8 +483,10 @@ router.post( '/', function ( req, res ) {
         var customer = req.body.content.customer;
         var subscription = req.body.content.subscription;
 
-        //  notify Slack
-        slack_notifier.send( 'subscription_cancelled', customer, subscription );
+        if ( process.env.ENVIRONMENT == 'prod' ) {
+            //  notify Slack
+            slack_notifier.send( 'subscription_cancelled', customer, subscription );
+        }
 
     }
 } );
