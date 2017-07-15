@@ -13,10 +13,13 @@ var redis = require( 'redis' );
 var logger = require( './lib_logger.js' );
 
 /*
- *  creates count for customer with passed id
+ *  creates count for customer with passed id. Includes test param which is set to true during (you guessed it) test run
  */
-exports.set = function ( customer_id, subscription_id ) {
+var set = function ( customer_id, subscription_id, test = false ) {
 
+    if ( test ) {
+        redis = require( 'redis-mock' );
+    }
     var client = redis.createClient();
 
     //  listen for errors
@@ -43,7 +46,7 @@ exports.set = function ( customer_id, subscription_id ) {
 /*
  *  increments counter for given customer_id - NOT USED REALLY
  */
-exports.increment = function ( customer_id, subscription_id ) {
+var increment = function ( customer_id, subscription_id ) {
 
     var client = redis.createClient();
 
@@ -60,9 +63,14 @@ exports.increment = function ( customer_id, subscription_id ) {
 };
 
 /*
- *  increments counter for given customer_id and returns boolean indicating whether a new order is required
+ *  increments counter for given customer_id and returns boolean indicating whether a new order is required.
+ *  Includes test param which is set to true during (you guessed it) test run
  */
-exports.increment_and_check = function ( customer_id, subscription_id, callback ) {
+var increment_and_check = function ( customer_id, subscription_id, callback, test = false ) {
+
+    if ( test ) {
+        redis = require( 'redis-mock' );
+    }
 
     var client = redis.createClient();
 
@@ -105,3 +113,7 @@ exports.increment_and_check = function ( customer_id, subscription_id, callback 
         return callback( null, false );
     } );
 };
+
+exports.set = set;
+exports.increment = increment;
+exports.increment_and_check = increment_and_check;
