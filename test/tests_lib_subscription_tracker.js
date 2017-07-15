@@ -8,7 +8,7 @@ var sub_tracker = require( '../libs/lib_subscription_tracker.js' );
 
 sub_tracker.set( 'test_id', 'test_sub', true );
 
-describe( 'Set initial subscription number ', function () {
+describe( 'Subscription created to first renewal ', function () {
 
     it( 'first subscription renewal counted', function ( done ) {
         sub_tracker.increment_and_check( 'test_id', 'test_sub', function ( err, ret ) {
