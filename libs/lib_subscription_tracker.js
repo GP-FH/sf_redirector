@@ -12,6 +12,9 @@
 var redis = require( 'redis' );
 var logger = require( './lib_logger.js' );
 
+var nock = require( 'nock' );
+nock.recorder.rec();
+
 /*
  *  creates count for customer with passed id
  */

@@ -1,5 +1,5 @@
 /*
- *  lib_cin7.js test suite: unit tests to make sure lib functions are returning expected values
+ *  Test suite for the cin7 library: unit tests to make sure lib functions are returning expected values
  */
 
 var expect = require( 'chai' ).expect;
