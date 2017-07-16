@@ -69,12 +69,11 @@ router.post( '/', function ( req, res ) {
                 code: customer_id
 
             } ).request( function ( error, result ) {
-
                 if ( error ) {
                     logger.error( 'Failed to create coupon code in chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
                 }
                 else {
-
+                    logger.info( 'DEBUG: created coupon code: ' + result );
                     //  get customer data using customer_id from newly created subscription event
                     chargebee.customer.retrieve( customer_id ).request(
 
