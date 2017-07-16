@@ -71,16 +71,17 @@ router.post( '/', function ( req, res ) {
                 if ( error ) {
                     logger.error( 'Failed to create coupon code in chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
                 }
-                else {
-                    logger.info( 'DEBUG: created coupon code: ' + result );
-                    //  get customer data using customer_id from newly created subscription event
-                    chargebee.customer.retrieve( customer_id ).request(
 
-                        function ( error, result ) {
+                logger.info( 'DEBUG: created coupon code: ' + result );
+                //  get customer data using customer_id from newly created subscription event
+                chargebee.customer.retrieve( customer_id ).request(
 
-                            if ( error ) {
-                                logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
-                            }
+                    function ( error, result ) {
+
+                        if ( error ) {
+                            logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
+                        }
+                        else {
 
                             var customer = result.customer;
 
@@ -229,17 +230,12 @@ router.post( '/', function ( req, res ) {
                                     } );
                                 }
                             } );
+
                         }
-                    }
-                );
-
+                    );
+                }
             } );
-
-
-
         } );
-
-
     }
     else if ( req.body.event_type == 'subscription_renewed' ) {
 
