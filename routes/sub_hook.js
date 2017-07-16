@@ -51,7 +51,7 @@ router.post( '/', function ( req, res ) {
 
             coupon_id: '2smoc9H7QPGWv6xL6y',
             coupon_set_name: "refer_a_friend",
-            code: result.coupon.id
+            code: customer_id
 
         } ).request( function ( error, result ) {
 
