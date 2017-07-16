@@ -37,7 +37,7 @@ router.post( '/', function ( req, res ) {
         var subscription_id = req.body.content.subscription.id;
         var webhook_sub_object = req.body.content.subscription;
         var email = req.body.content.customer.email;
-        var coupon = req.body.content.subscription.coupons[].coupon_code || false;
+        var coupon = req.body.content.subscription.coupons[ 0 ].coupon_code || false;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
 
         //  move them from the completers list to the subscribers list in autopilot
