@@ -37,10 +37,9 @@ router.post( '/', function ( req, res ) {
         var subscription_id = req.body.content.subscription.id;
         var webhook_sub_object = req.body.content.subscription;
         var email = req.body.content.customer.email;
-        var coupon = req.body.content.subscription.coupons[ 0 ].coupon_code || false;
+        var coupons = req.body.content.subscription.coupons || false;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
-        logger.info( 'DEBUG: coupon code: ' + coupon );
-        logger.info( 'DEBUG: coupon array: ' + JSON.stringify( req.body.content.subscription.coupons ) );
+        logger.info( 'DEBUG: coupons variable: ' + coupons );
 
         //  move them from the completers list to the subscribers list in autopilot
         autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
@@ -152,9 +151,9 @@ router.post( '/', function ( req, res ) {
                                                                     subscription_counter.set( customer_id, subscription_id );
 
                                                                     //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
-                                                                    if ( coupon ) {
+                                                                    if ( coupons ) {
 
-                                                                        if ( coupon.length > 8 ) {
+                                                                        if ( coupons[ 0 ].coupon_code.length > 8 ) {
 
                                                                             logger.info( 'Referral refer a friend coupon received - adding promotional credits to giver' );
 
@@ -205,9 +204,9 @@ router.post( '/', function ( req, res ) {
                                                 subscription_counter.set( customer_id, subscription_id );
 
                                                 //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
-                                                if ( coupon ) {
+                                                if ( coupons ) {
 
-                                                    if ( coupon.length > 8 ) {
+                                                    if ( coupons[ 0 ].coupon_code.length > 8 ) {
 
                                                         logger.info( 'Referral refer a friend coupon received - adding promotional credits to giver' );
 
