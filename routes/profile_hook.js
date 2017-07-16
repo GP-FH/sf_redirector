@@ -37,7 +37,7 @@ router.get( '/', function ( req, res ) {
         var palette = req.query.palette;
         if ( palette.length > 250 ) {
             logger.warn( 'Had to truncate palette field string for customer: ' + req.query.email );
-            palette.substring( 0, 250 );
+            palette = palette.substring( 0, 250 );
         }
 
 
