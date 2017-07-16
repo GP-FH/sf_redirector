@@ -37,9 +37,9 @@ router.post( '/', function ( req, res ) {
         var subscription_id = req.body.content.subscription.id;
         var webhook_sub_object = req.body.content.subscription;
         var email = req.body.content.customer.email;
-        var coupons = req.body.content.subscription.coupons || false;
+        var coupons = req.body.content.invoice.discounts || false;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
-        logger.info( 'DEBUG: total sub payload:' + JSON.stringify( req.body.content ) );
+        logger.info( 'DEBUG: discounts attached?:' + JSON.stringify( coupons ) );
 
         if ( process.env.ENVIRONMENT == 'prod' ) {
             //  move them from the completers list to the subscribers list in autopilot
@@ -139,11 +139,12 @@ router.post( '/', function ( req, res ) {
                                                         //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
                                                         if ( coupons ) {
 
-                                                            if ( coupons[ 0 ].coupon_code.length > 8 ) {
+                                                            if ( coupons[ 0 ].entity_id == process.env.FRIEND_REFERRAL_CODE_ID ) {
 
                                                                 logger.info( 'Referral refer a friend coupon received - adding promotional credits to giver' );
+                                                                var coupon_owner = coupons[ 0 ].description.split[ ' ' ][ 0 ];
 
-                                                                chargebee.customer.add_promotional_credits( coupon, {
+                                                                chargebee.customer.add_promotional_credits( coupon_owner, {
                                                                     amount: 1000,
                                                                     description: "refer_a_friend credits"
                                                                 } ).request( function ( error, result ) {
@@ -192,11 +193,12 @@ router.post( '/', function ( req, res ) {
                                     //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
                                     if ( coupons ) {
 
-                                        if ( coupons[ 0 ].coupon_code.length > 8 ) {
+                                        if ( coupons[ 0 ].entity_id == process.env.FRIEND_REFERRAL_CODE_ID ) {
 
                                             logger.info( 'Referral refer a friend coupon received - adding promotional credits to giver' );
+                                            var coupon_owner = coupons[ 0 ].description.split[ ' ' ][ 0 ];
 
-                                            chargebee.customer.add_promotional_credits( coupon, {
+                                            chargebee.customer.add_promotional_credits( coupon_owner, {
                                                 amount: 1000,
                                                 description: "refer_a_friend credits"
                                             } ).request( function ( error, result ) {
@@ -204,6 +206,7 @@ router.post( '/', function ( req, res ) {
                                                     logger.error( 'Failed to give referral credits to customer in Chargebee with ID: ' + customer_id );
                                                 }
                                             } );
+
                                         }
                                     }
 
