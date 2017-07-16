@@ -34,10 +34,10 @@ router.get( '/', function ( req, res ) {
         }
 
         //  the palette field in chargebee caps out at 250. This field can be longer so this is a temp fix
-        var truncated_palette = '';
-        if ( req.query.palette.length > 250 ) {
+        var palette = req.query.palette;
+        if ( palette.length > 250 ) {
             logger.warn( 'Had to truncate palette field string for customer: ' + req.query.email );
-            req.query.palette.substring( 0, 250 );
+            palette.substring( 0, 250 );
         }
 
 
@@ -53,7 +53,7 @@ router.get( '/', function ( req, res ) {
                 cf_bottomsize: req.query.shebottomsize || req.query.hebottomsize,
                 cf_jam: req.query.jam1 || req.query.jam2 || req.query.jam3 || req.query.jam4 || req.query.jam5 || req.query.jam6,
                 cf_doit: req.query.doit1 || req.query.doit2 || req.query.doit3 || req.query.doit4 || req.query.doit5 || req.query.doit6,
-                cf_palette: req.query.palette,
+                cf_palette: palette,
                 cf_fave: req.query.fav1 || req.query.fav2,
                 cf_keen: req.query.keen1 || req.query.keen2 || req.query.keen3,
                 cf_else: req.query.else
