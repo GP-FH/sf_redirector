@@ -49,7 +49,7 @@ router.post( '/', function ( req, res ) {
         //  create coupon code used for referring a friend
         chargebee.coupon_code.create( {
 
-            coupon_id: '2smoc9H7QPGWv6xL6y',
+            coupon_id: "2smoc9H7QPGWv6xL6y",
             coupon_set_name: "refer_a_friend",
             code: customer_id
 
