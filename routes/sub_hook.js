@@ -39,7 +39,7 @@ router.post( '/', function ( req, res ) {
         var email = req.body.content.customer.email;
         var coupons = req.body.content.subscription.coupons || false;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
-        logger.info( 'DEBUG: coupons variable: ' + JSON.stringify( coupons ) );
+        logger.info( 'DEBUG: total sub payload:' + JSON.stringify( req.body.content ) );
 
         if ( process.env.ENVIRONMENT == 'prod' ) {
             //  move them from the completers list to the subscribers list in autopilot
@@ -49,8 +49,8 @@ router.post( '/', function ( req, res ) {
         //  create coupon code used for referring a friend
         chargebee.coupon_code.create( {
 
-            coupon_id: "2smoc9H7QPGWv6xL6y",
-            coupon_set_name: "refer_a_friend",
+            coupon_id: process.env.FRIEND_REFERRAL_CODE_ID,
+            coupon_set_name: process.env.FRIEND_REFERRAL_SET_NAME,
             code: customer_id
 
         } ).request( function ( error, result ) {
