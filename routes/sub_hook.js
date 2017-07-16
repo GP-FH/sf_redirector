@@ -142,7 +142,7 @@ router.post( '/', function ( req, res ) {
                                                             if ( coupons[ 0 ].entity_id == process.env.FRIEND_REFERRAL_CODE_ID ) {
 
                                                                 logger.info( 'Referral refer a friend coupon received - adding promotional credits to giver' );
-                                                                var coupon_owner = coupons[ 0 ].description.split[ ' ' ][ 0 ];
+                                                                var coupon_owner = coupons[ 0 ].description.split( ' ' )[ 0 ];
 
                                                                 chargebee.customer.add_promotional_credits( coupon_owner, {
                                                                     amount: 1000,
