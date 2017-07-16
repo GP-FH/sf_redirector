@@ -39,7 +39,6 @@ router.post( '/', function ( req, res ) {
         var email = req.body.content.customer.email;
         var coupons = req.body.content.invoice.discounts || false;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
-        logger.info( 'DEBUG: discounts attached?:' + JSON.stringify( coupons ) );
 
         if ( process.env.ENVIRONMENT == 'prod' ) {
             //  move them from the completers list to the subscribers list in autopilot
@@ -58,8 +57,6 @@ router.post( '/', function ( req, res ) {
             if ( error ) {
                 logger.error( 'Failed to create coupon code in chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
             }
-
-            logger.info( 'DEBUG: created coupon code: ' + JSON.stringify( result ) );
 
             //  get customer data using customer_id from newly created subscription event
             chargebee.customer.retrieve( customer_id ).request( function ( error, result ) {
@@ -133,6 +130,8 @@ router.post( '/', function ( req, res ) {
                                                     }
                                                     else {
 
+                                                        logger.info( 'Successfully created sales record in Cin7 for customer_id: ' + customer_id );
+
                                                         //  add count to subscription_counter for customer ID
                                                         subscription_counter.set( customer_id, subscription_id );
 
@@ -171,6 +170,7 @@ router.post( '/', function ( req, res ) {
 
                         }
                         else {
+
                             logger.info( 'Request made to find user in cin7 - found. member_id: ' + ret.fields[ 0 ].id + ' I should create a new order now' );
 
                             //  create a new sales order in cin7
@@ -186,6 +186,8 @@ router.post( '/', function ( req, res ) {
                                     logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
                                 }
                                 else {
+
+                                    logger.info( 'Successfully created sales record in Cin7 for customer_id: ' + customer_id );
 
                                     //  add count to subscription_counter for customer ID
                                     subscription_counter.set( customer_id, subscription_id );
