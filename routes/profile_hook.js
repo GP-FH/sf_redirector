@@ -33,6 +33,14 @@ router.get( '/', function ( req, res ) {
             stylist_attr = stylist_campaigns[ stylist_idx ];
         }
 
+        //  the palette field in chargebee caps out at 250. This field can be longer so this is a temp fix
+        var truncated_palette = '';
+        if ( req.query.palette.length > 250 ) {
+            logger.warn( 'Had to truncate palette field string for customer: ' + req.query.email );
+            req.query.palette.substring( 0, 250 );
+        }
+
+
         //  get a new checkout page from Chargebee
         chargebee.hosted_page.checkout_new( {
 
