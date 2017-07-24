@@ -40,7 +40,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         json: true
     };
 
-    return limiter.submit( function ( cb ) {
+    callback = limiter.submit( function ( cb ) {
         request( options, function ( error, response, body ) {
 
             if ( error ) {
@@ -60,6 +60,8 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
             }
         } );
     } );
+
+    return callback;
 
 };
 
