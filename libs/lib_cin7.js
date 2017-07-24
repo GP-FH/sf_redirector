@@ -40,28 +40,27 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         json: true
     };
 
-    callback = limiter.submit( function ( cb ) {
-        request( options, function ( error, response, body ) {
 
-            if ( error ) {
-                return cb( error );
-            }
-            else if ( response.statusCode != 200 ) {
-                return cb( null, {
-                    ok: false,
-                    msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-                } );
-            }
-            else {
-                return cb( null, {
-                    ok: true,
-                    fields: body
-                } )
-            }
-        } );
+    var my_call = request( options, function ( error, response, body ) {
+
+        if ( error ) {
+            return cb( error );
+        }
+        else if ( response.statusCode != 200 ) {
+            return cb( null, {
+                ok: false,
+                msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+            } );
+        }
+        else {
+            return cb( null, {
+                ok: true,
+                fields: body
+            } )
+        }
     } );
 
-    return callback;
+    limiter.submit( my_call, options, callback );
 
 };
 
