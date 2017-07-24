@@ -60,7 +60,9 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         }
     } );
 
-    limiter.submit( my_call, options, callback );
+    limiter.submit( my_call, options, function ( callback ) {
+
+    } );
 
 };
 
