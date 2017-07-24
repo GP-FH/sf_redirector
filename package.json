@@ -17,6 +17,7 @@
     "redis": "^2.7.1",
     "redis-mock": "^0.17.1",
     "request": "^2.81.0",
+    "requestretry": "^1.12.0",
     "supertest": "^3.0.0",
     "underscore": "^1.8.3",
     "winston": "^2.3.1",
