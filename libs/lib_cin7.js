@@ -10,7 +10,7 @@
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
 var Bottleneck = require( 'bottleneck' );
-var throttled_queue = new Bottleneck( 1, 1000 );
+var throttled_queue = new Bottleneck( 1, 1000, -1, Bottleneck.strategy.LEAK, true );
 
 
 /*********************************************Sales Order Actions***********************************************/
