@@ -9,9 +9,7 @@
 
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
-var Bottleneck = require( 'bottleneck' );
-// Never more than 1 request running at a time. Wait at least 2000ms between each request.
-var limiter = new Bottleneck( 1, 1000 );
+var throttled_queue = require( '../app.js' ).throttled_queue;
 
 
 /*********************************************Sales Order Actions***********************************************/
@@ -20,7 +18,7 @@ var limiter = new Bottleneck( 1, 1000 );
  *  Creates a sales order in Cin7 for the given member and subscription plan
  */
 var create_sales_order = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET', callback ) {
-
+    logger.info( 'DEBUG: current queued requests: ' + throttled_queue.nbQueued() );
     var options = {
         method: 'POST',
         url: 'https://api.cin7.com/api/v1/SalesOrders',
@@ -41,7 +39,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
     };
 
 
-    limiter.submit( request, options, function ( error, response, body ) {
+    throttled_queue.submit( request, options, function ( error, response, body ) {
 
         if ( error ) {
             return callback( error );
@@ -63,7 +61,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
 };
 
 var get_sales_order = function ( field_wanted, filter, callback ) {
-
+    logger.info( 'DEBUG: current queued requests: ' + throttled_queue.nbQueued() );
     var options = {
         method: 'GET',
         url: 'https://api.cin7.com/api/v1/SalesOrders',
@@ -78,32 +76,29 @@ var get_sales_order = function ( field_wanted, filter, callback ) {
         json: true
     };
 
-    setTimeout( function () {
-        request( options, function ( error, response, body ) {
+    throttled_queue.submit( request, options, function ( error, response, body ) {
 
-            if ( error ) {
-                return callback( error );
-            }
-            else if ( response.statusCode != 200 ) {
-                return callback( null, {
-                    ok: false,
-                    msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-                } );
-            }
-            else {
-                return callback( null, {
-                    ok: true,
-                    fields: body
-                } )
-            }
-        } );
-    }, 1000 );
-
+        if ( error ) {
+            return callback( error );
+        }
+        else if ( response.statusCode != 200 ) {
+            return callback( null, {
+                ok: false,
+                msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+            } );
+        }
+        else {
+            return callback( null, {
+                ok: true,
+                fields: body
+            } )
+        }
+    }, callback );
 
 };
 
 var update_sales_order = function ( update_details, callback ) {
-
+    logger.info( 'DEBUG: current queued requests: ' + throttled_queue.nbQueued() );
     var options = {
         method: 'PUT',
         url: 'https://api.cin7.com/api/v1/SalesOrders',
@@ -116,33 +111,31 @@ var update_sales_order = function ( update_details, callback ) {
         json: true
     };
 
-    setTimeout( function () {
-        request( options, function ( error, response, body ) {
+    throttled_queue.submit( request, options, function ( error, response, body ) {
 
-            if ( error ) {
-                return callback( error );
-            }
-            else if ( response.statusCode != 200 ) {
-                return callback( null, {
-                    ok: false,
-                    msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-                } );
-            }
-            else {
-                return callback( null, {
-                    ok: true,
-                    fields: body
-                } )
-            }
-        } );
-    }, 1000 );
+        if ( error ) {
+            return callback( error );
+        }
+        else if ( response.statusCode != 200 ) {
+            return callback( null, {
+                ok: false,
+                msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+            } );
+        }
+        else {
+            return callback( null, {
+                ok: true,
+                fields: body
+            } )
+        }
+    }, callback );
 
 };
 
 /*********************************************Customer Record Actions***********************************************/
 
 var get_customer_record = function ( field_wanted, filter, callback ) {
-
+    logger.info( 'DEBUG: current queued requests: ' + throttled_queue.nbQueued() );
     //  check if customer record exists in cin7
     var options = {
         method: 'GET',
@@ -160,31 +153,29 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
 
     //TODO missing an error case here (success:false)
 
-    setTimeout( function () {
-        request( options, function ( error, response, body ) {
+    throttled_queue.submit( request, options, function ( error, response, body ) {
 
-            if ( error ) {
-                return callback( error );
-            }
-            else if ( response.statusCode != 200 ) {
-                return callback( null, {
-                    ok: false,
-                    msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-                } );
-            }
-            else {
-                return callback( null, {
-                    ok: true,
-                    fields: body
-                } )
-            }
-        } );
-    }, 1000 );
+        if ( error ) {
+            return callback( error );
+        }
+        else if ( response.statusCode != 200 ) {
+            return callback( null, {
+                ok: false,
+                msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+            } );
+        }
+        else {
+            return callback( null, {
+                ok: true,
+                fields: body
+            } )
+        }
+    }, callback );
 
 };
 
 var update_customer_record = function ( update_details, callback ) {
-
+    logger.info( 'DEBUG: current queued requests: ' + throttled_queue.nbQueued() );
     var options = {
         method: 'PUT',
         url: 'https://api.cin7.com/api/v1/Contacts',
@@ -197,30 +188,28 @@ var update_customer_record = function ( update_details, callback ) {
         json: true
     };
 
-    setTimeout( function () {
-        request( options, function ( error, response, body ) {
+    throttled_queue.submit( request, options, function ( error, response, body ) {
 
-            if ( error ) {
-                return callback( error );
-            }
-            else if ( response.statusCode != 200 ) {
-                return callback( null, {
-                    ok: false,
-                    msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-                } );
-            }
-            else {
-                return callback( null, {
-                    ok: true,
-                    fields: body
-                } )
-            }
-        } );
-    }, 1000 );
+        if ( error ) {
+            return callback( error );
+        }
+        else if ( response.statusCode != 200 ) {
+            return callback( null, {
+                ok: false,
+                msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+            } );
+        }
+        else {
+            return callback( null, {
+                ok: true,
+                fields: body
+            } )
+        }
+    }, callback );
 };
 
 var create_customer_record = function ( customer_details, callback ) {
-
+    logger.info( 'DEBUG: current queued requests: ' + throttled_queue.nbQueued() );
     var options = {
         method: 'POST',
         url: 'https://api.cin7.com/api/v1/Contacts',
@@ -233,27 +222,24 @@ var create_customer_record = function ( customer_details, callback ) {
         json: true
     };
 
-    setTimeout( function () {
-        request( options, function ( error, response, body ) {
+    throttled_queue.submit( request, options, function ( error, response, body ) {
 
-            if ( error ) {
-                return callback( error );
-            }
-            else if ( response.statusCode != 200 ) {
-                return callback( null, {
-                    ok: false,
-                    msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-                } );
-            }
-            else {
-                return callback( null, {
-                    ok: true,
-                    fields: body
-                } )
-            }
-        } );
-    }, 1000 );
-
+        if ( error ) {
+            return callback( error );
+        }
+        else if ( response.statusCode != 200 ) {
+            return callback( null, {
+                ok: false,
+                msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+            } );
+        }
+        else {
+            return callback( null, {
+                ok: true,
+                fields: body
+            } )
+        }
+    }, callback );
 };
 
 exports.create_sales_order = create_sales_order;

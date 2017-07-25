@@ -1,6 +1,6 @@
 /*
  *
- *  Stitchfox Redirector: This service bridges typeform->cin7->chargebee. 
+ *  Stitchfox Redirector: This service bridges typeform->cin7->chargebee.
  *  See README for more detailed information
  *
  */
@@ -28,6 +28,10 @@ chargebee.configure( {
     api_key: process.env.CHARGEBEE_API_KEY
 } );
 exports.chargebee = chargebee;
+
+var Bottleneck = require( 'bottleneck' );
+var cin7_throttled_queue = new Bottleneck( 1, 1000 );
+exports.throttled_queue = cin7_throttled_queue;
 
 app.use( bodyparser.json() );
 app.use( bodyparser.urlencoded( {
