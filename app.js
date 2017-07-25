@@ -29,10 +29,6 @@ chargebee.configure( {
 } );
 exports.chargebee = chargebee;
 
-var Bottleneck = require( 'bottleneck' );
-var cin7_throttled_queue = new Bottleneck( 1, 1000 );
-exports.throttled_queue = cin7_throttled_queue;
-
 app.use( bodyparser.json() );
 app.use( bodyparser.urlencoded( {
     extended: true

@@ -9,7 +9,8 @@
 
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
-var throttled_queue = require( '../app.js' ).throttled_queue;
+var Bottleneck = require( 'bottleneck' );
+var throttled_queue = new Bottleneck( 1, 1000 );
 
 
 /*********************************************Sales Order Actions***********************************************/
