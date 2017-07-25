@@ -39,8 +39,8 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         json: true
     };
 
-
-    throttled_queue.submit( request, options, function ( error, response, body ) {
+    var current_req = request;
+    throttled_queue.submit( current_req, options, function ( error, response, body ) {
 
         if ( error ) {
             return callback( error );
@@ -77,7 +77,8 @@ var get_sales_order = function ( field_wanted, filter, callback ) {
         json: true
     };
 
-    throttled_queue.submit( request, options, function ( error, response, body ) {
+    var current_req = request;
+    throttled_queue.submit( current_req, options, function ( error, response, body ) {
 
         if ( error ) {
             return callback( error );
@@ -112,7 +113,8 @@ var update_sales_order = function ( update_details, callback ) {
         json: true
     };
 
-    throttled_queue.submit( request, options, function ( error, response, body ) {
+    var current_req = request;
+    throttled_queue.submit( current_req, options, function ( error, response, body ) {
 
         if ( error ) {
             return callback( error );
@@ -153,8 +155,8 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
     };
 
     //TODO missing an error case here (success:false)
-
-    throttled_queue.submit( request, options, function ( error, response, body ) {
+    var current_req = request;
+    throttled_queue.submit( current_req, options, function ( error, response, body ) {
 
         if ( error ) {
             return callback( error );
@@ -189,7 +191,8 @@ var update_customer_record = function ( update_details, callback ) {
         json: true
     };
 
-    throttled_queue.submit( request, options, function ( error, response, body ) {
+    var current_req = request;
+    throttled_queue.submit( current_req, options, function ( error, response, body ) {
 
         if ( error ) {
             return callback( error );
@@ -223,7 +226,8 @@ var create_customer_record = function ( customer_details, callback ) {
         json: true
     };
 
-    throttled_queue.submit( request, options, function ( error, response, body ) {
+    var current_req = request;
+    throttled_queue.submit( current_req, options, function ( error, response, body ) {
 
         if ( error ) {
             return callback( error );
