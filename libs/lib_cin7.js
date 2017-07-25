@@ -41,9 +41,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
     };
 
 
-    var my_call = request();
-
-    limiter.submit( my_call, options, function ( error, response, body ) {
+    limiter.submit( request, options, function ( error, response, body ) {
 
         if ( error ) {
             return callback( error );
