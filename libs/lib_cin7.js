@@ -38,9 +38,9 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         } ],
         json: true
     };
-
+    var requests = require( 'request' );
     //var current_reqs = request;
-    throttled_queue.submit( request, options, function ( error, response, body ) {
+    throttled_queue.submit( requests, options, function ( error, response, body ) {
 
         if ( error ) {
             logger.info( 'DEBUG: sales order creation error' );
