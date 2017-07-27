@@ -43,15 +43,18 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
     throttled_queue.submit( current_req, options, function ( error, response, body ) {
 
         if ( error ) {
+            logger.info( 'DEBUG: sales order creation error' );
             callback( error );
         }
         else if ( response.statusCode != 200 ) {
+            logger.info( 'DEBUG: sales order creation non 200 resp' );
             callback( null, {
                 ok: false,
                 msg: 'status code ' + response.statusCode + ' reason: ' + response.body
             } );
         }
         else {
+            logger.info( 'DEBUG: sales order creation looks fine' );
             callback( null, {
                 ok: true,
                 fields: body
