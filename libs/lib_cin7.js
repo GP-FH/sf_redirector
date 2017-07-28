@@ -10,7 +10,7 @@
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
 var Bottleneck = require( 'bottleneck' );
-var throttled_queue = new Bottleneck( 1, 1000, -1, Bottleneck.strategy.LEAK, true );
+var throttled_queue = require( '../app.js' ).throttled_queue;
 
 
 /*********************************************Sales Order Actions***********************************************/
@@ -38,10 +38,10 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         } ],
         json: true
     };
-    var requests = require( 'request' );
-    //var current_reqs = request;
-    throttled_queue.submit( requests, options, function ( error, response, body ) {
 
+    var current_req = request;
+    throttled_queue.submit( current_req, options, function ( error, response, body ) {
+        logger.info( 'DEBUG: sales order creation beginning' );
         if ( error ) {
             logger.info( 'DEBUG: sales order creation error' );
             return callback( error );
@@ -61,7 +61,6 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
             } )
         }
     }, callback );
-
 };
 
 var get_sales_order = function ( field_wanted, filter, callback ) {
