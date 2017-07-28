@@ -24,6 +24,7 @@ throttled_queue.on( 'dropped', function ( dropped ) {
  */
 var create_sales_order = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET', callback ) {
     logger.info( 'DEBUG: current queued requests: ' + throttled_queue.nbQueued() );
+    var request = require( 'request' );
     var options = {
         method: 'POST',
         url: 'https://api.cin7.com/api/v1/SalesOrders',
