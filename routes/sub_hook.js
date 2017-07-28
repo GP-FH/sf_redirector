@@ -69,7 +69,7 @@ router.post( '/', function ( req, res ) {
                     var customer = result.customer;
 
                     cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
-
+                        logger.info( 'DEBUG: returned from cin7.get_customer_record: ' + JSON.stringify( ret ) );
                         if ( err || !ret.ok ) {
                             logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
                         }
