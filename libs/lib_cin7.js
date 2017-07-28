@@ -40,7 +40,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
     };
 
     var current_req = request;
-    throttled_queue.submit( current_req, options, function ( error, response, body ) {
+    throttled_queue.submit( request, options, function ( error, response, body ) {
         logger.info( 'DEBUG: sales order creation beginning' );
         if ( error ) {
             logger.info( 'DEBUG: sales order creation error' );
