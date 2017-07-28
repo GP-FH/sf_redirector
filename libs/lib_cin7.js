@@ -141,6 +141,7 @@ var update_sales_order = function ( update_details, callback ) {
 
 var get_customer_record = function ( field_wanted, filter, callback ) {
     logger.info( 'DEBUG: current queued requests: ' + throttled_queue.nbQueued() );
+
     //  check if customer record exists in cin7
     var options = {
         method: 'GET',
@@ -158,7 +159,7 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
 
     //TODO missing an error case here (success:false)
     var current_req = request;
-    throttled_queue.submit( current_req, options, function ( error, response, body ) {
+    throttled_queue.submit( request, options, function ( error, response, body ) {
 
         if ( error ) {
             return callback( error );
