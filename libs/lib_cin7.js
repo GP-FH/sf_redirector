@@ -12,6 +12,10 @@ var logger = require( './lib_logger.js' );
 var Bottleneck = require( 'bottleneck' );
 var throttled_queue = require( '../app.js' ).throttled_queue;
 
+throttled_queue.on( 'dropped', function ( dropped ) {
+    logger.info( 'DEBUG: request dropped: ' + JSON.stringify( dropped ) );
+} )
+
 
 /*********************************************Sales Order Actions***********************************************/
 
@@ -39,7 +43,6 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         json: true
     };
 
-    var current_req = request;
     throttled_queue.submit( request, options, function ( error, response, body ) {
         logger.info( 'DEBUG: sales order creation beginning' );
         if ( error ) {
