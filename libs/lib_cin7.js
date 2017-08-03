@@ -169,16 +169,16 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
     throttled_queue.submit( request, options, function ( error, response, body ) {
 
         if ( error ) {
-            return callback( error );
+            callback( error );
         }
         else if ( response.statusCode != 200 ) {
-            return callback( null, {
+            callback( null, {
                 ok: false,
                 msg: 'status code ' + response.statusCode + ' reason: ' + response.body
             } );
         }
         else {
-            return callback( null, {
+            callback( null, {
                 ok: true,
                 fields: body
             } )
