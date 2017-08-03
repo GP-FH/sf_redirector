@@ -165,25 +165,27 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
         json: true
     };
 
+    var another_callback = function () {};
+
     //TODO missing an error case here (success:false)
     throttled_queue.submit( request, options, function ( error, response, body ) {
 
         if ( error ) {
-            callback( error );
+            another_callback( error );
         }
         else if ( response.statusCode != 200 ) {
-            callback( null, {
+            another_callback( null, {
                 ok: false,
                 msg: 'status code ' + response.statusCode + ' reason: ' + response.body
             } );
         }
         else {
-            callback( null, {
+            another_callback( null, {
                 ok: true,
                 fields: body
             } )
         }
-    }, callback );
+    }, another_callback );
 
 };
 
