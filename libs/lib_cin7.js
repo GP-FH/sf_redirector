@@ -24,7 +24,7 @@ throttled_queue.on( 'dropped', function ( dropped ) {
  */
 var create_sales_order = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET', callback ) {
     logger.info( 'DEBUG: current queued requests: ' + throttled_queue.nbQueued() );
-    var options = {
+    var options1 = {
         method: 'POST',
         url: 'https://api.cin7.com/api/v1/SalesOrders',
         headers: {
@@ -47,27 +47,28 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
     logger.info( 'DEBUG: ARE THINGS RUNNING? ' + throttled_queue.nbRunning() );
     logger.info( 'DEBUG: IS IT BLOCKED: ' + throttled_queue.isBlocked() );
 
-    throttled_queue.submit( request, options, function ( error, response, body ) {
+    var another_request = request;
+    throttled_queue.submit( another_request, options1, function ( error, response, body ) {
         logger.info( 'DEBUG: sales order creation beginning' );
         if ( error ) {
             logger.info( 'DEBUG: sales order creation error' );
-            return cb( error );
+            return callback( error );
         }
         else if ( response.statusCode != 200 ) {
             logger.info( 'DEBUG: sales order creation non 200 resp' );
-            return cb( null, {
+            return callback( null, {
                 ok: false,
                 msg: 'status code ' + response.statusCode + ' reason: ' + response.body
             } );
         }
         else {
             logger.info( 'DEBUG: sales order creation looks fine' );
-            return cb( null, {
+            return callback( null, {
                 ok: true,
                 fields: body
             } )
         }
-    }, cb );
+    }, callback );
 };
 
 var get_sales_order = function ( field_wanted, filter, callback ) {
@@ -165,7 +166,6 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
     };
 
     //TODO missing an error case here (success:false)
-    var current_req = request;
     throttled_queue.submit( request, options, function ( error, response, body ) {
 
         if ( error ) {
@@ -183,7 +183,7 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
                 fields: body
             } )
         }
-    }, cb );
+    }, callback );
 
 };
 
