@@ -67,7 +67,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
                 fields: body
             } )
         }
-    }, callback );
+    }, cb );
 };
 
 var get_sales_order = function ( field_wanted, filter, callback ) {
@@ -183,7 +183,7 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
                 fields: body
             } )
         }
-    }, callback );
+    }, cb );
 
 };
 
