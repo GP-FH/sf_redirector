@@ -44,6 +44,8 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
     };
 
     logger.info( 'DEBUG: WILL IT RUN? ' + throttled_queue.check() );
+    logger.info( 'DEBUG: ARE THINGS RUNNING? ' + throttled_queue.nbRunning() );
+    logger.info( 'DEBUG: IS IT BLOCKED: ' + throttled_queue.isBlocked() );
 
     throttled_queue.submit( request, options, function ( error, response, body ) {
         logger.info( 'DEBUG: sales order creation beginning' );
