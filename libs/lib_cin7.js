@@ -187,6 +187,8 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
         }
     }, another_callback );
 
+    logger.log( 'DEBUG: the other callback: ' + JSON.stringify( another_callback ) );
+
 };
 
 var update_customer_record = function ( update_details, callback ) {
