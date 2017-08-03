@@ -24,7 +24,7 @@ throttled_queue.on( 'dropped', function ( dropped ) {
  */
 var create_sales_order = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET', callback ) {
     logger.info( 'DEBUG: current queued requests: ' + throttled_queue.nbQueued() );
-    var options1 = {
+    var options = {
         method: 'POST',
         url: 'https://api.cin7.com/api/v1/SalesOrders',
         headers: {
@@ -47,8 +47,8 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
     logger.info( 'DEBUG: ARE THINGS RUNNING? ' + throttled_queue.nbRunning() );
     logger.info( 'DEBUG: IS IT BLOCKED: ' + throttled_queue.isBlocked() );
 
-    var another_request = request;
-    throttled_queue.submit( another_request, options1, function ( error, response, body ) {
+
+    throttled_queue.submit( request, options, function ( error, response, body ) {
         logger.info( 'DEBUG: sales order creation beginning' );
         if ( error ) {
             logger.info( 'DEBUG: sales order creation error' );
