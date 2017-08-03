@@ -183,7 +183,7 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
                 fields: body
             } )
         }
-    }, callback );
+    }, null );
 
 };
 
