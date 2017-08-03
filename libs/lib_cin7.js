@@ -24,8 +24,7 @@ throttled_queue.on( 'dropped', function ( dropped ) {
  */
 var create_sales_order = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET', callback ) {
     logger.info( 'DEBUG: current queued requests: ' + throttled_queue.nbQueued() );
-    var requestl = require( 'request' );
-    var optionsl = {
+    var options = {
         method: 'POST',
         url: 'https://api.cin7.com/api/v1/SalesOrders',
         headers: {
@@ -44,7 +43,9 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         json: true
     };
 
-    throttled_queue.submit( requestl, optionsl, function ( error, response, body ) {
+    logger.info( 'DEBUG: WILL IT RUN? ' + throttled_queue.check() );
+
+    throttled_queue.submit( request, options, function ( error, response, body ) {
         logger.info( 'DEBUG: sales order creation beginning' );
         if ( error ) {
             logger.info( 'DEBUG: sales order creation error' );
@@ -64,7 +65,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
                 fields: body
             } )
         }
-    }, callback );
+    }, null );
 };
 
 var get_sales_order = function ( field_wanted, filter, callback ) {
