@@ -177,6 +177,8 @@ var get_customer_record = function ( field_wanted, filter, callback ) {
         } );
     };
 
+    throttledRequest();
+
     //TODO missing an error case here (success:false)
 
 
