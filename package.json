@@ -12,6 +12,7 @@
     "express": "^4.15.2",
     "fs": "0.0.1-security",
     "https": "^1.0.0",
+    "limiter": "^1.1.2",
     "mixpanel": "^0.7.0",
     "mocha": "^3.4.2",
     "nock": "^9.0.13",
