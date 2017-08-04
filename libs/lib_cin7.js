@@ -39,27 +39,31 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         json: true
     };
 
-    request( options, function ( error, response, body ) {
+    var throttledRequest = function () {
+        var requestArgs = options;
+        limiter.removeTokens( 1, function () {
+            request( options, function ( error, response, body ) {
 
-        if ( error ) {
-
-            return callback( error );
-        }
-        else if ( response.statusCode != 200 ) {
-
-            return callback( null, {
-                ok: false,
-                msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+                if ( error ) {
+                    return callback( error );
+                }
+                else if ( response.statusCode != 200 ) {
+                    return callback( null, {
+                        ok: false,
+                        msg: 'status code ' + response.statusCode + ' reason: ' + response.body
+                    } );
+                }
+                else {
+                    return callback( null, {
+                        ok: true,
+                        fields: body
+                    } )
+                }
             } );
-        }
-        else {
+        } );
+    };
 
-            return callback( null, {
-                ok: true,
-                fields: body
-            } )
-        }
-    } );
+    throttledRequest();
 };
 
 var get_sales_order = function ( field_wanted, filter, callback ) {
