@@ -9,8 +9,7 @@
 
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
-var RateLimiter = require( 'limiter' ).RateLimiter;
-var limiter = new RateLimiter( 1, 1000 ); // at most 1 request every 1000 ms
+var limiter = require( '../app.js' ).limiter;
 
 
 /*********************************************Sales Order Actions***********************************************/

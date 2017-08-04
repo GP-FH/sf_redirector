@@ -22,6 +22,9 @@ var options = {
     cert: fs.readFileSync( ssl_path + cert )
 };
 var server = https.createServer( options, app );
+var RateLimiter = require( 'limiter' ).RateLimiter;
+var limiter = new RateLimiter( 1, 1000 ); // at most 1 request every 1000 ms
+exports.limiter = limiter;
 
 chargebee.configure( {
     site: process.env.CHARGEBEE_SITE,
