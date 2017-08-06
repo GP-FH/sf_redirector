@@ -16,7 +16,7 @@ var util = require( 'underscore' );
 
 router.get( '/', function ( req, res ) {
 
-    logger.info( 'TMP DEBUG: request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) );
+    logger.info( 'Request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) );
 
     //  check for valid source token
     if ( req.query.token == process.env.VERIFICATION_TOKEN ) {

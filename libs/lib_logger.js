@@ -3,7 +3,7 @@
  *  lib_logger: this is the logging service. Allows logs of differing severity levels (info, warn, error)
  *  to be sent to paper trail for viewing/searching through. Also gracefully logs and handles exceptions
  *  without killing the service.
- *
+ * 
  */
 
 var winston = require( 'winston' );

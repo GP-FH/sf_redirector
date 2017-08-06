@@ -287,6 +287,8 @@ router.post( '/', function ( req, res ) {
                                                 logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
                                             }
 
+                                            logger.info( 'New sales order created on renewal for subscription_id: ' + subscription_id );
+
                                         } );
                                     }
                                 } );
@@ -300,7 +302,7 @@ router.post( '/', function ( req, res ) {
     else if ( req.body.event_type == 'subscription_shipping_address_updated' ) {
 
         /*
-         *  If the customer (or us) updates their shipping adress details, pass the updates on to Cin7.
+         *  If the customer (or us) updates their shipping address details, pass the updates on to Cin7.
          *  Note: this handler only handles shipping address updates.
          *
          */
