@@ -10,6 +10,7 @@
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
 var limiter = require( '../app.js' ).limiter;
+var bottleneck_limiter = require( '../app.js' ).bottleneck_limiter;
 
 
 /*********************************************Sales Order Actions***********************************************/
@@ -256,3 +257,7 @@ function _throttled_request( options, callback ) {
         } );
     } );
 };
+
+function _bottlenecked_request() {
+
+}
