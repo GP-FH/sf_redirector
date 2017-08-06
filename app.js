@@ -27,10 +27,6 @@ var RateLimiter = require( 'limiter' ).RateLimiter;
 var limiter = new RateLimiter( 1, 2000 ); // at most 1 request every 1000 ms
 exports.limiter = limiter;
 
-var Bottleneck = require( "bottleneck" );
-var bottleneck_limiter = new Bottleneck( 1, 1000 );
-exports.bottleneck_limiter = bottleneck_limiter;
-
 chargebee.configure( {
     site: process.env.CHARGEBEE_SITE,
     api_key: process.env.CHARGEBEE_API_KEY

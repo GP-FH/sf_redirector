@@ -10,7 +10,6 @@
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
 var limiter = require( '../app.js' ).limiter;
-var bottleneck_limiter = require( '../app.js' ).bottleneck_limiter;
 
 
 /*********************************************Sales Order Actions***********************************************/
@@ -39,8 +38,6 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         json: true
     };
 
-
-
     _throttled_request( options, function ( err, cb ) {
 
         if ( err ) {
@@ -67,23 +64,13 @@ var get_sales_order = function ( field_wanted, filter, callback ) {
         json: true
     };
 
-    request( options, function ( error, response, body ) {
+    _throttled_request( options, function ( err, cb ) {
 
-        if ( error ) {
-            return callback( error );
+        if ( err ) {
+            return callback( err );
         }
-        else if ( response.statusCode != 200 ) {
-            return callback( null, {
-                ok: false,
-                msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-            } );
-        }
-        else {
-            return callback( null, {
-                ok: true,
-                fields: body
-            } )
-        }
+
+        return callback( null, cb );
     } );
 
 };
@@ -102,23 +89,13 @@ var update_sales_order = function ( update_details, callback ) {
         json: true
     };
 
-    request( options, function ( error, response, body ) {
+    _throttled_request( options, function ( err, cb ) {
 
-        if ( error ) {
-            return callback( error );
+        if ( err ) {
+            return callback( err );
         }
-        else if ( response.statusCode != 200 ) {
-            return callback( null, {
-                ok: false,
-                msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-            } );
-        }
-        else {
-            return callback( null, {
-                ok: true,
-                fields: body
-            } )
-        }
+
+        return callback( null, cb );
     } );
 
 };
@@ -168,23 +145,13 @@ var update_customer_record = function ( update_details, callback ) {
         json: true
     };
 
-    request( options, function ( error, response, body ) {
+    _throttled_request( options, function ( err, cb ) {
 
-        if ( error ) {
-            return callback( error );
+        if ( err ) {
+            return callback( err );
         }
-        else if ( response.statusCode != 200 ) {
-            return callback( null, {
-                ok: false,
-                msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-            } );
-        }
-        else {
-            return callback( null, {
-                ok: true,
-                fields: body
-            } )
-        }
+
+        return callback( null, cb );
     } );
 };
 
@@ -202,23 +169,13 @@ var create_customer_record = function ( customer_details, callback ) {
         json: true
     };
 
-    request( options, function ( error, response, body ) {
+    _throttled_request( options, function ( err, cb ) {
 
-        if ( error ) {
-            return callback( error );
+        if ( err ) {
+            return callback( err );
         }
-        else if ( response.statusCode != 200 ) {
-            return callback( null, {
-                ok: false,
-                msg: 'status code ' + response.statusCode + ' reason: ' + response.body
-            } );
-        }
-        else {
-            return callback( null, {
-                ok: true,
-                fields: body
-            } )
-        }
+
+        return callback( null, cb );
     } );
 };
 
@@ -257,7 +214,3 @@ function _throttled_request( options, callback ) {
         } );
     } );
 };
-
-function _bottlenecked_request() {
-
-}
