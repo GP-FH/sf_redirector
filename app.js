@@ -24,7 +24,7 @@ var options = {
 var server = https.createServer( options, app );
 
 var RateLimiter = require( 'limiter' ).RateLimiter;
-var limiter = new RateLimiter( 1, 2000 ); // at most 1 request every 1000 ms
+var limiter = new RateLimiter( 1, 1100 ); // at most 1 request every 1000 ms
 exports.limiter = limiter;
 
 var Bottleneck = require( "bottleneck" );
