@@ -43,7 +43,7 @@ router.get( '/', function ( req, res ) {
 
         //  get a new checkout page from Chargebee
         chargebee.hosted_page.checkout_new( {
-
+            embed: false,
             subscription: {
                 plan_id: req.query.boxtype,
                 cf_gender: req.query.gender,
