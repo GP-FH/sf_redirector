@@ -25,9 +25,6 @@ Host [IP_OF_CREATED_INSTANCE]
 To install: `npm install pm2@latest -g`
 To setup pm2 to keep app running across machine startups: `pm2 startup`
 
-## Install + configure Redis
-Follow instructions here: https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04
-
 ## Deploy code to new machine via Deploybot
 - Head to `Production Environment -> Servers & Settings`
 - Enter the settings for the current server configuration
