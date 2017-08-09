@@ -6,7 +6,7 @@ The below instructions use the `doctl` command line tool. You must have this ins
 to complete the provisioning/setup steps
 
 ## Deploying a box
-`doctl compute droplet create stitchfox --enable-monitoring --enable-private-networking --image ubuntu-16-04-x64  --region sgp1 --size 512mb --ssh-keys 38:65:28:82:1d:85:65:c5:e7:7f:55:10:ca:85:f0:0e,af:31:73:08:4a:d1:38:ed:89:78:db:94:74:9c:80:73 --tag-name production-db`
+`doctl compute droplet create redis-[primary/secondary] --enable-monitoring --enable-private-networking --image ubuntu-16-04-x64  --region sgp1 --size 512mb --ssh-keys 38:65:28:82:1d:85:65:c5:e7:7f:55:10:ca:85:f0:0e,af:31:73:08:4a:d1:38:ed:89:78:db:94:74:9c:80:73 --tag-name production-db`
 
 NOTE: the first ssh key fingerprint relates to the `sf-mac` key stored in DO and the `~/.ssh/id_rsa_sf` IdentityFile stored locally. The second relates to Deploybot and is used to push code
 
