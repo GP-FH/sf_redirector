@@ -1,6 +1,16 @@
-# Deploying an configuring a redis box
+# Deploying and configuring a redis box
 
 NOTE: this runbook just gives the instructions for a standard setup. It does not include instructions for setting up master/slave replication either from scratch or in the more likely event of dealing with a failure (e.g promoting slave to master and provisioning a new slave). This will be documented separately.
++
+The below instructions use the `doctl` command line tool. You must have this installed + authorisation
+to complete the provisioning/setup steps
+
+## Deploying a box
+`doctl compute droplet create stitchfox --enable-monitoring --enable-private-networking --image ubuntu-16-04-x64  --region sgp1 --size 512mb --ssh-keys 38:65:28:82:1d:85:65:c5:e7:7f:55:10:ca:85:f0:0e,af:31:73:08:4a:d1:38:ed:89:78:db:94:74:9c:80:73 --tag-name production-db`
+
+NOTE: the first ssh key fingerprint relates to the `sf-mac` key stored in DO and the `~/.ssh/id_rsa_sf` IdentityFile stored locally. The second relates to Deploybot and is used to push code
+
+Add the new host to your ~/.ssh/config file then SSH in to complete the following steps:
 
 ## Install build & test dependencies
 `sudo apt-get update`
@@ -24,7 +34,7 @@ NOTE: this runbook just gives the instructions for a standard setup. It does not
 
 Next, find the `dir` directive. This option specifies the directory that Redis will use to dump persistent data. We need to pick a location that Redis will have write permission and that isn't viewable by normal users: `/var/lib/redis`
 
-Finally, find the `appendonly` directory and set this from `no` to `yes`. This will neable `AOF` storage.
+Finally, find the `appendonly` directory and set this from `no` to `yes`. This will enable `AOF` storage.
 
 ## Create a Redis systemd Unit File
 `vim /etc/systemd/system/redis.service`
