@@ -4,7 +4,7 @@ NOTE: the below instructions use the `doctl` command line tool. You must have th
 to complete the provisioning/setup steps
 
 ## Provision new droplet with the correct settings
-`doctl compute droplet create stitchfox --enable-monitoring --image ubuntu-16-10-x64 --region sgp1 --size 1gb --ssh-keys 38:65:28:82:1d:85:65:c5:e7:7f:55:10:ca:85:f0:0e,af:31:73:08:4a:d1:38:ed:89:78:db:94:74:9c:80:73 --tag-name production-redirector`
+`doctl compute droplet create stitchfox --enable-monitoring --enable-private-networking --image ubuntu-16-04-x64  --region sgp1 --size 1gb --ssh-keys 38:65:28:82:1d:85:65:c5:e7:7f:55:10:ca:85:f0:0e,af:31:73:08:4a:d1:38:ed:89:78:db:94:74:9c:80:73 --tag-name production-redirector`
 
 NOTE: the first ssh key fingerprint relates to the `sf-mac` key stored in DO and the `~/.ssh/id_rsa_sf` IdentityFile stored locally. The second relates to Deploybot and is used to push code
 
