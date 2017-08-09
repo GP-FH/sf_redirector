@@ -33,11 +33,19 @@ router.get( '/', function ( req, res ) {
             stylist_attr = stylist_campaigns[ stylist_idx ];
         }
 
-        //  the palette field in chargebee caps out at 250. This field can be longer so this is a temp fix
+        /*
+         *  the cf_palette and cf_keen field in chargebee cap out at 250. These fields can sometimes be longer so this
+         *  is a temp fix
+         */
         var palette = req.query.palette;
+        var keen = req.query.keen1 || req.query.keen2 || req.query.keen3;
         if ( palette.length > 250 ) {
             logger.warn( 'Had to truncate palette field string for customer: ' + req.query.email );
             palette = palette.substring( 0, 250 );
+        }
+        if ( keen.length > 250 ) {
+            logger.warn( 'Had to truncate keen field string for customer: ' + req.query.email );
+            keen = keen.substring( 0, 250 );
         }
 
 
@@ -55,7 +63,7 @@ router.get( '/', function ( req, res ) {
                 cf_doit: req.query.doit1 || req.query.doit2 || req.query.doit3 || req.query.doit4 || req.query.doit5 || req.query.doit6,
                 cf_palette: palette,
                 cf_fave: req.query.fav1 || req.query.fav2,
-                cf_keen: req.query.keen1 || req.query.keen2 || req.query.keen3,
+                cf_keen: keen,
                 cf_else: req.query.else
             },
             customer: {
