@@ -33,7 +33,10 @@ router.get( '/', function ( req, res ) {
             stylist_attr = stylist_campaigns[ stylist_idx ];
         }
 
-        //  the palette field in chargebee caps out at 250. This field can be longer so this is a temp fix
+        /*
+         *  the cf_palette and cf_keen field in chargebee cap out at 250. These fields can sometimes be longer so this
+         *  is a temp fix
+         */
         var palette = req.query.palette;
         var keen = req.query.keen1 || req.query.keen2 || req.query.keen3;
         if ( palette.length > 250 ) {
