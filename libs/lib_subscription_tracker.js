@@ -20,7 +20,13 @@ var set = function ( customer_id, subscription_id, test = false ) {
     if ( test ) {
         redis = require( 'redis-mock' );
     }
-    var client = redis.createClient();
+
+    var options = {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT
+    };
+
+    var client = redis.createClient( options );
 
     //  listen for errors
     client.on( 'error', function ( err ) {
@@ -48,7 +54,12 @@ var set = function ( customer_id, subscription_id, test = false ) {
  */
 var increment = function ( customer_id, subscription_id ) {
 
-    var client = redis.createClient();
+    var options = {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT
+    };
+
+    var client = redis.createClient( options );
 
     //  listen for errors
     client.on( 'error', function ( err ) {
@@ -72,7 +83,12 @@ var increment_and_check = function ( customer_id, subscription_id, callback, tes
         redis = require( 'redis-mock' );
     }
 
-    var client = redis.createClient();
+    var options = {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT
+    };
+
+    var client = redis.createClient( options );
 
     //  listen for errors
     client.on( 'error', function ( err ) {
