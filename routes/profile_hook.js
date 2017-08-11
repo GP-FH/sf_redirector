@@ -64,7 +64,8 @@ router.get( '/', function ( req, res ) {
                 cf_palette: palette,
                 cf_fave: req.query.fav1 || req.query.fav2,
                 cf_keen: keen,
-                cf_else: req.query.else
+                cf_else: req.query.else,
+                cf_notes: req.query.notes
             },
             customer: {
                 email: req.query.email,
