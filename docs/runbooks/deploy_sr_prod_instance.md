@@ -25,6 +25,9 @@ Host [IP_OF_CREATED_INSTANCE]
 To install: `npm install pm2@latest -g`
 To setup pm2 to keep app running across machine startups: `pm2 startup`
 
+## Apply SSL cert
+- Done using certbot
+
 ## Deploy code to new machine via Deploybot
 - Head to `Production Environment -> Servers & Settings`
 - Enter the settings for the current server configuration
