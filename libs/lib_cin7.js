@@ -20,6 +20,39 @@ var limiter = new RateLimiter( 1, 2000 );
  */
 var create_sales_order = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET', callback ) {
 
+
+    /*
+     *  For accounting purposes we add a dummy 'box' product to sales orders with a unit price equal to the total value of
+     *  a box. This allows us to calculate payments received against the total value (treating subscibers as debtors)
+     */
+    var plan_product = {};
+
+    switch ( plan_id ) {
+    case 'deluxe-box':
+        plan_product = {
+            Code: 'STX-DELUXE',
+            Name: 'Deluxe Box',
+            Option1: 'MON',
+            Option2: 'MONTH',
+            Option3: '1 x OSFA',
+            Qty: 1
+
+        };
+        break;
+    case 'premium-box':
+        plan_product = {
+            Code: 'STX-PREMIUM',
+            Name: 'Premium Box',
+            Option1: 'MON',
+            Option2: 'MONTH',
+            Option3: '1 x OSFA',
+            Qty: 1
+        };
+        break;
+    default:
+        logger.warn( 'Unrecognised plan_id passed on creation of sales order for subscription: ' + subscription_id );
+    }
+
     var options = {
         method: 'POST',
         url: 'https://api.cin7.com/api/v1/SalesOrders',
@@ -34,7 +67,10 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
             currencyCode: 'NZD',
             taxStatus: 'Incl',
             taxRate: 0.15,
-            internalComments: 'plan: ' + plan_id + ' archetype: ' + archetype + ' top size: ' + size_top + ' bottom size: ' + size_bottom + ' subscription: ' + subscription_id
+            internalComments: 'plan: ' + plan_id + ' archetype: ' + archetype + ' top size: ' + size_top + ' bottom size: ' + size_bottom + ' subscription: ' + subscription_id,
+            lineItems: [
+                plan_product
+            ]
         } ],
         json: true
     };

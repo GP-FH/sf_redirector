@@ -39,65 +39,74 @@ router.get( '/', function ( req, res ) {
          */
         var palette = req.query.palette;
         var keen = req.query.keen1 || req.query.keen2 || req.query.keen3;
-        if ( palette.length > 250 ) {
-            logger.warn( 'Had to truncate palette field string for customer: ' + req.query.email );
-            palette = palette.substring( 0, 250 );
+
+        //  if either of these fields is undefined - alert error. A bit heavy handed but need to enforce field mapping
+        if ( !keen || !palette ) {
+            logger.error( 'Error occurred on receiving style profile information - palette or keen* fields undefined' );
+            res.redirect( process.env.BASE_URL + '/error' );
         }
-        if ( keen.length > 250 ) {
-            logger.warn( 'Had to truncate keen field string for customer: ' + req.query.email );
-            keen = keen.substring( 0, 250 );
+        else {
+
+            if ( palette.length > 250 ) {
+                logger.warn( 'Had to truncate palette field string for customer: ' + req.query.email );
+                palette = palette.substring( 0, 250 );
+            }
+            if ( keen.length > 250 ) {
+                logger.warn( 'Had to truncate keen field string for customer: ' + req.query.email );
+                keen = keen.substring( 0, 250 );
+            }
+
+
+            //  get a new checkout page from Chargebee
+            chargebee.hosted_page.checkout_new( {
+                embed: false,
+                subscription: {
+                    plan_id: req.query.boxtype,
+                    cf_gender: req.query.gender,
+                    cf_childname: req.query.hername || req.query.hisname,
+                    cf_childage: req.query.sheage || req.query.heage,
+                    cf_topsize: req.query.shetopsize || req.query.hetopsize,
+                    cf_bottomsize: req.query.shebottomsize || req.query.hebottomsize,
+                    cf_jam: req.query.jam1 || req.query.jam2 || req.query.jam3 || req.query.jam4 || req.query.jam5 || req.query.jam6,
+                    cf_doit: req.query.doit1 || req.query.doit2 || req.query.doit3 || req.query.doit4 || req.query.doit5 || req.query.doit6,
+                    cf_palette: palette,
+                    cf_fave: req.query.fav1 || req.query.fav2,
+                    cf_keen: keen,
+                    cf_else: req.query.else,
+                    cf_notes: req.query.notes
+                },
+                customer: {
+                    email: req.query.email,
+                    first_name: req.query.fname,
+                    last_name: req.query.lname,
+                    phone: req.query.phone,
+                    cf_stylist_attr: stylist_attr
+                },
+                billing_address: {
+                    first_name: req.query.fname,
+                    last_name: req.query.lname,
+                    line1: req.query.streetaddress,
+                    line2: req.query.suburb,
+                    city: req.query.city,
+                    country: "NZ",
+                    phone: req.query.phone
+                }
+            } ).request( function ( error, result ) {
+
+                if ( error ) {
+                    logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON.stringify( error ) );
+                    res.redirect( process.env.BASE_URL + '/error' );
+                }
+                else {
+
+                    var hosted_page = result.hosted_page;
+                    logger.info( 'Checkout page URL successfully got: ' + JSON.stringify( hosted_page ) );
+
+                    //  redirect the request to the new, shiny, checkout page
+                    res.redirect( hosted_page.url );
+                }
+            } );
         }
-
-
-        //  get a new checkout page from Chargebee
-        chargebee.hosted_page.checkout_new( {
-            embed: false,
-            subscription: {
-                plan_id: req.query.boxtype,
-                cf_gender: req.query.gender,
-                cf_childname: req.query.hername || req.query.hisname,
-                cf_childage: req.query.sheage || req.query.heage,
-                cf_topsize: req.query.shetopsize || req.query.hetopsize,
-                cf_bottomsize: req.query.shebottomsize || req.query.hebottomsize,
-                cf_jam: req.query.jam1 || req.query.jam2 || req.query.jam3 || req.query.jam4 || req.query.jam5 || req.query.jam6,
-                cf_doit: req.query.doit1 || req.query.doit2 || req.query.doit3 || req.query.doit4 || req.query.doit5 || req.query.doit6,
-                cf_palette: palette,
-                cf_fave: req.query.fav1 || req.query.fav2,
-                cf_keen: keen,
-                cf_else: req.query.else,
-                cf_notes: req.query.notes
-            },
-            customer: {
-                email: req.query.email,
-                first_name: req.query.fname,
-                last_name: req.query.lname,
-                phone: req.query.phone,
-                cf_stylist_attr: stylist_attr
-            },
-            billing_address: {
-                first_name: req.query.fname,
-                last_name: req.query.lname,
-                line1: req.query.streetaddress,
-                line2: req.query.suburb,
-                city: req.query.city,
-                country: "NZ",
-                phone: req.query.phone
-            }
-        } ).request( function ( error, result ) {
-
-            if ( error ) {
-                logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON.stringify( error ) );
-                res.redirect( process.env.BASE_URL + '/error' );
-            }
-            else {
-
-                var hosted_page = result.hosted_page;
-                logger.info( 'Checkout page URL successfully got: ' + JSON.stringify( hosted_page ) );
-
-                //  redirect the request to the new, shiny, checkout page
-                res.redirect( hosted_page.url );
-            }
-        } );
     }
     else {
         logger.error( 'Incorrect token passed' );
