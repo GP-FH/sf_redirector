@@ -40,7 +40,8 @@ router.get( '/', function ( req, res ) {
         var palette = req.query.palette;
         var keen = req.query.keen1 || req.query.keen2 || req.query.keen3;
 
-        if ( !keen || !palete ) {
+        //  if either of these fields is undefined - alert error. A bit heavy handed but need to enforce field mapping
+        if ( !keen || !palette ) {
             logger.error( 'Error occurred on receiving style profile information - palette or keen* fields undefined' );
             res.redirect( process.env.BASE_URL + '/error' );
         }
