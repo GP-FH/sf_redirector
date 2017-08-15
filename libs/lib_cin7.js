@@ -50,10 +50,8 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         };
         break;
     default:
-        return;
+        logger.warn( 'Unrecognised plan_id passed on creation of sales order for subscription: ' + subscription_id );
     }
-
-    logger.info( 'DEBUG: plan_product: ' + JSON.stringify( plan_product ) );
 
     var options = {
         method: 'POST',
