@@ -77,7 +77,7 @@ var increment = function ( customer_id, subscription_id ) {
  *  increments counter for given customer_id and returns boolean indicating whether a new order is required.
  *  Includes test param which is set to true during (you guessed it) test run
  */
-var increment_and_check = function ( customer_id, subscription_id, callback, test = false ) {
+var increment_and_check_monthly = function ( customer_id, subscription_id, callback, test = false ) {
 
     if ( test ) {
         redis = require( 'redis-mock' );
@@ -132,4 +132,4 @@ var increment_and_check = function ( customer_id, subscription_id, callback, tes
 
 exports.set = set;
 exports.increment = increment;
-exports.increment_and_check = increment_and_check;
+exports.increment_and_check_monthly = increment_and_check_monthly;
