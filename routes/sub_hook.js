@@ -253,7 +253,7 @@ router.post( '/', function ( req, res ) {
                     var customer = result.customer;
 
                     //  increment counter for customer_id + check if they are due a box
-                    subscription_counter.increment_and_check( customer_id, subscription_id, function ( err, res ) {
+                    subscription_counter.increment_and_check_monthly( customer_id, subscription_id, function ( err, res ) {
 
                         if ( err ) {
                             logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
