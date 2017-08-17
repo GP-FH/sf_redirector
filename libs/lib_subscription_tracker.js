@@ -130,6 +130,64 @@ var increment_and_check_monthly = function ( customer_id, subscription_id, callb
     } );
 };
 
+/*
+ *  increments counter and checks if sales order is required for weekly subscribers. A sales order is requires every 12 weeks.
+ *
+ */
+var increment_and_check_weekly = function ( customer_id, subscription_id, callback, test = false ) {
+
+    if ( test ) {
+        redis = require( 'redis-mock' );
+    }
+
+    var options = {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT
+    };
+
+    var client = redis.createClient( options );
+
+    //  listen for errors
+    client.on( 'error', function ( err ) {
+
+        logger.error( 'Error with Redis: ' + err );
+        client.quit();
+
+    } );
+
+    client.hincrby( customer_id, subscription_id, 1, function ( err, reply ) {
+
+        if ( err ) {
+
+            logger.error( 'Error incrementing count for subscription - reason: ' + err + '. For customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+            return callback( err );
+
+        }
+
+        //  if reply is 14, reset the counter to 1
+        if ( reply == 14 ) {
+
+            client.hset( customer_id, subscription_id, 1 );
+            logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+            client.quit();
+            return callback( null, false );
+
+        } // if reply is 2 then a new sales order is required
+        else if ( reply == 2 ) {
+
+            logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
+            client.quit();
+            return callback( null, true );
+
+        }
+
+        logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+        client.quit();
+        return callback( null, false );
+    } );
+
+};
+
 exports.set = set;
 exports.increment = increment;
 exports.increment_and_check_monthly = increment_and_check_monthly;
