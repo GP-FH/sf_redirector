@@ -1,11 +1,21 @@
 /*
  *
  *  lib_subscription_tracker: this lib handles keeping track of the number of billing cycles completed per subscription.
- *  This is necessary as we bill monthly but only deliver quarterly, so we need a way to know when to generate a sales
+ *  This is necessary as we bill monthly & weekly but only deliver quarterly, so we need a way to know when to generate a sales
  *  order.
  *
  *  This is accomplished using a redis hash with the customer_id as the hash, subscription_id as the field, and a count
  *  as the field value
+ *
+ *  A bit about count ranges:
+ *  In order to accurately keep track of weekly and monthly counts + provide a way to keep counts (and deliveries)
+ *  consistent for customers that may switch payment frequency, monthly and weekly subs utilise different number ranges.
+ *
+ *  Monthly: 1-3 & weekly: 5-17
+ *
+ *  As change can only take effect on renewal (you can't immediately change from monthly to weekly or vice versa - the
+ *  change only takes effect on next renewal), these differing ranges allow us to detect when someone has changed plans
+ *  (their count range doesn't match their plan payment frequency) + it's easy to map the ranges to eachother.
  *
  */
 
@@ -13,9 +23,10 @@ var redis = require( 'redis' );
 var logger = require( './lib_logger.js' );
 
 /*
- *  creates count for customer with passed id. Includes test param which is set to true during (you guessed it) test run
+ *  creates count for customer with passed id on monthly plan. Includes test param which is set
+ *  to true during (you guessed it) test run
  */
-var set = function ( customer_id, subscription_id, test = false ) {
+var set_monthly = function ( customer_id, subscription_id, test = false ) {
 
     if ( test ) {
         redis = require( 'redis-mock' );
@@ -50,9 +61,14 @@ var set = function ( customer_id, subscription_id, test = false ) {
 };
 
 /*
- *  increments counter for given customer_id - NOT USED REALLY
+ *  creates count for customer with passed id on weekly plan. Includes test param which is set to
+ *  true during (you guessed it) test run
  */
-var increment = function ( customer_id, subscription_id ) {
+var set_weekly = function ( customer_id, subscription_id, test = false ) {
+
+    if ( test ) {
+        redis = require( 'redis-mock' );
+    }
 
     var options = {
         host: process.env.REDIS_HOST,
@@ -69,15 +85,24 @@ var increment = function ( customer_id, subscription_id ) {
 
     } );
 
-    client.hincrby( customer_id, subscription_id, 1 );
-    client.quit();
+    client.hset( customer_id, subscription_id, 6, function ( err, res ) {
+
+        if ( err ) {
+
+            logger.error( 'Error setting initial count for subscription - reason: ' + err + '. For customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+            client.quit();
+
+        }
+
+        client.quit();
+    } );
 };
 
 /*
  *  increments counter for given customer_id and returns boolean indicating whether a new order is required.
  *  Includes test param which is set to true during (you guessed it) test run
  */
-var increment_and_check_monthly = function ( customer_id, subscription_id, callback, test = false ) {
+var increment_and_check_monthly = function ( customer_id, subscription_id, plan_id, callback, test = false ) {
 
     if ( test ) {
         redis = require( 'redis-mock' );
@@ -98,43 +123,52 @@ var increment_and_check_monthly = function ( customer_id, subscription_id, callb
 
     } );
 
-    client.hincrby( customer_id, subscription_id, 1, function ( err, reply ) {
-
+    _validate_subscription_count( client, plan_id, customer_id, subscription_id, function ( err, result ) {
         if ( err ) {
-
-            logger.error( 'Error incrementing count for subscription - reason: ' + err + '. For customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-            return callback( err );
-
+            logger.error( 'Error validating subscription count for subscription_id: ' + subscription_id + ' with error: ' + err );
         }
+        else {
 
-        //  if reply is 4, reset the counter to 1
-        if ( reply == 4 ) {
+            //  increment user count and decide whether to generate a Sales Order in Cin7
+            client.hincrby( customer_id, subscription_id, 1, function ( err, reply ) {
 
-            client.hset( customer_id, subscription_id, 1 );
-            logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-            client.quit();
-            return callback( null, false );
+                if ( err ) {
 
-        } // if reply is 2 then a new sales order is required
-        else if ( reply == 2 ) {
+                    logger.error( 'Error incrementing count for subscription - reason: ' + err + '. For customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+                    return callback( err );
 
-            logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
-            client.quit();
-            return callback( null, true );
+                }
 
+                //  if reply is 4, reset the counter to 1
+                if ( reply == 4 ) {
+
+                    client.hset( customer_id, subscription_id, 1 );
+                    logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+                    client.quit();
+                    return callback( null, false );
+
+                } // if reply is 2 then a new sales order is required
+                else if ( reply == 2 ) {
+
+                    logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
+                    client.quit();
+                    return callback( null, true );
+
+                }
+
+                logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+                client.quit();
+                return callback( null, false );
+            } );
         }
-
-        logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-        client.quit();
-        return callback( null, false );
     } );
 };
 
 /*
- *  increments counter and checks if sales order is required for weekly subscribers. A sales order is requires every 12 weeks.
- *
+ *  increments counter and checks if sales order is required for weekly subscribers.
+ *  A sales order is requires every 13 weeks.
  */
-var increment_and_check_weekly = function ( customer_id, subscription_id, callback, test = false ) {
+var increment_and_check_weekly = function ( customer_id, subscription_id, plan_id, callback, test = false ) {
 
     if ( test ) {
         redis = require( 'redis-mock' );
@@ -155,39 +189,98 @@ var increment_and_check_weekly = function ( customer_id, subscription_id, callba
 
     } );
 
-    client.hincrby( customer_id, subscription_id, 1, function ( err, reply ) {
-
+    _validate_subscription_count( client, plan_id, customer_id, subscription_id, function ( err, result ) {
         if ( err ) {
+            logger.error( 'Error validating subscription count for subscription_id: ' + subscription_id + ' with error: ' + err );
+        }
+        else {
 
-            logger.error( 'Error incrementing count for subscription - reason: ' + err + '. For customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-            return callback( err );
+            //  increment user count and decide whether to generate a Sales Order in Cin7
+            client.hincrby( customer_id, subscription_id, 1, function ( err, reply ) {
+
+                if ( err ) {
+
+                    logger.error( 'Error incrementing count for subscription - reason: ' + err + '. For customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+                    return callback( err );
+
+                }
+
+                //  if reply is 18, reset the counter to 5
+                if ( reply == 18 ) {
+
+                    client.hset( customer_id, subscription_id, 5 );
+                    logger.info( 'Reset counter to 5 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+                    client.quit();
+                    return callback( null, false );
+
+                } // if reply is 6 then a new sales order is required
+                else if ( reply == 6 ) {
+
+                    logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
+                    client.quit();
+                    return callback( null, true );
+
+                }
+
+                logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+                client.quit();
+                return callback( null, false );
+            } );
 
         }
+    } );
+};
 
-        //  if reply is 14, reset the counter to 1
-        if ( reply == 14 ) {
+/*
+ *  this function is used to detect whether a customer has changed their plan from weekly to monthly (or vice versa).
+ *  It looks at the plan id and verifies that they have the correct count range (monthly 1-3, weekly 5-17). If it detects
+ *  that the count range does not match the plan_id this indicates the person has changed plans on renewal and the
+ *  correct count in set.
+ */
+function _validate_subscription_count( client, plan_id, customer_id, subscription_id, callback ) {
 
-            client.hset( customer_id, subscription_id, 1 );
-            logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-            client.quit();
-            return callback( null, false );
+    client.hget( customer_id, subscription_id, function ( err, reply ) {
+        if ( err ) {
+            return callback( err );
+        }
+        var count_to_set = '0';
 
-        } // if reply is 2 then a new sales order is required
-        else if ( reply == 2 ) {
+        //  means customer has changed to weekly plan on this renewal
+        if ( reply < 5 && ( plan_id == 'deluxe-box-weekly' || plan_id == 'premium-box-weekly' ) ) {
 
-            logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
-            client.quit();
+            if ( reply == 1 ) {
+                count_to_set = 14;
+            }
+            else if ( reply == 2 ) {
+                count_to_set = 6;
+            }
+            else {
+                count_to_set = 10;
+            }
+
+            client.hset( customer_id, subscription_id, count_to_set );
             return callback( null, true );
 
         }
+        else if ( reply > 4 && ( plan_id == 'deluxe-box' || plan_id == 'premium-box' ) ) {
 
-        logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-        client.quit();
-        return callback( null, false );
+            if ( reply > 5 && reply < 10 ) {
+                count_to_set = 2;
+            }
+            else if ( reply > 9 && reply < 14 ) {
+                count_to_set = 3;
+            }
+            else {
+                count_to_set = 1;
+            }
+
+            client.hset( customer_id, subscription_id, count_to_set );
+            return callback( null, true );
+        }
     } );
+}
 
-};
-
-exports.set = set;
-exports.increment = increment;
+exports.set_monthly = set_monthly;
+exports.set_weekly = set_weekly;
 exports.increment_and_check_monthly = increment_and_check_monthly;
+exports.increment_and_check_weekly = increment_and_check_weekly;

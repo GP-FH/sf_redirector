@@ -75,7 +75,7 @@ router.post( '/', function ( req, res ) {
                             logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
                         }
                         else if ( util.isEmpty( ret.fields ) ) {
-                            logger.info( 'Request made to find user in cin7 - no user found. I should create one' );
+                            logger.info( 'Request made to find user in cin7 - no user found. We should create one' );
 
                             //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
                             chargebee.subscription.retrieve( subscription_id ).request(
@@ -133,8 +133,21 @@ router.post( '/', function ( req, res ) {
 
                                                         logger.info( 'Successfully created sales record in Cin7 for customer_id: ' + customer_id );
 
-                                                        //  add count to subscription_counter for customer ID
-                                                        subscription_counter.set( customer_id, subscription_id );
+                                                        //  set intitial subscription count based on the plan_id
+                                                        switch ( plan ) {
+                                                        case 'deluxe-box':
+                                                        case 'premium-box':
+                                                            //  set monthly count to subscription_counter for customer ID
+                                                            subscription_counter.set_monthly( customer_id, subscription_id );
+                                                            break;
+                                                        case 'deluxe-box-weekly':
+                                                        case 'premium-box-weekly':
+                                                            //  set weekly count to subscription_counter for customer ID
+                                                            subscription_counter.set_weekly( customer_id, subscription_id );
+                                                            break;
+                                                        default:
+                                                            logger.error( 'Failed to set count appropriately as plan not found - subscription_id: ' + subscription_id );
+                                                        }
 
                                                         //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
                                                         if ( coupons ) {
@@ -190,8 +203,21 @@ router.post( '/', function ( req, res ) {
 
                                     logger.info( 'Successfully created sales record in Cin7 for customer_id: ' + customer_id );
 
-                                    //  add count to subscription_counter for customer ID
-                                    subscription_counter.set( customer_id, subscription_id );
+                                    //  set intitial subscription count based on the plan_id
+                                    switch ( plan ) {
+                                    case 'deluxe-box':
+                                    case 'premium-box':
+                                        //  set monthly count to subscription_counter for customer ID
+                                        subscription_counter.set_monthly( customer_id, subscription_id );
+                                        break;
+                                    case 'deluxe-box-weekly':
+                                    case 'premium-box-weekly':
+                                        //  set weekly count to subscription_counter for customer ID
+                                        subscription_counter.set_weekly( customer_id, subscription_id );
+                                        break;
+                                    default:
+                                        logger.error( 'Failed to set count appropriately as plan not found - subscription_id: ' + subscription_id );
+                                    }
 
                                     //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
                                     if ( coupons ) {
@@ -257,7 +283,7 @@ router.post( '/', function ( req, res ) {
                     case 'deluxe-box':
                     case 'premium-box':
                         //  increment counter for customer_id + check if they are due a box
-                        subscription_counter.increment_and_check_monthly( customer_id, subscription_id, function ( err, res ) {
+                        subscription_counter.increment_and_check_monthly( customer_id, subscription_id, plan, function ( err, res ) {
 
                             if ( err ) {
                                 logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
@@ -303,7 +329,7 @@ router.post( '/', function ( req, res ) {
                     case 'deluxe-box-weekly':
                     case 'premium-box-weekly':
                         //  increment counter for customer_id + check if they are due a box
-                        subscription_counter.increment_and_check_weekly( customer_id, subscription_id, function ( err, res ) {
+                        subscription_counter.increment_and_check_weekly( customer_id, subscription_id, plan, function ( err, res ) {
 
                             if ( err ) {
                                 logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
