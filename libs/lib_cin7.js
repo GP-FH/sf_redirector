@@ -20,7 +20,6 @@ var limiter = new RateLimiter( 1, 2000 );
  */
 var create_sales_order = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET', callback ) {
 
-
     /*
      *  For accounting purposes we add a dummy 'box' product to sales orders with a unit price equal to the total value of
      *  a box. This allows us to calculate payments received against the total value (treating subscibers as debtors)
@@ -39,12 +38,35 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
 
         };
         break;
+    case 'deluxe-box-weekly':
+        plan_product = {
+            Code: 'STX-DELUXE',
+            Name: 'Deluxe Box',
+            Option1: 'WEK',
+            Option2: 'WEEK',
+            Option3: '1 x OSFA',
+            Qty: 1
+
+        };
+        break;
+
     case 'premium-box':
         plan_product = {
             Code: 'STX-PREMIUM',
             Name: 'Premium Box',
             Option1: 'MON',
             Option2: 'MONTH',
+            Option3: '1 x OSFA',
+            Qty: 1
+        };
+        break;
+
+    case 'premium-box-weekly':
+        plan_product = {
+            Code: 'STX-PREMIUM',
+            Name: 'Premium Box',
+            Option1: 'WEK',
+            Option2: 'WEEK',
             Option3: '1 x OSFA',
             Qty: 1
         };
