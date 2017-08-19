@@ -29,7 +29,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
     switch ( plan_id ) {
     case 'deluxe-box':
         plan_product = {
-            Code: 'STX-DELUXE',
+            Code: 'STX-DELUXE-MON',
             Name: 'Deluxe Box',
             Option1: 'MON',
             Option2: 'MONTH',
@@ -40,7 +40,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
         break;
     case 'deluxe-box-weekly':
         plan_product = {
-            Code: 'STX-DELUXE',
+            Code: 'STX-DELUXE-WEK',
             Name: 'Deluxe Box',
             Option1: 'WEK',
             Option2: 'WEEK',
@@ -52,7 +52,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
 
     case 'premium-box':
         plan_product = {
-            Code: 'STX-PREMIUM',
+            Code: 'STX-PREMIUM-MON',
             Name: 'Premium Box',
             Option1: 'MON',
             Option2: 'MONTH',
@@ -63,7 +63,7 @@ var create_sales_order = function ( member_id, plan_id, subscription_id, size_to
 
     case 'premium-box-weekly':
         plan_product = {
-            Code: 'STX-PREMIUM',
+            Code: 'STX-PREMIUM-WEK',
             Name: 'Premium Box',
             Option1: 'WEK',
             Option2: 'WEEK',
