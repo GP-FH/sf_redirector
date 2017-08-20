@@ -265,6 +265,7 @@ function _validate_subscription_count( client, plan_id, customer_id, subscriptio
             return callback( err );
         }
         var count_to_set = '0';
+        logger.info( 'DEBUG: count returned:' + reply );
 
         //  means customer has changed to weekly plan on this renewal
         if ( reply < 5 && ( plan_id == 'deluxe-box-weekly' || plan_id == 'premium-box-weekly' ) ) {
@@ -298,6 +299,8 @@ function _validate_subscription_count( client, plan_id, customer_id, subscriptio
             client.hset( customer_id, subscription_id, count_to_set );
             return callback( null, true );
         }
+
+        return callback( null, true );
     } );
 }
 
