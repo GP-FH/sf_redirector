@@ -127,7 +127,7 @@ var increment_and_check_monthly = function ( customer_id, subscription_id, plan_
         if ( err ) {
             logger.error( 'Error validating subscription count for subscription_id: ' + subscription_id + ' with error: ' + err );
         }
-        else {
+        else if ( result ) {
 
             //  increment user count and decide whether to generate a Sales Order in Cin7
             client.hincrby( customer_id, subscription_id, 1, function ( err, reply ) {
@@ -194,7 +194,7 @@ var increment_and_check_weekly = function ( customer_id, subscription_id, plan_i
         if ( err ) {
             logger.error( 'Error validating subscription count for subscription_id: ' + subscription_id + ' with error: ' + err );
         }
-        else {
+        else if ( result ) {
             logger.info( 'DEBUG: _validate_subscription_count returned' );
             //  increment user count and decide whether to generate a Sales Order in Cin7
             client.hincrby( customer_id, subscription_id, 1, function ( err, reply ) {
@@ -237,6 +237,8 @@ var increment_and_check_weekly = function ( customer_id, subscription_id, plan_i
  *  It looks at the plan id and verifies that they have the correct count range (monthly 1-3, weekly 5-17). If it detects
  *  that the count range does not match the plan_id this indicates the person has changed plans on renewal and the
  *  correct count in set.
+ *
+ *  Returns True if count is fine to increment (no plan change detected), otherwise False
  */
 function _validate_subscription_count( client, plan_id, customer_id, subscription_id, callback, test = false ) {
     logger.info( 'DEBUG: _validate_subscription_count entered' );
@@ -261,6 +263,7 @@ function _validate_subscription_count( client, plan_id, customer_id, subscriptio
     } );
 
     client.hget( customer_id, subscription_id, function ( err, reply ) {
+
         if ( err ) {
             return callback( err );
         }
@@ -281,7 +284,7 @@ function _validate_subscription_count( client, plan_id, customer_id, subscriptio
             }
 
             client.hset( customer_id, subscription_id, count_to_set );
-            return callback( null, true );
+            return callback( null, false );
 
         }
         else if ( reply > 4 && ( plan_id == 'deluxe-box' || plan_id == 'premium-box' ) ) {
@@ -297,7 +300,7 @@ function _validate_subscription_count( client, plan_id, customer_id, subscriptio
             }
 
             client.hset( customer_id, subscription_id, count_to_set );
-            return callback( null, true );
+            return callback( null, false );
         }
 
         return callback( null, true );
