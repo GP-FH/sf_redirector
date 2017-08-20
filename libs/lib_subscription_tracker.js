@@ -170,7 +170,7 @@ var increment_and_check_monthly = function ( customer_id, subscription_id, plan_
  */
 var increment_and_check_weekly = function ( customer_id, subscription_id, plan_id, callback, test = false ) {
 
-    logger.log( 'DEBUG: increment_and_check_weekly entered' );
+    logger.info( 'DEBUG: increment_and_check_weekly entered' );
     if ( test ) {
         redis = require( 'redis-mock' );
     }
@@ -195,7 +195,7 @@ var increment_and_check_weekly = function ( customer_id, subscription_id, plan_i
             logger.error( 'Error validating subscription count for subscription_id: ' + subscription_id + ' with error: ' + err );
         }
         else {
-            logger.log( 'DEBUG: _validate_subscription_count returned' );
+            logger.info( 'DEBUG: _validate_subscription_count returned' );
             //  increment user count and decide whether to generate a Sales Order in Cin7
             client.hincrby( customer_id, subscription_id, 1, function ( err, reply ) {
 
@@ -239,7 +239,7 @@ var increment_and_check_weekly = function ( customer_id, subscription_id, plan_i
  *  correct count in set.
  */
 function _validate_subscription_count( client, plan_id, customer_id, subscription_id, callback ) {
-    logger.log( 'DEBUG: _validate_subscription_count entered' );
+    logger.info( 'DEBUG: _validate_subscription_count entered' );
     client.hget( customer_id, subscription_id, function ( err, reply ) {
         if ( err ) {
             return callback( err );
