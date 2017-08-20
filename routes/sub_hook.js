@@ -278,6 +278,8 @@ router.post( '/', function ( req, res ) {
 
                     var customer = result.customer;
 
+                    logger.info( 'DEBUG: plan received: ' + plan );
+
                     switch ( plan ) {
                     case 'deluxe-box':
                     case 'premium-box':
