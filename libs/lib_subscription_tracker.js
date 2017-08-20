@@ -238,8 +238,28 @@ var increment_and_check_weekly = function ( customer_id, subscription_id, plan_i
  *  that the count range does not match the plan_id this indicates the person has changed plans on renewal and the
  *  correct count in set.
  */
-function _validate_subscription_count( client, plan_id, customer_id, subscription_id, callback ) {
+function _validate_subscription_count( client, plan_id, customer_id, subscription_id, callback, test = false ) {
     logger.info( 'DEBUG: _validate_subscription_count entered' );
+
+    if ( test ) {
+        redis = require( 'redis-mock' );
+    }
+
+    var options = {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT
+    };
+
+    var client = redis.createClient( options );
+
+    //  listen for errors
+    client.on( 'error', function ( err ) {
+
+        logger.error( 'Error with Redis: ' + err );
+        client.quit();
+
+    } );
+
     client.hget( customer_id, subscription_id, function ( err, reply ) {
         if ( err ) {
             return callback( err );
