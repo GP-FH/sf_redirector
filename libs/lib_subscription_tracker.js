@@ -123,7 +123,7 @@ var increment_and_check_monthly = function ( customer_id, subscription_id, plan_
 
     } );
 
-    _validate_subscription_count( client, plan_id, customer_id, subscription_id, function ( err, result ) {
+    _validate_subscription_count( plan_id, customer_id, subscription_id, function ( err, result ) {
         if ( err ) {
             logger.error( 'Error validating subscription count for subscription_id: ' + subscription_id + ' with error: ' + err );
         }
@@ -190,7 +190,7 @@ var increment_and_check_weekly = function ( customer_id, subscription_id, plan_i
 
     } );
 
-    _validate_subscription_count( client, plan_id, customer_id, subscription_id, function ( err, result ) {
+    _validate_subscription_count( plan_id, customer_id, subscription_id, function ( err, result ) {
         if ( err ) {
             logger.error( 'Error validating subscription count for subscription_id: ' + subscription_id + ' with error: ' + err );
         }
@@ -236,11 +236,13 @@ var increment_and_check_weekly = function ( customer_id, subscription_id, plan_i
  *  this function is used to detect whether a customer has changed their plan from weekly to monthly (or vice versa).
  *  It looks at the plan id and verifies that they have the correct count range (monthly 1-3, weekly 5-17). If it detects
  *  that the count range does not match the plan_id this indicates the person has changed plans on renewal and the
- *  correct count in set.
+ *  correct count is set.
  *
- *  Returns True if count is fine to increment (no plan change detected), otherwise False
+ *  Returns True indicating that the count is fine to increment. Currently no clear case for False but, ya know, wanted to
+ *  give myself options.
+ *
  */
-function _validate_subscription_count( client, plan_id, customer_id, subscription_id, callback, test = false ) {
+function _validate_subscription_count( plan_id, customer_id, subscription_id, callback, test = false ) {
     logger.info( 'DEBUG: _validate_subscription_count entered' );
 
     if ( test ) {
@@ -270,40 +272,55 @@ function _validate_subscription_count( client, plan_id, customer_id, subscriptio
         var count_to_set = '0';
         logger.info( 'DEBUG: count returned:' + reply );
 
-        //  means customer has changed to weekly plan on this renewal
+        //  means customer has changed to weekly plan on this renewal...
         if ( reply < 5 && ( plan_id == 'deluxe-box-weekly' || plan_id == 'premium-box-weekly' ) ) {
 
+            /*
+             *  map the current month to the last week in the monthly period and return true. This way the count
+             *  will be incremented and the appropriate action taken
+             */
             if ( reply == 1 ) {
-                count_to_set = 14;
+                count_to_set = 5;
             }
             else if ( reply == 2 ) {
-                count_to_set = 6;
+                count_to_set = 9;
             }
             else {
-                count_to_set = 10;
+                count_to_set = 13;
             }
 
             client.hset( customer_id, subscription_id, count_to_set );
-            return callback( null, false );
 
-        }
+            return callback( null, true );
+
+        } // ... and vice versa NOTE: this needs WORK
         else if ( reply > 4 && ( plan_id == 'deluxe-box' || plan_id == 'premium-box' ) ) {
 
-            if ( reply > 5 && reply < 10 ) {
+            /*
+             *  if the current weekly count is the last of a mapped monthly period, set the count and return true so that
+             *  the monthly count is incremented and the correct action is taken. If however the current weekly count is
+             *  not the last week of a monthly period then fail validation and return false.
+             */
+            if ( reply == 9 ) {
                 count_to_set = 2;
             }
-            else if ( reply > 9 && reply < 14 ) {
+            else if ( reply == 13 ) {
                 count_to_set = 3;
             }
-            else {
+            else if ( count == 5 ) {
                 count_to_set = 1;
+            }
+            else {
+                return callback( null, false );
             }
 
             client.hset( customer_id, subscription_id, count_to_set );
-            return callback( null, false );
+            return callback( null, true );
+
         }
 
         return callback( null, true );
+
     } );
 }
 
