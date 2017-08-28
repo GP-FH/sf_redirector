@@ -293,25 +293,22 @@ function _validate_subscription_count( plan_id, customer_id, subscription_id, ca
 
             return callback( null, true );
 
-        } // ... and vice versa NOTE: this needs WORK
+        } // ... and vice versa
         else if ( reply > 4 && ( plan_id == 'deluxe-box' || plan_id == 'premium-box' ) ) {
 
             /*
-             *  if the current weekly count is the last of a mapped monthly period, set the count and return true so that
-             *  the monthly count is incremented and the correct action is taken. If however the current weekly count is
-             *  not the last week of a monthly period then fail validation and return false.
+             *  maps weekly ranges to monthly counts. This assumes manual handling of the switch is correct (seeing out
+             *  weekly renewals for the rest of the current month and scheduling plan change on a renewal date the same
+             *  as the plan creation date - ) 
              */
-            if ( reply == 9 ) {
+            if ( reply > 5 && reply < 10 ) {
                 count_to_set = 2;
             }
-            else if ( reply == 13 ) {
+            else if ( reply > 9 && reply < 14 ) {
                 count_to_set = 3;
             }
-            else if ( reply == 5 ) {
-                count_to_set = 1;
-            }
             else {
-                return callback( null, false );
+                count_to_set = 1;
             }
 
             client.hset( customer_id, subscription_id, count_to_set );
