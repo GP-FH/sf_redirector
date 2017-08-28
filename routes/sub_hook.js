@@ -544,7 +544,7 @@ router.post( '/', function ( req, res ) {
                         cin7.update_sales_order( sales_order_updates, function ( err, ret ) {
 
                             if ( err || !ret.ok ) {
-                                logger.error( 'Failed to update sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                                logger.error( 'Failed to update sales order in Cin7 - reason: ' + ( err || ret.msg ) + '. For subscription_id: ' + subscription_id );
                             }
                             else if ( util.isEmpty( ret.fields ) ) {
                                 logger.error( 'Failed to update sales order in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );

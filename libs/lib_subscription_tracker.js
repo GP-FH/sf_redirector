@@ -307,7 +307,7 @@ function _validate_subscription_count( plan_id, customer_id, subscription_id, ca
             else if ( reply == 13 ) {
                 count_to_set = 3;
             }
-            else if ( count == 5 ) {
+            else if ( reply == 5 ) {
                 count_to_set = 1;
             }
             else {
