@@ -278,8 +278,6 @@ router.post( '/', function ( req, res ) {
 
                     var customer = result.customer;
 
-                    logger.info( 'DEBUG: plan received: ' + plan );
-
                     switch ( plan ) {
                     case 'deluxe-box':
                     case 'premium-box':
@@ -329,7 +327,6 @@ router.post( '/', function ( req, res ) {
                         break;
                     case 'deluxe-box-weekly':
                     case 'premium-box-weekly':
-                        logger.info( 'DEBUG: test switch case' );
                         //  increment counter for customer_id + check if they are due a box
                         subscription_counter.increment_and_check_weekly( customer_id, subscription_id, plan, function ( err, res ) {
 

@@ -170,7 +170,6 @@ var increment_and_check_monthly = function ( customer_id, subscription_id, plan_
  */
 var increment_and_check_weekly = function ( customer_id, subscription_id, plan_id, callback, test = false ) {
 
-    logger.info( 'DEBUG: increment_and_check_weekly entered' );
     if ( test ) {
         redis = require( 'redis-mock' );
     }
@@ -195,7 +194,7 @@ var increment_and_check_weekly = function ( customer_id, subscription_id, plan_i
             logger.error( 'Error validating subscription count for subscription_id: ' + subscription_id + ' with error: ' + err );
         }
         else if ( result ) {
-            logger.info( 'DEBUG: _validate_subscription_count returned' );
+
             //  increment user count and decide whether to generate a Sales Order in Cin7
             client.hincrby( customer_id, subscription_id, 1, function ( err, reply ) {
 
@@ -243,7 +242,7 @@ var increment_and_check_weekly = function ( customer_id, subscription_id, plan_i
  *
  */
 function _validate_subscription_count( plan_id, customer_id, subscription_id, callback, test = false ) {
-    logger.info( 'DEBUG: _validate_subscription_count entered' );
+
 
     if ( test ) {
         redis = require( 'redis-mock' );
@@ -270,7 +269,6 @@ function _validate_subscription_count( plan_id, customer_id, subscription_id, ca
             return callback( err );
         }
         var count_to_set = '0';
-        logger.info( 'DEBUG: count returned:' + reply );
 
         //  means customer has changed to weekly plan on this renewal...
         if ( reply < 5 && ( plan_id == 'deluxe-box-weekly' || plan_id == 'premium-box-weekly' ) ) {
@@ -299,7 +297,7 @@ function _validate_subscription_count( plan_id, customer_id, subscription_id, ca
             /*
              *  maps weekly ranges to monthly counts. This assumes manual handling of the switch is correct (seeing out
              *  weekly renewals for the rest of the current month and scheduling plan change on a renewal date the same
-             *  as the plan creation date - ) 
+             *  as the plan creation date - (ugh))
              */
             if ( reply > 5 && reply < 10 ) {
                 count_to_set = 2;
