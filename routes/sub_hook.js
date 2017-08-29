@@ -74,7 +74,7 @@ router.post( '/', function ( req, res ) {
                             logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
                         }
                         else if ( util.isEmpty( ret.fields ) ) {
-                            logger.info( 'Request made to find user in cin7 - no user found. I should create one' );
+                            logger.info( 'Request made to find user in cin7 - no user found. We should create one' );
 
                             //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
                             chargebee.subscription.retrieve( subscription_id ).request(
@@ -132,8 +132,21 @@ router.post( '/', function ( req, res ) {
 
                                                         logger.info( 'Successfully created sales record in Cin7 for customer_id: ' + customer_id );
 
-                                                        //  add count to subscription_counter for customer ID
-                                                        subscription_counter.set( customer_id, subscription_id );
+                                                        //  set intitial subscription count based on the plan_id
+                                                        switch ( plan ) {
+                                                        case 'deluxe-box':
+                                                        case 'premium-box':
+                                                            //  set monthly count to subscription_counter for customer ID
+                                                            subscription_counter.set_monthly( customer_id, subscription_id );
+                                                            break;
+                                                        case 'deluxe-box-weekly':
+                                                        case 'premium-box-weekly':
+                                                            //  set weekly count to subscription_counter for customer ID
+                                                            subscription_counter.set_weekly( customer_id, subscription_id );
+                                                            break;
+                                                        default:
+                                                            logger.error( 'Failed to set count appropriately as plan not found - subscription_id: ' + subscription_id );
+                                                        }
 
                                                         //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
                                                         if ( coupons ) {
@@ -189,8 +202,21 @@ router.post( '/', function ( req, res ) {
 
                                     logger.info( 'Successfully created sales record in Cin7 for customer_id: ' + customer_id );
 
-                                    //  add count to subscription_counter for customer ID
-                                    subscription_counter.set( customer_id, subscription_id );
+                                    //  set intitial subscription count based on the plan_id
+                                    switch ( plan ) {
+                                    case 'deluxe-box':
+                                    case 'premium-box':
+                                        //  set monthly count to subscription_counter for customer ID
+                                        subscription_counter.set_monthly( customer_id, subscription_id );
+                                        break;
+                                    case 'deluxe-box-weekly':
+                                    case 'premium-box-weekly':
+                                        //  set weekly count to subscription_counter for customer ID
+                                        subscription_counter.set_weekly( customer_id, subscription_id );
+                                        break;
+                                    default:
+                                        logger.error( 'Failed to set count appropriately as plan not found - subscription_id: ' + subscription_id );
+                                    }
 
                                     //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
                                     if ( coupons ) {
@@ -231,8 +257,8 @@ router.post( '/', function ( req, res ) {
     else if ( req.body.event_type == 'subscription_renewed' ) {
 
         /*
-         *  On subscription renewal check whether it's a delivery month. If so, create a sales order in cin7.
-         *  If not a delivery month, increment the subscription count in redis
+         *  On subscription renewal check whether it's delivery time. If so, create a sales order in cin7.
+         *  If not a delivery time, increment the subscription count
          */
 
         var customer_id = req.body.content.subscription.customer_id;
@@ -252,49 +278,102 @@ router.post( '/', function ( req, res ) {
 
                     var customer = result.customer;
 
-                    //  increment counter for customer_id + check if they are due a box
-                    subscription_counter.increment_and_check_monthly( customer_id, subscription_id, function ( err, res ) {
+                    switch ( plan ) {
+                    case 'deluxe-box':
+                    case 'premium-box':
+                        //  increment counter for customer_id + check if they are due a box
+                        subscription_counter.increment_and_check_monthly( customer_id, subscription_id, plan, function ( err, res ) {
 
-                        if ( err ) {
-                            logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-                        }
-                        else {
-
-                            //  if true create order
-                            if ( res ) {
-
-                                cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
-
-                                    if ( err || !ret.ok ) {
-                                        logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
-                                    }
-                                    else if ( util.isEmpty( ret.fields ) ) {
-                                        logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
-                                    }
-                                    else if ( ret.fields[ 0 ].success == false ) {
-                                        logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
-                                    }
-                                    else {
-                                        cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, subscription.cf_archetype, function ( err, ret ) {
-
-                                            if ( err || !ret.ok ) {
-                                                logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
-                                            }
-                                            else if ( util.isEmpty( ret.fields ) ) {
-                                                logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
-                                            }
-                                            else if ( ret.fields[ 0 ].success == false ) {
-                                                logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
-                                            }
-
-                                            logger.info( 'New sales order created on renewal for subscription_id: ' + subscription_id );
-
-                                        } );
-                                    }
-                                } );
+                            if ( err ) {
+                                logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
                             }
-                        }
-                    } );
+                            else {
+
+                                //  if true create order
+                                if ( res ) {
+
+                                    cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
+
+                                        if ( err || !ret.ok ) {
+                                            logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                                        }
+                                        else if ( util.isEmpty( ret.fields ) ) {
+                                            logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+                                        }
+                                        else if ( ret.fields[ 0 ].success == false ) {
+                                            logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                                        }
+                                        else {
+                                            cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, subscription.cf_archetype, function ( err, ret ) {
+
+                                                if ( err || !ret.ok ) {
+                                                    logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                                                }
+                                                else if ( util.isEmpty( ret.fields ) ) {
+                                                    logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                                                }
+                                                else if ( ret.fields[ 0 ].success == false ) {
+                                                    logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                                                }
+
+                                                logger.info( 'New sales order created on renewal for subscription_id: ' + subscription_id );
+
+                                            } );
+                                        }
+                                    } );
+                                }
+                            }
+                        } );
+                        break;
+                    case 'deluxe-box-weekly':
+                    case 'premium-box-weekly':
+                        //  increment counter for customer_id + check if they are due a box
+                        subscription_counter.increment_and_check_weekly( customer_id, subscription_id, plan, function ( err, res ) {
+
+                            if ( err ) {
+                                logger.warn( 'Error occurred in subscription counter that could have stopped a salesorder for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+                            }
+                            else {
+
+                                //  if true create order
+                                if ( res ) {
+
+                                    cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
+
+                                        if ( err || !ret.ok ) {
+                                            logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                                        }
+                                        else if ( util.isEmpty( ret.fields ) ) {
+                                            logger.error( 'Failed to retrieve member_id from Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
+                                        }
+                                        else if ( ret.fields[ 0 ].success == false ) {
+                                            logger.error( 'Failed to retrieve member_id from Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                                        }
+                                        else {
+                                            cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, subscription.cf_archetype, function ( err, ret ) {
+
+                                                if ( err || !ret.ok ) {
+                                                    logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                                                }
+                                                else if ( util.isEmpty( ret.fields ) ) {
+                                                    logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                                                }
+                                                else if ( ret.fields[ 0 ].success == false ) {
+                                                    logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                                                }
+
+                                                logger.info( 'New sales order created on renewal for subscription_id: ' + subscription_id );
+
+                                            } );
+                                        }
+                                    } );
+                                }
+                            }
+                        } );
+                        break;
+                    default:
+                        logger.error( 'Error - unknown subscription plan received on renewal for subscription with id: ' + subscription_id );
+                    }
                 }
             }
         );
@@ -462,7 +541,7 @@ router.post( '/', function ( req, res ) {
                         cin7.update_sales_order( sales_order_updates, function ( err, ret ) {
 
                             if ( err || !ret.ok ) {
-                                logger.error( 'Failed to update sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                                logger.error( 'Failed to update sales order in Cin7 - reason: ' + ( err || ret.msg ) + '. For subscription_id: ' + subscription_id );
                             }
                             else if ( util.isEmpty( ret.fields ) ) {
                                 logger.error( 'Failed to update sales order in Cin7 - reason: customer does not exist for customer_id: ' + customer_id );
