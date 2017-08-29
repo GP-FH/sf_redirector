@@ -2,15 +2,17 @@
 
 ## Overview
 
-This sits between Typeform -> Cin7 -> Chargebee and allows us to provide a user subscription flow across all these products.
+The redirector repo is all of the code that we have had to write to tie all of the products we use together. Over time we hope to relieve ourselves of some of this stuff (see typeform) and refine and improve what exists.
 
 **The products**
 
 - Typeform: nice form builder used to allow people to create their style profile
 - Chargebee: subscription service. Manages recurring payments, subscription plans, and customers. Also provides customer portal.
 - Cin7: inventory management system.
+- Autopilot: marketing automation - mailing, journeys etc
+- Mixpanel: web metrics and analytics
 
-## How this works
+## Features
 
 ### Subscription flow
 
@@ -23,20 +25,26 @@ This sits between Typeform -> Cin7 -> Chargebee and allows us to provide a user 
 
 ### Renewals & updates
 
-**As this is a monthly subscription, but we only ship every 3 months, this service also keeps track of when we should be sending stock to customers:**
+**As this is a monthly/weekly subscription, but we only ship every 3 months, this service also keeps track of when we should be sending stock to customers:**
 
-Every month the Chargebee webhook fires off a `subscription_renewed` event which we listen for. On hearing this we check the sales counter for this customer. The sales counter is a number that is used to tell whether a customer is due a delivery. As we deliver on a 3 monthly basis it checks to see how many renewals have occurred since the last delivery. If the answer is 3 then it resets the counter and creates a new sales order in Cin7 for the customer. If it is something else then it just increments the counter and that's it.
+Every month/week the Chargebee webhook fires off a `subscription_renewed` event which we listen for. On hearing this we check the sales counter for this customer. The sales counter is a number that is used to tell whether a customer is due a delivery. As we deliver on a 3 monthly basis it checks to see how many renewals have occurred since the last delivery.
 
 **We provide a customer portal to users which allows them to modify address and CC details:**
 
 While Chargebee is currently our customer source of truth, we also store customer info in Cin7 (so that we can send things to people). As a result if any changes occur to a customer record in Chargebee they need to be reflected in Cin7. To do this we listen for the `customer_changed` & `subscription_shipping_address_updated` Chargebee webhook events. These contain the new customer info. We then update the corresponding Cin7 customer record via the API. **It's important that we only ever update customer info IN CHARGEBEE**
 
-### Archetype addition
-
 ### User mapping between Chargebee & Cin7
 
-### Planned improvements
+Currently due to the way we create subscriptions (via hosted checkout pages) a new customer is created in chargebee for every subscription. This isn't quite what we want as it can result in multiple customer records for people who sign up more than once. We map accounts in chargebee to accounts in cin7 using email. Cin7 doesn't allow multiple customer records with the same email so while there may be multiple customer records for a single email in chargebee, they will only ever map to a single account in cin7.
 
 ### Tracking stylist customer attribution
 
+We have arrangements with stylists who get paid for sending people to our site who convert. To track this we include a `campaign` query parameter on customer creation. Each stylist has a unique campaign code which is stored in the `stylist_campaigns` array in `profile_hook.js`. We check this and add it to the customer details if present. This allows us to track customer records and who they are attributed to. If you need to add more codes, just add them to this array + this spreadsheet: https://docs.google.com/spreadsheets/u/1/d/1_wy0Y-SMC0yxFeZQYPaaHdOJ3D4zJJMDUpFnhkGbOe0/edit#gid=0
+
 ### Mixpanel event firing for funnel tracking
+
+To accurately track people moving through our subscription creation flow we fire a `profile_form_complete` event to mixpanel when we receive the initial request to `/profile_hook`. This allows us to create a funnel in mixpanel and see where people are dropping off. If you wish to add more events/edit the event name, just edit the config file.
+
+### Planned improvements
+
+There are some
