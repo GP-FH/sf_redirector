@@ -520,7 +520,7 @@ router.post( '/', function ( req, res ) {
                 cin7.get_sales_order( 'id,internalComments', 'internalComments LIKE\'%' + subscription_id + '\'', function ( err, ret ) {
 
                     if ( err || !ret.ok ) {
-                        logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                        logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: ' + ( err || ret.msg ) + '. For subscription_id: ' + subscription_id );
                     }
                     else if ( util.isEmpty( ret.fields ) ) {
                         logger.error( 'Failed to retrieve sales order ID from Cin7 - reason: sales order does not exist for subscription_id: ' + subscription_id );
