@@ -10,7 +10,7 @@
 var request = require( 'request' );
 var logger = require( './lib_logger.js' );
 var RateLimiter = require( 'limiter' ).RateLimiter;
-var limiter = new RateLimiter( 1, 2000 );
+var limiter = new RateLimiter( 1, 3000 );
 
 
 /*********************************************Sales Order Actions***********************************************/
