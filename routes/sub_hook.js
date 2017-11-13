@@ -20,6 +20,8 @@ var slack_notifier = require( '../libs/lib_slack.js' );
 var cin7 = require( '../libs/lib_cin7.js' );
 var autopilot = require( '../libs/lib_autopilot.js' );
 var util = require( 'underscore' );
+var order = require( '../libs/lib_order.js' );
+var coupon = require( '../libs/lib_coupon.js' );
 
 
 router.post( '/', function ( req, res ) {
@@ -44,6 +46,20 @@ router.post( '/', function ( req, res ) {
             //  move them from the completers list to the subscribers list in autopilot
             autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
         }
+
+        order.order_create_new_subscription( req.body.content.subscription, coupons )
+            .then( ( ret ) => {
+                return slack_notifier.send( 'subscription_created', req.body.content.customer, req.body.content.subscription );
+            } )
+            .then( ( ret ) => {
+                logger.info( 'Subscription successfully created: ' + req.body.content.subscription.id );
+            } )
+            .catch( ( err ) => {
+                next( err );
+            } );
+
+
+
 
         //  create coupon code used for referring a friend
         chargebee.coupon_code.create( {
