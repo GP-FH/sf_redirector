@@ -45,6 +45,11 @@ We have arrangements with stylists who get paid for sending people to our site w
 
 To accurately track people moving through our subscription creation flow we fire a `profile_form_complete` event to mixpanel when we receive the initial request to `/profile_hook`. This allows us to create a funnel in mixpanel and see where people are dropping off. If you wish to add more events/edit the event name, just edit the config file.
 
-### Planned improvements
+### Needed improvements
 
-There are some
+- `sub_hook.js` is a fucking mess.  Needs a major refactor. This file should only handle moving requests around, but currently it does way too much heavy lifting.
+- create a `lib_order.js` module. This can contain the logic for managing new subs, renewals etc.
+- user per route error handling.
+- create standard return format for all `lib_*.js` functions. Currently all over the place.
+- using zapier for autopilot makes no sense and results in incomplete data making it into autopilot profiles. We can handle this much better: details in Slack - https://stitchfox.slack.com/archives/C4AAT050A/p1503763459000009
+- tests need a proper rewrite. Should focus on function inputs and outputs from the perspective of the calling party. got stuck testing 3rd party calls which is dumb in this case
