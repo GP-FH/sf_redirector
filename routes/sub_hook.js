@@ -33,11 +33,6 @@ router.post( '/', function ( req, res ) {
      *  On subscription creation, a new customer and a new sales order is created in Cin7
      */
     if ( req.body.event_type == 'subscription_created' ) {
-
-        var customer_id = req.body.content.subscription.customer_id;
-        var plan = req.body.content.subscription.plan_id;
-        var subscription_id = req.body.content.subscription.id;
-        var webhook_sub_object = req.body.content.subscription;
         var email = req.body.content.customer.email;
         var coupons = req.body.content.invoice.discounts || false;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
@@ -55,7 +50,7 @@ router.post( '/', function ( req, res ) {
                 res.end();
             } )
             .then( ( ret ) => {
-                logger.info( 'Subscription successfully created: ' + req.body.content.subscription.id );
+                logger.info( 'Subscription process created: ' + req.body.content.subscription.id );
             } )
             .catch( ( err ) => {
                 next( err );
