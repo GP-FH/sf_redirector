@@ -11,6 +11,7 @@ var request = require( 'request' );
 var logger = require( './lib_logger.js' );
 var RateLimiter = require( 'limiter' ).RateLimiter;
 var limiter = new RateLimiter( 1, 3000 );
+var util = require( 'underscore' );
 
 
 /*********************************************Sales Order Actions***********************************************/
@@ -19,7 +20,6 @@ var limiter = new RateLimiter( 1, 3000 );
  *  Creates a sales order in Cin7 for the given member and subscription plan
  */
 var create_sales_order = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET', callback ) {
-
     /*
      *  For accounting purposes we add a dummy 'box' product to sales orders with a unit price equal to the total value of
      *  a box. This allows us to calculate payments received against the total value (treating subscibers as debtors)
@@ -238,12 +238,251 @@ var create_customer_record = function ( customer_details, callback ) {
     } );
 };
 
+/****************************************************** promisified functions ***********************************************/
+
+var cin7_check_customer_exists = ( email ) => {
+    return new Promise( ( resolve, reject ) => {
+        var options = {
+            method: 'GET',
+            url: 'https://api.cin7.com/api/v1/Contacts',
+            qs: {
+                fields: 'id',
+                where: 'email=\'' + email + '\''
+            },
+            headers: {
+                'cache-control': 'no-cache',
+                authorization: process.env.CIN7_AUTH
+            },
+            json: true
+        };
+
+        _throttled_request( options, ( err, ret ) => {
+            return reject( {
+                ok: false,
+                err_msg: err,
+                meta: {
+                    email: email
+                }
+            } );
+
+            var exists = util.isEmpty( ret.fields ) ? false : true;
+            var id = exists ? ret.fields[ 0 ].id : false;
+
+            return resolve( {
+                ok: true,
+                exists: exists,
+                id: id
+            } );
+        } );
+    } );
+};
+
+var cin7_create_customer_record = ( customer, subscription ) => {
+    return new Promise( ( resolve, reject ) => {
+        var customer_details = [ {
+            integrationRef: customer.id,
+            isActive: true,
+            type: 'Customer',
+            firstName: customer.first_name,
+            lastName: customer.last_name,
+            email: customer.email,
+            phone: customer.phone,
+            address1: subscription.shipping_address.line1,
+            address2: subscription.shipping_address.line2,
+            city: subscription.shipping_address.city,
+            state: null,
+            postCode: subscription.shipping_address.postcode,
+            country: 'New Zealand',
+            group: null,
+            subGroup: null,
+            PriceColumn: 'RetailPrice'
+        } ];
+
+        var options = {
+            method: 'POST',
+            url: 'https://api.cin7.com/api/v1/Contacts',
+            headers: {
+                'cache-control': 'no-cache',
+                'content-type': 'application/json',
+                authorization: process.env.CIN7_AUTH
+            },
+            body: customer_details,
+            json: true
+        };
+
+        _throttled_request( options, ( err, ret ) => {
+            if ( err ) {
+                return reject( {
+                    ok: false,
+                    err_msg: err,
+                    meta: {
+                        customer_id: customer.id,
+                        subscription_id: subscription.id
+                    }
+                } );
+            }
+
+            if ( !ret.fields[ 0 ].success ) {
+                return reject( ok: false,
+                    err_msg: ret.fields.[ 0 ].errors.toString(),
+                    meta: {
+                        customer_id: customer.id,
+                        subscription_id: subscription.id
+                    } );
+            }
+
+            return resolve( {
+                ok: true,
+                id: ret.fields[ 0 ].id
+            } );
+        } );
+
+    } );
+};
+
+var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET' ) => {
+    return new Promise( ( resolve, reject ) => {
+        /*
+         *  For accounting purposes we add a dummy 'box' product to sales orders with a unit price equal to the total value of
+         *  a box. This allows us to calculate payments received against the total value (treating subscibers as debtors)
+         */
+        var plan_product = {};
+
+        switch ( plan_id ) {
+        case 'deluxe-box':
+            plan_product = {
+                Code: 'STX-DELUXE-MON',
+                Name: 'Deluxe Box',
+                Option1: 'MON',
+                Option2: 'MONTH',
+                Option3: '1 x OSFA',
+                Qty: 1
+
+            };
+            break;
+        case 'deluxe-box-weekly':
+            plan_product = {
+                Code: 'STX-DELUXE-WEK',
+                Name: 'Deluxe Box',
+                Option1: 'WEK',
+                Option2: 'WEEK',
+                Option3: '1 x OSFA',
+                Qty: 1
+
+            };
+            break;
+
+        case 'premium-box':
+            plan_product = {
+                Code: 'STX-PREMIUM-MON',
+                Name: 'Premium Box',
+                Option1: 'MON',
+                Option2: 'MONTH',
+                Option3: '1 x OSFA',
+                Qty: 1
+            };
+            break;
+
+        case 'premium-box-weekly':
+            plan_product = {
+                Code: 'STX-PREMIUM-WEK',
+                Name: 'Premium Box',
+                Option1: 'WEK',
+                Option2: 'WEEK',
+                Option3: '1 x OSFA',
+                Qty: 1
+            };
+            break;
+        default:
+            return reject( {
+                ok: false,
+                err_msg: 'Unrecognised plan_id received.',
+                meta: {
+                    member_id: member_id,
+                    plan_id: plan_id,
+                    subscription_id: subscription_id,
+                }
+            } );
+        }
+
+        var options = {
+            method: 'POST',
+            url: 'https://api.cin7.com/api/v1/SalesOrders',
+            headers: {
+                'cache-control': 'no-cache',
+                'content-type': 'application/json',
+                authorization: process.env.CIN7_AUTH
+            },
+            body: [ {
+                stage: 'New',
+                memberId: member_id,
+                currencyCode: 'NZD',
+                taxStatus: 'Incl',
+                taxRate: 0.15,
+                internalComments: 'plan: ' + plan_id + ' archetype: ' + archetype + ' top size: ' + size_top + ' bottom size: ' + size_bottom + ' subscription: ' + subscription_id,
+                lineItems: [
+                    plan_product
+                ]
+            } ],
+            json: true
+        };
+
+        _throttled_request( options, ( err, ret ) => {
+            if ( err ) {
+                return reject( {
+                    ok: false,
+                    err_msg: err,
+                    meta: {
+                        member_id: member_id,
+                        plan_id: plan_id,
+                        subscription_id: subscription_id
+                    }
+                } );
+            }
+
+            if ( util.isEmpty( ret.fields ) ) {
+                return reject( {
+                    ok: false,
+                    err_msg: 'Empty_response from Cin7',
+                    meta: {
+                        member_id: member_id,
+                        plan_id: plan_id,
+                        subscription_id: subscription_id
+                    }
+                } );
+            }
+
+            if ( !ret.fields[ 0 ].success ) {
+                return reject( {
+                    ok: false,
+                    err_msg: ret.fields.[ 0 ].errors.toString(),
+                    meta: {
+                        member_id: member_id,
+                        plan_id: plan_id,
+                        subscription_id: subscription_id
+                    }
+                } );
+            }
+
+            return resolve( {
+                ok: true,
+                id: ret.fields[ 0 ].id,
+                resolve: true
+            } );
+        } );
+
+    } );
+};
+
 exports.create_sales_order = create_sales_order;
 exports.get_sales_order = get_sales_order;
 exports.update_sales_order = update_sales_order;
 exports.get_customer_record = get_customer_record;
 exports.update_customer_record = update_customer_record;
 exports.create_customer_record = create_customer_record;
+exports.cin7_check_customer_exists = cin7_check_customer_exists;
+exports.cin7_create_customer_record = cin7_create_customer_record;
+exports.cin7_create_sales_order = cin7_create_sales_order;
 
 /******************************************************** private functions ************************************************/
 
