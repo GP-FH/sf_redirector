@@ -323,20 +323,23 @@ var cin7_create_customer_record = ( customer, subscription ) => {
             }
 
             if ( !ret.fields[ 0 ].success ) {
-                return reject( ok: false,
-                    err_msg: ret.fields.[ 0 ].errors.toString(),
+                return reject( {
+                    ok: false,
+                    err_msg: ret.fields[ 0 ].errors.toString(),
                     meta: {
                         customer_id: customer.id,
                         subscription_id: subscription.id
-                    } );
+                    }
+                } );
             }
 
             return resolve( {
                 ok: true,
                 id: ret.fields[ 0 ].id
             } );
-        } );
 
+
+        } );
     } );
 };
 
@@ -455,7 +458,7 @@ var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, s
             if ( !ret.fields[ 0 ].success ) {
                 return reject( {
                     ok: false,
-                    err_msg: ret.fields.[ 0 ].errors.toString(),
+                    err_msg: ret.fields[ 0 ].errors.toString(),
                     meta: {
                         member_id: member_id,
                         plan_id: plan_id,
