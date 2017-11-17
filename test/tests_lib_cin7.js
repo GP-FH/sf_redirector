@@ -5,6 +5,8 @@
 var expect = require( 'chai' ).expect;
 var nock = require( 'nock' );
 var cin7 = require( '../libs/lib_cin7.js' );
+var sinon = require( 'sinon' );
+var proxyquire = require( 'proxyquire' );
 
 //  mock calls - customer records
 nock( 'https://api.cin7.com:443', {
@@ -79,15 +81,61 @@ nock( 'https://api.cin7.com:443', {
         "message": "error"
     } );
 
-
-
-//  mock calls - sales orders TODO
+//  mock calls - sales orders
 nock( 'https://api.cin7.com:443', {
         "encodedQueryParams": true
-    } ).post( '/api/v1/SalesOrders' )
+    } )
+    .post( '/api/v1/SalesOrders', [ {
+        'member_id': 'win',
+        'plan_id': 'deluxe-box',
+        'subscription_id': 's1',
+        'size_top': '3',
+        'size_bottom': '3',
+        'archetype': 'NOT_SET'
+    } ] )
     .reply( 200, [ { // success
         "index": 0,
         "success": true,
+        "id": 21,
+        "code": "13-0",
+        "errors": []
+    } ] )
+    .post( '/api/v1/SalesOrders', [ {
+        'member_id': 'empty_resp',
+        'plan_id': 'deluxe-box',
+        'subscription_id': 's1',
+        'size_top': '3',
+        'size_bottom': '3',
+        'archetype': 'NOT_SET'
+    } ] )
+    .reply( 200, [ { // fail - empty response
+    } ] )
+    .post( '/api/v1/SalesOrders', [ {
+        'member_id': 'success_false',
+        'plan_id': 'deluxe-box',
+        'subscription_id': 's1',
+        'size_top': '3',
+        'size_bottom': '3',
+        'archetype': 'NOT_SET'
+    } ] )
+    .reply( 200, [ { // fail - success == false
+        "index": 0,
+        "success": false,
+        "id": 21,
+        "code": "13-0",
+        "errors": []
+    } ] )
+    .post( '/api/v1/SalesOrders', [ {
+        'member_id': 'invalid_plan',
+        'plan_id': 'poop_box',
+        'subscription_id': 's1',
+        'size_top': '3',
+        'size_bottom': '3',
+        'archetype': 'NOT_SET'
+    } ] )
+    .reply( 200, [ { // fail - invalid plan
+        "index": 0,
+        "success": false,
         "id": 21,
         "code": "13-0",
         "errors": []
@@ -190,5 +238,53 @@ describe( 'Create customer record', function () {
             expect( ret.fields[ 0 ].errors[ 0 ] ).to.equal( 'error' );
             done();
         } );
+    } );
+} );
+
+/************************************** New Tests for V1.1 functions ***************************************/
+
+describe( 'cin7_create_sales_order() - Create a sales order', () => {
+    it( 'should return a valid ret (ok:true) argument on success', ( done ) => {
+        cin7.cin7_create_sales_order( 'win', 'deluxe-box', 's1', '3', '3', 'NOT_SET' )
+            .then( ( ret ) => {
+                expect( ret.ok ).to.be.true;
+                done();
+            } )
+            .catch( ( err ) => {
+                done( err );
+            } );
+    } );
+
+    it( 'should return a valid error (ok:false) for and empty response from cin7', ( done ) => {
+        cin7.cin7_create_sales_order( 'empty_resp', 'deluxe-box', 's1', '3', '3', 'NOT_SET' )
+            .then( ( ret ) => {
+                done( 'This should not resolve' );
+            } )
+            .catch( ( err ) => {
+                expect( err.ok ).to.be.false;
+                done();
+            } );
+    } );
+
+    it( 'should return a valid error (ok:false) for an invalid plan id', ( done ) => {
+        cin7.cin7_create_sales_order( 'invalid_plan', 'poop-box', 's1', '3', '3', 'NOT_SET' )
+            .then( ( ret ) => {
+                done( 'This should not resolve' );
+            } )
+            .catch( ( err ) => {
+                expect( err.ok ).to.be.false;
+                done();
+            } );
+    } );
+
+    it( 'should return a valid error (ok:false) for missing function parameters', ( done ) => {
+        cin7.cin7_create_sales_order( '1', 'deluxe-box', 's1', '3' )
+            .then( ( ret ) => {
+                done( 'This should not resolve' );
+            } )
+            .catch( ( err ) => {
+                expect( err.ok ).to.be.false;
+                done();
+            } );
     } );
 } );

@@ -345,10 +345,25 @@ var cin7_create_customer_record = ( customer, subscription ) => {
 
 var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET' ) => {
     return new Promise( ( resolve, reject ) => {
+        if ( member_id === undefined || plan_id === undefined || subscription_id === undefined || size_top === undefined || size_bottom === undefined ) {
+            return reject( {
+                ok: false,
+                err_msg: 'Missing parameter',
+                meta: {
+                    member_id: member_id,
+                    plan_id: plan_id,
+                    subscription_id: subscription_id,
+                    size_top: size_top,
+                    size_bottom: size_bottom
+                }
+            } );
+        }
+
         /*
          *  For accounting purposes we add a dummy 'box' product to sales orders with a unit price equal to the total value of
          *  a box. This allows us to calculate payments received against the total value (treating subscibers as debtors)
          */
+
         var plan_product = {};
 
         switch ( plan_id ) {
