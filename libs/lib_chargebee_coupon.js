@@ -6,6 +6,18 @@ chargebee.configure( {
 
 var chargebee_coupon_create_new = ( coupon_id, set_name, customer_id ) => {
     return new Promise( ( resolve, reject ) => {
+        if ( coupon_id === undefined, set_name === undefined, customer_id === undefined ) {
+            return reject( {
+                ok: false,
+                err_msg: 'Required parameter is undefined.',
+                meta: {
+                    coupon_id: coupon_id,
+                    set_name: set_name,
+                    customer_id: customer_id
+                }
+            } );
+        }
+
         chargebee.coupon_code.create( {
             coupon_id: coupon_id,
             coupon_set_name: set_name,
@@ -32,6 +44,16 @@ var chargebee_coupon_create_new = ( coupon_id, set_name, customer_id ) => {
 
 var chargebee_coupon_check_and_apply_referral = ( entity_id ) => {
     return new Promise( ( resolve, reject ) => {
+        if ( entity_id === undefined ) {
+            return reject( {
+                ok: false,
+                err_msg: 'Required parameter is undefined.',
+                meta: {
+                    entity_id: entity_id
+                }
+            } );
+        }
+
         if ( entity_id == process.env.FRIEND_REFERRAL_CODE_ID ) {
             var coupon_owner = coupons[ 0 ].description.split( ' ' )[ 0 ];
 
@@ -54,6 +76,10 @@ var chargebee_coupon_check_and_apply_referral = ( entity_id ) => {
                 } );
             } );
         }
+
+        return resolve( {
+            ok: true
+        } );
     } );
 };
 
