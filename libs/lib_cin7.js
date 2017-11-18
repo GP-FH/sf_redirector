@@ -242,6 +242,16 @@ var create_customer_record = function ( customer_details, callback ) {
 
 var cin7_check_customer_exists = ( email ) => {
     return new Promise( ( resolve, reject ) => {
+        if ( email === undefined ) {
+            return reject( {
+                ok: false,
+                err_msg: 'Missing parameter',
+                meta: {
+                    email: email
+                }
+            } );
+        }
+
         var options = {
             method: 'GET',
             url: 'https://api.cin7.com/api/v1/Contacts',
@@ -279,6 +289,17 @@ var cin7_check_customer_exists = ( email ) => {
 
 var cin7_create_customer_record = ( customer, subscription ) => {
     return new Promise( ( resolve, reject ) => {
+        if ( customer === undefined || subscription === undefined ) {
+            return reject( {
+                ok: false,
+                err_msg: 'Missing parameter',
+                meta: {
+                    customer_id: 'undefined',
+                    subscription_id: 'undefined'
+                }
+            } );
+        }
+
         var customer_details = [ {
             integrationRef: customer.id,
             isActive: true,
@@ -315,6 +336,17 @@ var cin7_create_customer_record = ( customer, subscription ) => {
                 return reject( {
                     ok: false,
                     err_msg: err,
+                    meta: {
+                        customer_id: customer.id,
+                        subscription_id: subscription.id
+                    }
+                } );
+            }
+
+            if ( util.isEmpty( ret.fields ) ) {
+                return reject( {
+                    ok: false,
+                    err_msg: 'Empty_response from Cin7',
                     meta: {
                         customer_id: customer.id,
                         subscription_id: subscription.id

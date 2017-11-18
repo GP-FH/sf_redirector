@@ -27,7 +27,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "mocha -t 4000"
+    "test": "mocha -t 5000"
   },
   "author": "Marcelo Hudson",
   "license": "ISC"
