@@ -20,8 +20,6 @@ var slack_notifier = require( '../libs/lib_slack.js' );
 var cin7 = require( '../libs/lib_cin7.js' );
 var autopilot = require( '../libs/lib_autopilot.js' );
 var util = require( 'underscore' );
-var order = require( '../libs/lib_order.js' );
-var coupon = require( '../libs/lib_coupon.js' );
 
 
 router.post( '/', function ( req, res ) {
@@ -33,6 +31,11 @@ router.post( '/', function ( req, res ) {
      *  On subscription creation, a new customer and a new sales order is created in Cin7
      */
     if ( req.body.event_type == 'subscription_created' ) {
+
+        var customer_id = req.body.content.subscription.customer_id;
+        var plan = req.body.content.subscription.plan_id;
+        var subscription_id = req.body.content.subscription.id;
+        var webhook_sub_object = req.body.content.subscription;
         var email = req.body.content.customer.email;
         var coupons = req.body.content.invoice.discounts || false;
         logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
@@ -42,19 +45,214 @@ router.post( '/', function ( req, res ) {
             autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
         }
 
-        order.order_create_new_subscription( req.body.content.subscription, coupons )
-            .then( ( ret ) => {
-                if ( process.env.ENVIRONMENT == 'prod' ) {
-                    return slack_notifier.send( 'subscription_created', req.body.content.customer, req.body.content.subscription );
+        //  create coupon code used for referring a friend
+        chargebee.coupon_code.create( {
+
+            coupon_id: process.env.FRIEND_REFERRAL_CODE_ID,
+            coupon_set_name: process.env.FRIEND_REFERRAL_SET_NAME,
+            code: customer_id
+
+        } ).request( function ( error, result ) {
+
+            if ( error ) {
+                logger.error( 'Failed to create coupon code in chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
+            }
+
+            //  get customer data using customer_id from newly created subscription event
+            chargebee.customer.retrieve( customer_id ).request( function ( error, result ) {
+
+                if ( error ) {
+                    logger.error( 'Failed to retrieve customer record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id );
                 }
-                res.end();
-            } )
-            .then( ( ret ) => {
-                logger.info( 'Subscription process created: ' + req.body.content.subscription.id );
-            } )
-            .catch( ( err ) => {
-                next( err );
+                else {
+
+                    var customer = result.customer;
+
+                    cin7.get_customer_record( 'id', 'email=\'' + customer.email + '\'', function ( err, ret ) {
+
+                        if ( err || !ret.ok ) {
+                            logger.error( 'Failed to check if user exists in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                        }
+                        else if ( util.isEmpty( ret.fields ) ) {
+                            logger.info( 'Request made to find user in cin7 - no user found. We should create one' );
+
+                            //  get subscription object for new subscription so that the correct shipping address is sent to cin7 customer record
+                            chargebee.subscription.retrieve( subscription_id ).request(
+
+                                function ( error, result ) {
+
+                                    if ( error ) {
+                                        logger.error( 'Failed to retrieve subscription record from chargebee - reason: ' + JSON.stringify( error ) + '. For customer_id: ' + customer_id + ' subscription_id: ' + subscription_id );
+                                    }
+                                    else {
+                                        var subscription = result.subscription;
+                                        var customer_details = [ {
+                                            integrationRef: customer_id,
+                                            isActive: true,
+                                            type: 'Customer',
+                                            firstName: customer.first_name,
+                                            lastName: customer.last_name,
+                                            email: customer.email,
+                                            phone: customer.phone,
+                                            address1: subscription.shipping_address.line1,
+                                            address2: subscription.shipping_address.line2,
+                                            city: subscription.shipping_address.city,
+                                            state: null,
+                                            postCode: subscription.shipping_address.postcode,
+                                            country: 'New Zealand',
+                                            group: null,
+                                            subGroup: null,
+                                            PriceColumn: 'RetailPrice'
+                                        } ];
+
+                                        cin7.create_customer_record( customer_details, function ( err, ret ) {
+
+                                            if ( error || !ret.ok ) {
+                                                logger.error( 'Failed to create customer in Cin7 - reason: ' + ( error || ret.msg ) + '. For customer_id: ' + customer_id );
+                                            }
+                                            else if ( ret.fields[ 0 ].success == false ) {
+                                                logger.error( 'Failed to create customer in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For customer_id: ' + customer_id );
+                                            }
+                                            else {
+
+                                                logger.info( 'Successfully created customer record in Cin7 for customer_id: ' + customer_id + '.  Returned member_id: ' + ret.fields[ 0 ].id );
+
+                                                cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, subscription.cf_topsize, subscription.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
+
+                                                    if ( err || !ret.ok ) {
+                                                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                                                    }
+                                                    else if ( util.isEmpty( ret.fields ) ) {
+                                                        logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                                                    }
+                                                    else if ( ret.fields[ 0 ].success == false ) {
+                                                        logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                                                    }
+                                                    else {
+
+                                                        logger.info( 'Successfully created sales record in Cin7 for customer_id: ' + customer_id );
+
+                                                        //  set intitial subscription count based on the plan_id
+                                                        switch ( plan ) {
+                                                        case 'deluxe-box':
+                                                        case 'premium-box':
+                                                            //  set monthly count to subscription_counter for customer ID
+                                                            subscription_counter.set_monthly( customer_id, subscription_id );
+                                                            break;
+                                                        case 'deluxe-box-weekly':
+                                                        case 'premium-box-weekly':
+                                                            //  set weekly count to subscription_counter for customer ID
+                                                            subscription_counter.set_weekly( customer_id, subscription_id );
+                                                            break;
+                                                        default:
+                                                            logger.error( 'Failed to set count appropriately as plan not found - subscription_id: ' + subscription_id );
+                                                        }
+
+                                                        //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
+                                                        if ( coupons ) {
+
+                                                            if ( coupons[ 0 ].entity_id == process.env.FRIEND_REFERRAL_CODE_ID ) {
+
+                                                                logger.info( 'Referral refer a friend coupon received - adding promotional credits to giver' );
+                                                                var coupon_owner = coupons[ 0 ].description.split( ' ' )[ 0 ];
+
+                                                                chargebee.customer.add_promotional_credits( coupon_owner, {
+                                                                    amount: 1000,
+                                                                    description: "refer_a_friend credits"
+                                                                } ).request( function ( error, result ) {
+                                                                    if ( error ) {
+                                                                        logger.error( 'Failed to give referral credits to customer in Chargebee with ID: ' + customer_id );
+                                                                    }
+                                                                } );
+
+                                                            }
+                                                        }
+
+                                                        if ( process.env.ENVIRONMENT == 'prod' ) {
+                                                            //  notify Slack
+                                                            slack_notifier.send( 'subscription_created', customer, subscription );
+                                                        }
+
+                                                    }
+                                                } );
+                                            }
+                                        } );
+                                    }
+                                }
+                            );
+
+                        }
+                        else {
+
+                            logger.info( 'Request made to find user in cin7 - found. member_id: ' + ret.fields[ 0 ].id + ' I should create a new order now' );
+
+                            //  create a new sales order in cin7
+                            cin7.create_sales_order( ret.fields[ 0 ].id, plan, subscription_id, webhook_sub_object.cf_topsize, webhook_sub_object.cf_bottomsize, 'NOT_SET', function ( err, ret ) {
+
+                                if ( err || !ret.ok ) {
+                                    logger.error( 'Failed to create sales order in Cin7 - reason: ' + ( error || ret.msg ) + '. For subscription_id: ' + subscription_id );
+                                }
+                                else if ( util.isEmpty( ret.fields ) ) {
+                                    logger.error( 'Failed to create sales order in Cin7 - reason: empty_response. For subscription_id: ' + subscription_id );
+                                }
+                                else if ( ret.fields[ 0 ].success == false ) {
+                                    logger.error( 'Failed to create sales order in Cin7 - reason: ' + ret.fields[ 0 ].errors[ 0 ] + '. For subscription_id: ' + subscription_id );
+                                }
+                                else {
+
+                                    logger.info( 'Successfully created sales record in Cin7 for customer_id: ' + customer_id );
+
+                                    //  set intitial subscription count based on the plan_id
+                                    switch ( plan ) {
+                                    case 'deluxe-box':
+                                    case 'premium-box':
+                                        //  set monthly count to subscription_counter for customer ID
+                                        subscription_counter.set_monthly( customer_id, subscription_id );
+                                        break;
+                                    case 'deluxe-box-weekly':
+                                    case 'premium-box-weekly':
+                                        //  set weekly count to subscription_counter for customer ID
+                                        subscription_counter.set_weekly( customer_id, subscription_id );
+                                        break;
+                                    default:
+                                        logger.error( 'Failed to set count appropriately as plan not found - subscription_id: ' + subscription_id );
+                                    }
+
+                                    //  check if they used a refer_a_friend coupon code - length greater than 8. If so, credit the referrer
+                                    if ( coupons ) {
+
+                                        if ( coupons[ 0 ].entity_id == process.env.FRIEND_REFERRAL_CODE_ID ) {
+
+                                            logger.info( 'Referral refer a friend coupon received - adding promotional credits to giver' );
+                                            var coupon_owner = coupons[ 0 ].description.split[ ' ' ][ 0 ];
+
+                                            chargebee.customer.add_promotional_credits( coupon_owner, {
+                                                amount: 1000,
+                                                description: "refer_a_friend credits"
+                                            } ).request( function ( error, result ) {
+                                                if ( error ) {
+                                                    logger.error( 'Failed to give referral credits to customer in Chargebee with ID: ' + customer_id );
+                                                }
+                                            } );
+
+                                        }
+                                    }
+
+                                    if ( process.env.ENVIRONMENT == 'prod' ) {
+                                        //  notify Slack
+                                        slack_notifier.send( 'subscription_created', customer, webhook_sub_object );
+                                    }
+
+                                }
+                            } );
+                        }
+                    } );
+
+                }
+
             } );
+        } );
+
     }
     else if ( req.body.event_type == 'subscription_renewed' ) {
 
@@ -375,11 +573,6 @@ router.post( '/', function ( req, res ) {
         }
 
     }
-} );
-
-// error handling for the sub route
-router.use( function ( err, req, res, next ) {
-    logger.error( JSON.stringify( err ) );
 } );
 
 module.exports = router;
