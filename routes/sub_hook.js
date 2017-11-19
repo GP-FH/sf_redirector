@@ -24,7 +24,7 @@ var order = require( '../libs/lib_order.js' );
 var coupon = require( '../libs/lib_chargebee_coupon.js' );
 
 
-router.post( '/', function ( req, res ) {
+router.post( '/', function ( req, res, next ) {
 
     //  send immediate 200OK to keep chargebee happy and prevent unneccessary retries
     res.status( 200 ).send();
@@ -35,7 +35,7 @@ router.post( '/', function ( req, res ) {
     if ( req.body.event_type == 'subscription_created' ) {
         var email = req.body.content.customer.email;
         var coupons = req.body.content.invoice.discounts || false;
-        logger.info( 'Subscription created for customer with ID: ' + req.body.content.customer.id + ' for plan: ' + req.body.content.subscription.id );
+        logger.info( 'Subscription created for customer with ID: ' + req.body.content.customer.id );
 
         if ( process.env.ENVIRONMENT == 'prod' ) {
             //  move them from the completers list to the subscribers list in autopilot
@@ -380,6 +380,7 @@ router.post( '/', function ( req, res ) {
 
 // error handling for the sub route
 router.use( function ( err, req, res, next ) {
+    res.end();
     logger.error( JSON.stringify( err ) );
 } );
 
