@@ -7,6 +7,7 @@ chargebee.configure( {
 var chargebee_get_customer_info = ( customer_id ) => {
     return new Promise( ( resolve, reject ) => {
         if ( customer_id === undefined ) {
+            logger.info( 'DEBUG: chargebee_get_customer_info() - invalid param' );
             return reject( {
                 ok: false,
                 err_msg: 'Required parameter (customer_id) is undefined. ',
@@ -18,6 +19,7 @@ var chargebee_get_customer_info = ( customer_id ) => {
 
         chargebee.customer.retrieve( customer_id ).request( ( err, ret ) => {
             if ( err ) {
+                logger.info( 'DEBUG: chargebee_get_customer_info() - request error' );
                 return reject( {
                     ok: false,
                     err_msg: err,
@@ -26,6 +28,7 @@ var chargebee_get_customer_info = ( customer_id ) => {
                     }
                 } );
             }
+            logger.info( 'DEBUG: chargebee_get_customer_info() - returning success' );
             return resolve( {
                 ok: true,
                 customer: ret.customer
@@ -37,6 +40,7 @@ var chargebee_get_customer_info = ( customer_id ) => {
 var chargebee_get_subscription_info = ( subscription_id ) => {
     return new Promise( ( resolve, reject ) => {
         if ( subscription_id === undefined ) {
+            logger.info( 'DEBUG: chargebee_get_subscription_info() - invalid param' );
             return reject( {
                 ok: false,
                 err_msg: 'Required parameter (subscription_id) is undefined. ',
@@ -47,6 +51,7 @@ var chargebee_get_subscription_info = ( subscription_id ) => {
         }
         chargebee.subscription.retrieve( subscription_id ).request( ( err, ret ) => {
             if ( err ) {
+                logger.info( 'DEBUG: chargebee_get_subscription_info() - request error' );
                 return reject( {
                     ok: false,
                     err_msg: err,
@@ -55,6 +60,7 @@ var chargebee_get_subscription_info = ( subscription_id ) => {
                     }
                 } );
             }
+            logger.info( 'DEBUG: chargebee_get_subscription_info() - returning success' );
             return resolve( {
                 ok: true,
                 subscription: ret.subscription
