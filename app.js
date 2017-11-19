@@ -23,14 +23,11 @@ var options = {
 };
 var server = https.createServer( options, app );
 
-var RateLimiter = require( 'limiter' ).RateLimiter;
-var limiter = new RateLimiter( 1, 2000 ); // at most 1 request every 1000 ms
-exports.limiter = limiter;
-
 chargebee.configure( {
     site: process.env.CHARGEBEE_SITE,
     api_key: process.env.CHARGEBEE_API_KEY
 } );
+
 exports.chargebee = chargebee;
 
 app.use( bodyparser.json() );
