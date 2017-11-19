@@ -35,7 +35,7 @@ router.post( '/', function ( req, res ) {
     if ( req.body.event_type == 'subscription_created' ) {
         var email = req.body.content.customer.email;
         var coupons = req.body.content.invoice.discounts || false;
-        logger.info( 'Subscription created for customer with ID: ' + customer_id + ' for plan: ' + plan );
+        logger.info( 'Subscription created for customer with ID: ' + req.body.content.customer.id + ' for plan: ' + req.body.content.subscription.id );
 
         if ( process.env.ENVIRONMENT == 'prod' ) {
             //  move them from the completers list to the subscribers list in autopilot
@@ -47,6 +47,7 @@ router.post( '/', function ( req, res ) {
                 if ( process.env.ENVIRONMENT == 'prod' ) {
                     return slack_notifier.send( 'subscription_created', req.body.content.customer, req.body.content.subscription );
                 }
+                logger.info( 'Subscription process created: ' + req.body.content.subscription.id );
                 res.end();
             } )
             .then( ( ret ) => {
