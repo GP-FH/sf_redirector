@@ -21,7 +21,7 @@ var cin7 = require( '../libs/lib_cin7.js' );
 var autopilot = require( '../libs/lib_autopilot.js' );
 var util = require( 'underscore' );
 var order = require( '../libs/lib_order.js' );
-var coupon = require( '../libs/lib_coupon.js' );
+var coupon = require( '../libs/lib_chargebee_coupon.js' );
 
 
 router.post( '/', function ( req, res ) {
