@@ -243,6 +243,7 @@ var create_customer_record = function ( customer_details, callback ) {
 var cin7_check_customer_exists = ( email ) => {
     return new Promise( ( resolve, reject ) => {
         if ( email === undefined ) {
+            logger.info( 'DEBUG: cin7_check_customer_exists() - missing params error' );
             return reject( {
                 ok: false,
                 err_msg: 'Missing parameter',
@@ -267,17 +268,32 @@ var cin7_check_customer_exists = ( email ) => {
         };
 
         _throttled_request( options, ( err, ret ) => {
-            return reject( {
-                ok: false,
-                err_msg: err,
-                meta: {
-                    email: email
-                }
-            } );
+            if ( err ) {
+                logger.info( 'DEBUG: cin7_check_customer_exists() - request error' );
+                return reject( {
+                    ok: false,
+                    err_msg: err,
+                    meta: {
+                        email: email
+                    }
+                } );
+            }
+
+            if ( !ret.ok ) {
+                logger.info( 'DEBUG: cin7_check_customer_exists() - request error' );
+                return reject( {
+                    ok: false,
+                    err_msg: ret.msg,
+                    meta: {
+                        email: email
+                    }
+                } );
+            }
 
             var exists = util.isEmpty( ret.fields ) ? false : true;
             var id = exists ? ret.fields[ 0 ].id : false;
 
+            logger.info( 'DEBUG: cin7_check_customer_exists() - return success' );
             return resolve( {
                 ok: true,
                 exists: exists,
@@ -341,6 +357,17 @@ var cin7_create_customer_record = ( customer, subscription ) => {
                     meta: {
                         customer_id: customer.id,
                         subscription_id: subscription.id
+                    }
+                } );
+            }
+
+            if ( !ret.ok ) {
+                logger.info( 'DEBUG: cin7_create_customer_record() - request error' );
+                return reject( {
+                    ok: false,
+                    err_msg: ret.msg,
+                    meta: {
+                        email: email
                     }
                 } );
             }
@@ -495,6 +522,17 @@ var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, s
                 } );
             }
 
+            if ( !ret.ok ) {
+                logger.info( 'DEBUG: cin7_create_sales_order() - request error' );
+                return reject( {
+                    ok: false,
+                    err_msg: ret.msg,
+                    meta: {
+                        email: email
+                    }
+                } );
+            }
+
             if ( util.isEmpty( ret.fields ) ) {
                 return reject( {
                     ok: false,
@@ -552,7 +590,7 @@ function _throttled_request( options, callback ) {
             if ( error ) {
                 return callback( error );
             }
-            else if ( response.statusCode != 200 ) {
+            else if ( response.statusCode != 200 ) { //NOTE: handle this case properly Marcelo
                 return callback( null, {
                     ok: false,
                     msg: 'status code ' + response.statusCode + ' reason: ' + response.body
