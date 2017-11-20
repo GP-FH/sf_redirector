@@ -383,5 +383,3 @@ router.use( function ( err, req, res, next ) {
     res.end();
     logger.error( JSON.stringify( err ) );
 } );
-
-module.exports = router;

@@ -51,7 +51,7 @@ var chargebee_coupon_create_new = ( coupon_id, set_name, customer_id ) => {
 /*
  * This function checks a coupon code to see if it is a referral code. If it is a referral code
  * it adds adds promotional credits to the referrers account in Chargebee. It can do this as the
- * referral code is actually just the customer ID of the referring customer. 
+ * referral code is actually just the customer ID of the referring customer.
  */
 var chargebee_coupon_check_and_apply_referral = ( entity_id ) => {
     return new Promise( ( resolve, reject ) => {

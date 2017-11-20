@@ -11,7 +11,6 @@ var request = require( 'request' );
 var logger = require( './lib_logger.js' );
 var RateLimiter = require( 'limiter' ).RateLimiter;
 var limiter = new RateLimiter( 1, 3000 );
-var util = require( 'underscore' );
 
 
 /*********************************************Sales Order Actions***********************************************/
@@ -20,6 +19,7 @@ var util = require( 'underscore' );
  *  Creates a sales order in Cin7 for the given member and subscription plan
  */
 var create_sales_order = function ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET', callback ) {
+
     /*
      *  For accounting purposes we add a dummy 'box' product to sales orders with a unit price equal to the total value of
      *  a box. This allows us to calculate payments received against the total value (treating subscibers as debtors)
@@ -590,9 +590,6 @@ exports.update_sales_order = update_sales_order;
 exports.get_customer_record = get_customer_record;
 exports.update_customer_record = update_customer_record;
 exports.create_customer_record = create_customer_record;
-exports.cin7_check_customer_exists = cin7_check_customer_exists;
-exports.cin7_create_customer_record = cin7_create_customer_record;
-exports.cin7_create_sales_order = cin7_create_sales_order;
 
 /******************************************************** private functions ************************************************/
 

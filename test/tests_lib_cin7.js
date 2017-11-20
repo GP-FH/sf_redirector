@@ -370,7 +370,7 @@ describe( 'cin7_check_customer_exists() - Check whether contact in Cin7 exists',
     /*
      * These two tests are failing but it's due to a nock thing, not a function error. Will fix later
      *
-     
+
     it( 'should return a valid ret (ok:true + exists true) argument on success', ( done ) => {
         cin7.cin7_check_customer_exists( 'test@exists.com' )
             .then( ( ret ) => {
@@ -382,7 +382,6 @@ describe( 'cin7_check_customer_exists() - Check whether contact in Cin7 exists',
                 done( err );
             } );
     } );
-
     it( 'should return a valid ret (ok:true + exists false) argument on success', ( done ) => {
         cin7.cin7_check_customer_exists( 'test@notexists.com' )
             .then( ( ret ) => {
