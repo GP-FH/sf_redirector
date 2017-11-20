@@ -31,7 +31,7 @@ var order_create_new_subscription = ( sub, coupons ) => {
                 }
                 else if ( ret.exists ) {
                     logger.info( 'Existing customer. Creating new sales order in Cin7: ' + sub.id );
-                    return cin7.cin7_create_sales_order( ret.id, sub.plan, sub.id, sub.cf_topsize, sub.cf_bottomsize, 'NOT_SET' );
+                    return cin7.cin7_create_sales_order( ret.id, sub.plan_id, sub.id, sub.cf_topsize, sub.cf_bottomsize, 'NOT_SET' );
                 }
             } )
             .then( ( ret ) => {
@@ -47,7 +47,7 @@ var order_create_new_subscription = ( sub, coupons ) => {
             } )
             .then( ( ret ) => {
                 logger.info( 'Creating new sales order in Cin7: ' + sub.id );
-                cin7.cin7_create_sales_order( ret.id, sub.plan, sub.id, sub.cf_topsize, sub.cf_bottomsize, 'NOT_SET' );
+                cin7.cin7_create_sales_order( ret.id, sub.plan_id, sub.id, sub.cf_topsize, sub.cf_bottomsize, 'NOT_SET' );
             } )
             .then( ( ret ) => {
                 subscription_tracker.subscription_tracker_set_subscription_count( sub.plan_id, sub.id, customer.id );
