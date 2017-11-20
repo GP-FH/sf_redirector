@@ -594,6 +594,7 @@ exports.cin7_check_customer_exists = cin7_check_customer_exists;
 exports.cin7_create_customer_record = cin7_create_customer_record;
 exports.cin7_create_sales_order = cin7_create_sales_order;
 
+
 /******************************************************** private functions ************************************************/
 
 /*
