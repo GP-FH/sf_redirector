@@ -240,6 +240,10 @@ var create_customer_record = function ( customer_details, callback ) {
 
 /****************************************************** promisified functions ***********************************************/
 
+/*
+ * A promise wrapper around a call to the Cin7 API. This functions checks for a customer with the given
+ * email and returns the customers member_id if found + exists=true.
+ */
 var cin7_check_customer_exists = ( email ) => {
     return new Promise( ( resolve, reject ) => {
         if ( email === undefined ) {
@@ -306,6 +310,10 @@ var cin7_check_customer_exists = ( email ) => {
     } );
 };
 
+/*
+ * A promise wrapper around a call to the Cin7 API. This function creates a customer record
+ * in Cin7 using information from Chargebee. It returns the customer's member_id.
+ */
 var cin7_create_customer_record = ( customer, subscription ) => {
     return new Promise( ( resolve, reject ) => {
         if ( customer === undefined || subscription === undefined ) {
@@ -415,6 +423,10 @@ var cin7_create_customer_record = ( customer, subscription ) => {
     } );
 };
 
+/*
+ * A promise wrapper around a call to the Cin7 API. This function creates a sales order in Cin7. Sales orders
+ * are created seasonally with generation controlled by the renewal_tracker.
+ */
 var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET' ) => {
     return new Promise( ( resolve, reject ) => {
         if ( member_id === undefined || plan_id === undefined || subscription_id === undefined || size_top === undefined || size_bottom === undefined ) {

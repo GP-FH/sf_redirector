@@ -5,6 +5,10 @@ chargebee.configure( {
     api_key: process.env.CHARGEBEE_API_KEY
 } );
 
+/*
+ * This function is a promise wrapper for the customer retrieval functions of the chargebee module.
+ * It returns a customer object full of useful information.
+ */
 var chargebee_get_customer_info = ( customer_id ) => {
     return new Promise( ( resolve, reject ) => {
         if ( customer_id === undefined ) {
@@ -40,6 +44,10 @@ var chargebee_get_customer_info = ( customer_id ) => {
     } );
 };
 
+/*
+ * This function is a promise wrapper for the subscription retrieval functions of the chargebee module.
+ * Similar to the above function it returns a subscription object full of good stuff.
+ */
 var chargebee_get_subscription_info = ( subscription_id ) => {
     return new Promise( ( resolve, reject ) => {
         if ( subscription_id === undefined ) {

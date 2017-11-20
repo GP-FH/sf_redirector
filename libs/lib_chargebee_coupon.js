@@ -4,6 +4,10 @@ chargebee.configure( {
     api_key: process.env.CHARGEBEE_API_KEY
 } );
 
+/*
+ * Creates a new coupion in an existing coupon set in Chargebee. These coupons are used by customers
+ * on on purchase to unlock discounts.
+ */
 var chargebee_coupon_create_new = ( coupon_id, set_name, customer_id ) => {
     return new Promise( ( resolve, reject ) => {
         if ( coupon_id === undefined, set_name === undefined, customer_id === undefined ) {
@@ -44,6 +48,11 @@ var chargebee_coupon_create_new = ( coupon_id, set_name, customer_id ) => {
     } );
 };
 
+/*
+ * This function checks a coupon code to see if it is a referral code. If it is a referral code
+ * it adds adds promotional credits to the referrers account in Chargebee. It can do this as the
+ * referral code is actually just the customer ID of the referring customer. 
+ */
 var chargebee_coupon_check_and_apply_referral = ( entity_id ) => {
     return new Promise( ( resolve, reject ) => {
         if ( entity_id === undefined ) {
