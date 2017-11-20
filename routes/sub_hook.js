@@ -47,7 +47,6 @@ router.post( '/', function ( req, res, next ) {
                 if ( process.env.ENVIRONMENT == 'prod' ) {
                     return slack_notifier.send( 'subscription_created', req.body.content.customer, req.body.content.subscription );
                 }
-                logger.info( 'Subscription process created: ' + req.body.content.subscription.id );
                 res.end();
             } )
             .then( ( ret ) => {
