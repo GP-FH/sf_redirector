@@ -36,7 +36,7 @@ var order_create_new_subscription = ( sub, coupons ) => {
             } )
             .then( ( ret ) => {
                 if ( ret.resolve ) {
-                    subscription_tracker.subscription_tracker_set_subscription_count( sub.plan, sub.id, customer.id );
+                    subscription_tracker.subscription_tracker_set_subscription_count( sub.plan_id, sub.id, customer.id );
                     return resolve( {
                         ok: true
                     } );
@@ -50,7 +50,7 @@ var order_create_new_subscription = ( sub, coupons ) => {
                 cin7.cin7_create_sales_order( ret.id, sub.plan, sub.id, sub.cf_topsize, sub.cf_bottomsize, 'NOT_SET' );
             } )
             .then( ( ret ) => {
-                subscription_tracker.subscription_tracker_set_subscription_count( sub.plan, sub.id, customer.id );
+                subscription_tracker.subscription_tracker_set_subscription_count( sub.plan_id, sub.id, customer.id );
 
                 /*
                  * If a coupon code was used by the customer we want to check whether it was a referral as
