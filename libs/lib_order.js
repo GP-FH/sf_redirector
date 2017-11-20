@@ -13,7 +13,7 @@ var order_create_new_subscription = ( sub, coupons ) => {
         chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, sub.customer_id )
             .then( ( ret ) => {
                 logger.info( 'Created referral coupon code: subscription_id: ' + sub.id );
-                return chargebee.chargebee_get_customer_info( sub.customer.id );
+                return chargebee.chargebee_get_customer_info( sub.customer_id );
             } )
             .then( ( ret ) => {
                 customer = ret.customer;
