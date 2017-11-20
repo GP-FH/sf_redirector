@@ -5,6 +5,10 @@ chargebee.configure( {
     api_key: process.env.CHARGEBEE_API_KEY
 } );
 
+/*
+ * This function is a promise wrapper for the customer retrieval functions of the chargebee module.
+ * It returns a customer object full of useful information.
+ */
 var chargebee_get_customer_info = ( customer_id ) => {
     return new Promise( ( resolve, reject ) => {
         if ( customer_id === undefined ) {
@@ -13,7 +17,8 @@ var chargebee_get_customer_info = ( customer_id ) => {
                 ok: false,
                 err_msg: 'Required parameter (customer_id) is undefined. ',
                 meta: {
-                    customer_id: 'undefined'
+                    customer_id: 'undefined',
+                    function: 'chargebee_get_customer_info()'
                 }
             } );
         }
@@ -25,7 +30,8 @@ var chargebee_get_customer_info = ( customer_id ) => {
                     ok: false,
                     err_msg: err,
                     meta: {
-                        customer_id: customer_id
+                        customer_id: customer_id,
+                        function: 'chargebee_get_customer_info()'
                     }
                 } );
             }
@@ -38,6 +44,10 @@ var chargebee_get_customer_info = ( customer_id ) => {
     } );
 };
 
+/*
+ * This function is a promise wrapper for the subscription retrieval functions of the chargebee module.
+ * Similar to the above function it returns a subscription object full of good stuff.
+ */
 var chargebee_get_subscription_info = ( subscription_id ) => {
     return new Promise( ( resolve, reject ) => {
         if ( subscription_id === undefined ) {
@@ -46,7 +56,8 @@ var chargebee_get_subscription_info = ( subscription_id ) => {
                 ok: false,
                 err_msg: 'Required parameter (subscription_id) is undefined. ',
                 meta: {
-                    subscription_id: 'undefined'
+                    subscription_id: 'undefined',
+                    function: 'chargebee_get_subscription_info()'
                 }
             } );
         }
@@ -57,7 +68,8 @@ var chargebee_get_subscription_info = ( subscription_id ) => {
                     ok: false,
                     err_msg: err,
                     meta: {
-                        subscription_id: subscription.id
+                        subscription_id: subscription.id,
+                        function: 'chargebee_get_subscription_info()'
                     }
                 } );
             }

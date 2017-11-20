@@ -47,12 +47,11 @@ router.post( '/', function ( req, res, next ) {
         order.order_create_new_subscription( req.body.content.subscription, coupons )
             .then( ( ret ) => {
                 if ( process.env.ENVIRONMENT == 'prod' ) {
-                    return slack_notifier.send( 'subscription_created', req.body.content.customer, req.body.content.subscription );
+                    slack_notifier.send( 'subscription_created', req.body.content.customer, req.body.content.subscription );
                 }
+
+                logger.info( 'New order complete: ' + req.body.content.subscription.id );
                 res.end();
-            } )
-            .then( ( ret ) => {
-                logger.info( 'Subscription process created: ' + req.body.content.subscription.id );
             } )
             .catch( ( err ) => {
                 next( err );

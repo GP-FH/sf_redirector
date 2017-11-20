@@ -240,6 +240,10 @@ var create_customer_record = function ( customer_details, callback ) {
 
 /****************************************************** promisified functions ***********************************************/
 
+/*
+ * A promise wrapper around a call to the Cin7 API. This functions checks for a customer with the given
+ * email and returns the customers member_id if found + exists=true.
+ */
 var cin7_check_customer_exists = ( email ) => {
     return new Promise( ( resolve, reject ) => {
         if ( email === undefined ) {
@@ -248,7 +252,8 @@ var cin7_check_customer_exists = ( email ) => {
                 ok: false,
                 err_msg: 'Missing parameter',
                 meta: {
-                    email: email
+                    email: email,
+                    function: 'cin7_check_customer_exists()'
                 }
             } );
         }
@@ -274,7 +279,8 @@ var cin7_check_customer_exists = ( email ) => {
                     ok: false,
                     err_msg: err,
                     meta: {
-                        email: email
+                        email: email,
+                        function: 'cin7_check_customer_exists()'
                     }
                 } );
             }
@@ -285,7 +291,8 @@ var cin7_check_customer_exists = ( email ) => {
                     ok: false,
                     err_msg: ret.msg,
                     meta: {
-                        email: email
+                        email: email,
+                        function: 'cin7_check_customer_exists()'
                     }
                 } );
             }
@@ -303,6 +310,10 @@ var cin7_check_customer_exists = ( email ) => {
     } );
 };
 
+/*
+ * A promise wrapper around a call to the Cin7 API. This function creates a customer record
+ * in Cin7 using information from Chargebee. It returns the customer's member_id.
+ */
 var cin7_create_customer_record = ( customer, subscription ) => {
     return new Promise( ( resolve, reject ) => {
         if ( customer === undefined || subscription === undefined ) {
@@ -312,7 +323,8 @@ var cin7_create_customer_record = ( customer, subscription ) => {
                 err_msg: 'Missing parameter',
                 meta: {
                     customer_id: 'undefined',
-                    subscription_id: 'undefined'
+                    subscription_id: 'undefined',
+                    function: 'cin7_create_customer_record()'
                 }
             } );
         }
@@ -356,7 +368,8 @@ var cin7_create_customer_record = ( customer, subscription ) => {
                     err_msg: err,
                     meta: {
                         customer_id: customer.id,
-                        subscription_id: subscription.id
+                        subscription_id: subscription.id,
+                        function: 'cin7_create_customer_record()'
                     }
                 } );
             }
@@ -367,7 +380,9 @@ var cin7_create_customer_record = ( customer, subscription ) => {
                     ok: false,
                     err_msg: ret.msg,
                     meta: {
-                        email: email
+                        customer_id: customer.id,
+                        subscription_id: subscription.id,
+                        function: 'cin7_create_customer_record()'
                     }
                 } );
             }
@@ -379,7 +394,8 @@ var cin7_create_customer_record = ( customer, subscription ) => {
                     err_msg: 'Empty_response from Cin7',
                     meta: {
                         customer_id: customer.id,
-                        subscription_id: subscription.id
+                        subscription_id: subscription.id,
+                        function: 'cin7_create_customer_record()'
                     }
                 } );
             }
@@ -407,6 +423,10 @@ var cin7_create_customer_record = ( customer, subscription ) => {
     } );
 };
 
+/*
+ * A promise wrapper around a call to the Cin7 API. This function creates a sales order in Cin7. Sales orders
+ * are created seasonally with generation controlled by the renewal_tracker.
+ */
 var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, size_bottom, archetype = 'NOT_SET' ) => {
     return new Promise( ( resolve, reject ) => {
         if ( member_id === undefined || plan_id === undefined || subscription_id === undefined || size_top === undefined || size_bottom === undefined ) {
@@ -418,7 +438,8 @@ var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, s
                     plan_id: plan_id,
                     subscription_id: subscription_id,
                     size_top: size_top,
-                    size_bottom: size_bottom
+                    size_bottom: size_bottom,
+                    function: 'cin7_create_sales_order()'
                 }
             } );
         }
@@ -483,6 +504,7 @@ var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, s
                     member_id: member_id,
                     plan_id: plan_id,
                     subscription_id: subscription_id,
+                    function: 'cin7_create_sales_order()'
                 }
             } );
         }
@@ -517,7 +539,8 @@ var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, s
                     meta: {
                         member_id: member_id,
                         plan_id: plan_id,
-                        subscription_id: subscription_id
+                        subscription_id: subscription_id,
+                        function: 'cin7_create_sales_order()'
                     }
                 } );
             }
@@ -528,7 +551,10 @@ var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, s
                     ok: false,
                     err_msg: ret.msg,
                     meta: {
-                        email: email
+                        member_id: member_id,
+                        plan_id: plan_id,
+                        subscription_id: subscription_id,
+                        function: 'cin7_create_sales_order()'
                     }
                 } );
             }
@@ -540,7 +566,8 @@ var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, s
                     meta: {
                         member_id: member_id,
                         plan_id: plan_id,
-                        subscription_id: subscription_id
+                        subscription_id: subscription_id,
+                        function: 'cin7_create_sales_order()'
                     }
                 } );
             }
@@ -552,7 +579,8 @@ var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, s
                     meta: {
                         member_id: member_id,
                         plan_id: plan_id,
-                        subscription_id: subscription_id
+                        subscription_id: subscription_id,
+                        function: 'cin7_create_sales_order()'
                     }
                 } );
             }

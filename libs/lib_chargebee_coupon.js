@@ -4,6 +4,10 @@ chargebee.configure( {
     api_key: process.env.CHARGEBEE_API_KEY
 } );
 
+/*
+ * Creates a new coupion in an existing coupon set in Chargebee. These coupons are used by customers
+ * on on purchase to unlock discounts.
+ */
 var chargebee_coupon_create_new = ( coupon_id, set_name, customer_id ) => {
     return new Promise( ( resolve, reject ) => {
         if ( coupon_id === undefined, set_name === undefined, customer_id === undefined ) {
@@ -13,7 +17,8 @@ var chargebee_coupon_create_new = ( coupon_id, set_name, customer_id ) => {
                 meta: {
                     coupon_id: coupon_id,
                     set_name: set_name,
-                    customer_id: customer_id
+                    customer_id: customer_id,
+                    function: 'chargebee_coupon_create_new()'
                 }
             } );
         }
@@ -30,7 +35,8 @@ var chargebee_coupon_create_new = ( coupon_id, set_name, customer_id ) => {
                     meta: {
                         customer_id: customer.id,
                         coupon_id: coupon_id,
-                        set_name: set_name
+                        set_name: set_name,
+                        function: 'chargebee_coupon_create_new()'
                     }
                 } );
             }
@@ -42,6 +48,11 @@ var chargebee_coupon_create_new = ( coupon_id, set_name, customer_id ) => {
     } );
 };
 
+/*
+ * This function checks a coupon code to see if it is a referral code. If it is a referral code
+ * it adds adds promotional credits to the referrers account in Chargebee. It can do this as the
+ * referral code is actually just the customer ID of the referring customer. 
+ */
 var chargebee_coupon_check_and_apply_referral = ( entity_id ) => {
     return new Promise( ( resolve, reject ) => {
         if ( entity_id === undefined ) {
@@ -49,7 +60,8 @@ var chargebee_coupon_check_and_apply_referral = ( entity_id ) => {
                 ok: false,
                 err_msg: 'Required parameter is undefined.',
                 meta: {
-                    entity_id: entity_id
+                    entity_id: entity_id,
+                    function: 'chargebee_coupon_check_and_apply_referral()'
                 }
             } );
         }
@@ -66,7 +78,8 @@ var chargebee_coupon_check_and_apply_referral = ( entity_id ) => {
                         ok: false,
                         err_msg: err,
                         meta: {
-                            entity_id: entity_id
+                            entity_id: entity_id,
+                            function: 'chargebee_coupon_check_and_apply_referral()'
                         }
                     } );
                 }
