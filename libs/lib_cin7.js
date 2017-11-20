@@ -247,7 +247,6 @@ var create_customer_record = function ( customer_details, callback ) {
 var cin7_check_customer_exists = ( email ) => {
     return new Promise( ( resolve, reject ) => {
         if ( email === undefined ) {
-            logger.info( 'DEBUG: cin7_check_customer_exists() - missing params error' );
             return reject( {
                 ok: false,
                 err_msg: 'Missing parameter',
@@ -274,7 +273,6 @@ var cin7_check_customer_exists = ( email ) => {
 
         _throttled_request( options, ( err, ret ) => {
             if ( err ) {
-                logger.info( 'DEBUG: cin7_check_customer_exists() - request error' );
                 return reject( {
                     ok: false,
                     err_msg: err,
@@ -286,7 +284,6 @@ var cin7_check_customer_exists = ( email ) => {
             }
 
             if ( !ret.ok ) {
-                logger.info( 'DEBUG: cin7_check_customer_exists() - request error' );
                 return reject( {
                     ok: false,
                     err_msg: ret.msg,
@@ -300,7 +297,6 @@ var cin7_check_customer_exists = ( email ) => {
             var exists = util.isEmpty( ret.fields ) ? false : true;
             var id = exists ? ret.fields[ 0 ].id : false;
 
-            logger.info( 'DEBUG: cin7_check_customer_exists() - return success' );
             return resolve( {
                 ok: true,
                 exists: exists,
@@ -317,7 +313,6 @@ var cin7_check_customer_exists = ( email ) => {
 var cin7_create_customer_record = ( customer, subscription ) => {
     return new Promise( ( resolve, reject ) => {
         if ( customer === undefined || subscription === undefined ) {
-            logger.info( 'DEBUG: cin7_create_customer_record() - invalid param' );
             return reject( {
                 ok: false,
                 err_msg: 'Missing parameter',
@@ -362,7 +357,6 @@ var cin7_create_customer_record = ( customer, subscription ) => {
 
         _throttled_request( options, ( err, ret ) => {
             if ( err ) {
-                logger.info( 'DEBUG: cin7_create_customer_record() - request error' );
                 return reject( {
                     ok: false,
                     err_msg: err,
@@ -375,7 +369,6 @@ var cin7_create_customer_record = ( customer, subscription ) => {
             }
 
             if ( !ret.ok ) {
-                logger.info( 'DEBUG: cin7_create_customer_record() - request error' );
                 return reject( {
                     ok: false,
                     err_msg: ret.msg,
@@ -388,7 +381,6 @@ var cin7_create_customer_record = ( customer, subscription ) => {
             }
 
             if ( util.isEmpty( ret.fields ) ) {
-                logger.info( 'DEBUG: cin7_create_customer_record() - empty response' );
                 return reject( {
                     ok: false,
                     err_msg: 'Empty_response from Cin7',
@@ -401,7 +393,6 @@ var cin7_create_customer_record = ( customer, subscription ) => {
             }
 
             if ( !ret.fields[ 0 ].success ) {
-                logger.info( 'DEBUG: cin7_create_customer_record() - !success repsonse' );
                 return reject( {
                     ok: false,
                     err_msg: ret.fields[ 0 ].errors.toString(),
@@ -412,7 +403,6 @@ var cin7_create_customer_record = ( customer, subscription ) => {
                 } );
             }
 
-            logger.info( 'DEBUG: cin7_create_customer_record() - returning success' );
             return resolve( {
                 ok: true,
                 id: ret.fields[ 0 ].id
@@ -546,7 +536,6 @@ var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, s
             }
 
             if ( !ret.ok ) {
-                logger.info( 'DEBUG: cin7_create_sales_order() - request error' );
                 return reject( {
                     ok: false,
                     err_msg: ret.msg,
