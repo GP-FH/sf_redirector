@@ -15,9 +15,11 @@
     "mixpanel": "^0.7.0",
     "mocha": "^3.4.2",
     "nock": "^9.0.13",
+    "proxyquire": "^1.8.0",
     "redis": "^2.7.1",
     "redis-mock": "^0.17.1",
     "request": "^2.81.0",
+    "sinon": "^4.1.2",
     "supertest": "^3.0.0",
     "underscore": "^1.8.3",
     "winston": "^2.3.1",
@@ -25,7 +27,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "mocha -t 4000"
+    "test": "mocha -t 5000"
   },
   "author": "Marcelo Hudson",
   "license": "ISC"
