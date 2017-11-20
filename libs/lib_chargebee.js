@@ -1,3 +1,4 @@
+var logger = require( './lib_logger.js' );
 var chargebee = require( 'chargebee' );
 chargebee.configure( {
     site: process.env.CHARGEBEE_SITE,
