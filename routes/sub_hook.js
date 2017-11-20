@@ -25,20 +25,22 @@ var coupon = require( '../libs/lib_chargebee_coupon.js' );
 
 
 router.post( '/', function ( req, res, next ) {
-
-    //  send immediate 200OK to keep chargebee happy and prevent unneccessary retries
-    res.status( 200 ).send();
+    res.status( 200 ).send(); // Send immediate 200OK to keep chargebee happy and prevent unneccessary retries
 
     /*
      *  On subscription creation, a new customer and a new sales order is created in Cin7
      */
+
     if ( req.body.event_type == 'subscription_created' ) {
         var email = req.body.content.customer.email;
         var coupons = req.body.content.invoice.discounts || false;
         logger.info( 'Subscription created for customer with ID: ' + req.body.content.customer.id );
 
+        /*
+         *  Move them from the completers list to the subscribers list in Autopilot
+         */
+
         if ( process.env.ENVIRONMENT == 'prod' ) {
-            //  move them from the completers list to the subscribers list in autopilot
             autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
         }
 
