@@ -13,7 +13,8 @@ var chargebee_coupon_create_new = ( coupon_id, set_name, customer_id ) => {
                 meta: {
                     coupon_id: coupon_id,
                     set_name: set_name,
-                    customer_id: customer_id
+                    customer_id: customer_id,
+                    function: 'chargebee_coupon_create_new()'
                 }
             } );
         }
@@ -30,7 +31,8 @@ var chargebee_coupon_create_new = ( coupon_id, set_name, customer_id ) => {
                     meta: {
                         customer_id: customer.id,
                         coupon_id: coupon_id,
-                        set_name: set_name
+                        set_name: set_name,
+                        function: 'chargebee_coupon_create_new()'
                     }
                 } );
             }
@@ -49,7 +51,8 @@ var chargebee_coupon_check_and_apply_referral = ( entity_id ) => {
                 ok: false,
                 err_msg: 'Required parameter is undefined.',
                 meta: {
-                    entity_id: entity_id
+                    entity_id: entity_id,
+                    function: 'chargebee_coupon_check_and_apply_referral()'
                 }
             } );
         }
@@ -66,7 +69,8 @@ var chargebee_coupon_check_and_apply_referral = ( entity_id ) => {
                         ok: false,
                         err_msg: err,
                         meta: {
-                            entity_id: entity_id
+                            entity_id: entity_id,
+                            function: 'chargebee_coupon_check_and_apply_referral()'
                         }
                     } );
                 }

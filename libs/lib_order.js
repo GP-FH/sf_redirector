@@ -5,6 +5,10 @@ var slack = require( './lib_slack.js' );
 var subscription_tracker = require( './lib_subscription_tracker.js' );
 var logger = require( './lib_logger.js' );
 
+/*
+ * This function does what it says - it handles the creation of new orders. Currently this means
+ * creating/checking referral codes, creating Cin7 contacts/sales orders, sewtting the renewal count.
+ */
 var order_create_new_subscription = ( sub, coupons ) => {
     var customer = '';
     var subscription = '';

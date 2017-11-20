@@ -13,7 +13,8 @@ var chargebee_get_customer_info = ( customer_id ) => {
                 ok: false,
                 err_msg: 'Required parameter (customer_id) is undefined. ',
                 meta: {
-                    customer_id: 'undefined'
+                    customer_id: 'undefined',
+                    function: 'chargebee_get_customer_info()'
                 }
             } );
         }
@@ -25,7 +26,8 @@ var chargebee_get_customer_info = ( customer_id ) => {
                     ok: false,
                     err_msg: err,
                     meta: {
-                        customer_id: customer_id
+                        customer_id: customer_id,
+                        function: 'chargebee_get_customer_info()'
                     }
                 } );
             }
@@ -46,7 +48,8 @@ var chargebee_get_subscription_info = ( subscription_id ) => {
                 ok: false,
                 err_msg: 'Required parameter (subscription_id) is undefined. ',
                 meta: {
-                    subscription_id: 'undefined'
+                    subscription_id: 'undefined',
+                    function: 'chargebee_get_subscription_info()'
                 }
             } );
         }
@@ -57,7 +60,8 @@ var chargebee_get_subscription_info = ( subscription_id ) => {
                     ok: false,
                     err_msg: err,
                     meta: {
-                        subscription_id: subscription.id
+                        subscription_id: subscription.id,
+                        function: 'chargebee_get_subscription_info()'
                     }
                 } );
             }
