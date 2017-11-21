@@ -22,6 +22,7 @@ var autopilot = require( '../libs/lib_autopilot.js' );
 var util = require( 'underscore' );
 var order = require( '../libs/lib_order.js' );
 var coupon = require( '../libs/lib_chargebee_coupon.js' );
+var product_plan = require( '../libs/lib_product_plan.js' );
 
 
 router.post( '/', function ( req, res, next ) {
@@ -34,17 +35,27 @@ router.post( '/', function ( req, res, next ) {
     if ( req.body.event_type == 'subscription_created' ) {
         var email = req.body.content.customer.email;
         var coupons = req.body.content.invoice.discounts || false;
+        var plan_id = req.body.content.subscription.plan_id;
         logger.info( 'Subscription created for customer with ID: ' + req.body.content.customer.id );
 
-        /*
-         *  Move them from the completers list to the subscribers list in Autopilot
-         */
+        product_plan.product_plan_is_one_off( plan_id )
+            .then( ( ret ) => {
+                if ( ret.one_off ) {
+                    // TODO: some sort of autopilot thing here
+                    return order.order_create_new_purchase( req.body.content.subscription );
+                }
+                else {
+                    /*
+                     *  Move them from the completers list to the subscribers list in Autopilot
+                     */
 
-        if ( process.env.ENVIRONMENT == 'prod' ) {
-            autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
-        }
+                    if ( process.env.ENVIRONMENT == 'prod' ) {
+                        autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
+                    }
 
-        order.order_create_new_subscription( req.body.content.subscription, coupons )
+                    return order.order_create_new_subscription( req.body.content.subscription, coupons );
+                }
+            } )
             .then( ( ret ) => {
                 if ( process.env.ENVIRONMENT == 'prod' ) {
                     slack_notifier.send( 'subscription_created', req.body.content.customer, req.body.content.subscription );
