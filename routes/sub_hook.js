@@ -41,7 +41,13 @@ router.post( '/', function ( req, res, next ) {
         product_plan.product_plan_is_one_off( plan_id )
             .then( ( ret ) => {
                 if ( ret.one_off ) {
-                    // TODO: some sort of autopilot thing here
+                    /*
+                     *  Move them from the completers list to the Gift Box Purchasers list in Autopilot
+                     */
+
+                    if ( process.env.ENVIRONMENT == 'prod' ) {
+                        autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_E427B712-F86E-4864-80F5-C8C5AC335E17', email );
+                    }
                     return order.order_create_new_purchase( req.body.content.subscription );
                 }
                 else {
