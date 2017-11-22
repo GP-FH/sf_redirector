@@ -137,3 +137,4 @@ var order_create_new_purchase = ( sub ) => {
 }
 
 exports.order_create_new_subscription = order_create_new_subscription;
+exports.order_create_new_purchase = order_create_new_purchase;

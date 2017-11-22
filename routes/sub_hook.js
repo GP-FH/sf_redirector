@@ -41,6 +41,7 @@ router.post( '/', function ( req, res, next ) {
         product_plan.product_plan_is_one_off( plan_id )
             .then( ( ret ) => {
                 if ( ret.one_off ) {
+                    logger.info( 'DEBUG: product plan is for one-off box' );
                     if ( process.env.ENVIRONMENT == 'prod' ) {
                         /*
                          *  Move them from the completers list to the Gift Box Purchasers list in Autopilot
