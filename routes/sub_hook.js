@@ -37,7 +37,7 @@ router.post( '/', function ( req, res, next ) {
         var coupons = req.body.content.invoice.discounts || false;
         var plan_id = req.body.content.subscription.plan_id;
         logger.info( 'Subscription created for customer with ID: ' + req.body.content.customer.id );
-        logger.info( 'DEBUG: plan_id' + plan_id );
+        logger.info( 'DEBUG: plan_id=' + plan_id + ' coupons=' + coupons + ' email=' + email );
 
         product_plan.product_plan_is_one_off( plan_id )
             .then( ( ret ) => {
@@ -401,7 +401,7 @@ router.post( '/', function ( req, res, next ) {
 // error handling for the sub route
 router.use( function ( err, req, res, next ) {
     res.end();
-    logger.error( JSON.stringify( err ) );
+    logger.error( JSON.stringify( err ), JSON.stringify( req ), JSON.stringify( res ), JSON.stringify( next ) );
 } );
 
 module.exports = router;
