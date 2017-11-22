@@ -23,8 +23,6 @@ var util = require( 'underscore' );
 var order = require( '../libs/lib_order.js' );
 var coupon = require( '../libs/lib_chargebee_coupon.js' );
 var product_plan = require( '../libs/lib_product_plan.js' );
-var product_plans_one_offs = [ 'style-pack', 'style-chest', 'style-bomb' ];
-
 
 router.post( '/', function ( req, res, next ) {
     res.status( 200 ).send(); // Send immediate 200OK to keep chargebee happy and prevent unneccessary retries
@@ -38,7 +36,6 @@ router.post( '/', function ( req, res, next ) {
         var coupons = req.body.content.invoice.discounts || false;
         var plan_id = req.body.content.subscription.plan_id;
         logger.info( 'Subscription created for customer with ID: ' + req.body.content.customer.id );
-        logger.info( 'DEBUG: plan_id=' + plan_id + ' coupons=' + coupons + ' email=' + email + 'product_plans_one_offs.include(plan_id) = ' + product_plans_one_offs.includes( plan_id ) );
 
         product_plan.product_plan_is_one_off( plan_id )
             .then( ( ret ) => {

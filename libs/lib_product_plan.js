@@ -14,7 +14,7 @@ var product_plan_is_one_off = ( plan_id ) => {
             } );
         }
         else {
-            return resolve( {
+            return reject( {
                 ok: true,
                 one_off: false
             } );
