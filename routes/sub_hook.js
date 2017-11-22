@@ -52,6 +52,7 @@ router.post( '/', function ( req, res, next ) {
                     return order.order_create_new_purchase( req.body.content.subscription );
                 }
                 else {
+                    logger.info( 'DEBUG: product plan is for subscription box' );
                     if ( process.env.ENVIRONMENT == 'prod' ) {
                         /*
                          *  Move them from the completers list to the subscribers list in Autopilot
