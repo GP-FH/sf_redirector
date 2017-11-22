@@ -37,6 +37,7 @@ router.post( '/', function ( req, res, next ) {
         var coupons = req.body.content.invoice.discounts || false;
         var plan_id = req.body.content.subscription.plan_id;
         logger.info( 'Subscription created for customer with ID: ' + req.body.content.customer.id );
+        logger.info( 'DEBUG: plan_id' + plan_id );
 
         product_plan.product_plan_is_one_off( plan_id )
             .then( ( ret ) => {
