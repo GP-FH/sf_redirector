@@ -35,12 +35,12 @@ router.post( '/', function ( req, res, next ) {
         var email = req.body.content.customer.email;
         var coupons = req.body.content.invoice.discounts || false;
         var plan_id = req.body.content.subscription.plan_id;
+        var subscription = req.body.content.subscription;
         logger.info( 'Subscription created for customer with ID: ' + req.body.content.customer.id );
 
         product_plan.product_plan_is_one_off( plan_id )
             .then( ( ret ) => {
                 if ( ret.one_off ) {
-                    logger.info( 'DEBUG: product plan is for one-off box' );
                     if ( process.env.ENVIRONMENT == 'prod' ) {
                         /*
                          *  Move them from the completers list to the Gift Box Purchasers list in Autopilot
@@ -48,10 +48,9 @@ router.post( '/', function ( req, res, next ) {
 
                         autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_E427B712-F86E-4864-80F5-C8C5AC335E17', email );
                     }
-                    return order.order_create_new_purchase( req.body.content.subscription );
+                    return order.order_create_new_purchase( subscription );
                 }
                 else {
-                    logger.info( 'DEBUG: product plan is for subscription box' );
                     if ( process.env.ENVIRONMENT == 'prod' ) {
                         /*
                          *  Move them from the completers list to the subscribers list in Autopilot
@@ -60,7 +59,7 @@ router.post( '/', function ( req, res, next ) {
                         autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', email );
                     }
 
-                    return order.order_create_new_subscription( req.body.content.subscription, coupons );
+                    return order.order_create_new_subscription( subscription, coupons );
                 }
             } )
             .then( ( ret ) => {
