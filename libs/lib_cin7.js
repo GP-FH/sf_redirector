@@ -505,7 +505,7 @@ var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, s
                 Qty: 1
             };
             break;
-        case 'style-pack':
+        case 'style-bomb':
             plan_product = {
                 Code: 'STX-STE-BOB',
                 Name: 'Style One-Off',
