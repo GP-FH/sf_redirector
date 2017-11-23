@@ -7,7 +7,7 @@ var logger = require( './lib_logger.js' );
 
 /*
  * This function does what it says - it handles the creation of new orders. Currently this means
- * creating/checking referral codes, creating Cin7 contacts/sales orders, sewtting the renewal count.
+ * creating/checking referral codes, creating Cin7 contacts/sales orders, setting the renewal count.
  */
 var order_create_new_subscription = ( sub, coupons ) => {
     var customer = '';
@@ -81,4 +81,60 @@ var order_create_new_subscription = ( sub, coupons ) => {
     } );
 };
 
+/*
+ * Different to a 'subscription', a 'purchase' is a one-off box. The below function handles the backend shenanigans required when
+ * someone make a purchase: creating Cin7 contacts/sales orders. You'll also notice that there is no tracking of renewal count.
+ * As these are one-off purchases, billing cycle is capped at 1, so nothing to keep track of.
+ */
+var order_create_new_purchase = ( sub ) => {
+    var customer = '';
+    var subscription = '';
+
+    return new Promise( ( resolve, reject ) => {
+        chargebee.chargebee_get_customer_info( sub.customer_id )
+            .then( ( ret ) => {
+                customer = ret.customer;
+                return cin7.cin7_check_customer_exists( customer.email );
+            } )
+            .then( ( ret ) => {
+                /*
+                 * If the customer exists in Cin7 then we can jump straight to creating a sales order.
+                 * Otherwise we need to mine Chargbee for some extra info so we can create a new customer in Cin7
+                 */
+
+                if ( !ret.exists ) {
+                    logger.info( 'New customer. Creating new contact in Cin7: ' + sub.id );
+                    return chargebee.chargebee_get_subscription_info( sub.id );
+                }
+                else if ( ret.exists ) {
+                    logger.info( 'Existing customer. Creating new sales order in Cin7: ' + sub.id );
+                    return cin7.cin7_create_sales_order( ret.id, sub.plan_id, sub.id, sub.cf_topsize, sub.cf_bottomsize, 'NOT_SET' );
+                }
+            } )
+            .then( ( ret ) => {
+                if ( ret.resolve ) {
+                    return resolve( {
+                        ok: true
+                    } );
+                }
+
+                subscription = ret.subscription;
+                return cin7.cin7_create_customer_record( customer, subscription );
+            } )
+            .then( ( ret ) => {
+                logger.info( 'Creating new sales order in Cin7: ' + sub.id );
+                cin7.cin7_create_sales_order( ret.id, sub.plan_id, sub.id, sub.cf_topsize, sub.cf_bottomsize, 'NOT_SET' );
+            } )
+            .then( ( ret ) => {
+                return resolve( {
+                    ok: true
+                } );
+            } )
+            .catch( ( err ) => {
+                reject( err );
+            } );
+    } );
+}
+
 exports.order_create_new_subscription = order_create_new_subscription;
+exports.order_create_new_purchase = order_create_new_purchase;
