@@ -48,6 +48,25 @@ app.use( '/sub_hook', sub_hook );
 app.use( '/profile_hook', profile_hook );
 
 /*
+ * App level error handlers
+ */
+
+// development error handler
+// will print stacktrace
+if ( process.env.ENVIRONMENT == 'dev' ) {
+    app.use( function ( err, req, res, next ) {
+        res.status( err.status || 500 );
+        logger.error( 'ERROR: ' + err + 'MESSAGE: ' + err.message );
+    } );
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use( function ( err, req, res, next ) {
+    logger.error( 'Error: ' + err.message + '. Status: ' + err.status );
+} );
+
+/*
  *  start the engine
  */
 server.listen( 443, function () {
