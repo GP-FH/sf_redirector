@@ -1,3 +1,4 @@
+var logger = require( './lib_logger.js' );
 var product_plans_one_offs = [ 'style-pack', 'style-chest', 'style-bomb' ];
 var product_plans_subscriptions = [ 'premium-box', 'deluxe-box', 'premium-box-weekly', 'deluxe-box-weekly' ];
 
