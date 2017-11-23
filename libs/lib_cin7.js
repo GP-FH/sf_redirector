@@ -486,6 +486,34 @@ var cin7_create_sales_order = ( member_id, plan_id, subscription_id, size_top, s
                 Qty: 1
             };
             break;
+
+        case 'style-pack':
+            plan_product = {
+                Code: 'STX-STE-PAK',
+                Name: 'Style One-Off',
+                Option1: 'PAK',
+                Option2: 'Style Pack',
+                Qty: 1
+            };
+            break;
+        case 'style-chest':
+            plan_product = {
+                Code: 'STX-STE-CHT',
+                Name: 'Style One-Off',
+                Option1: 'CHT',
+                Option2: 'Style Chest',
+                Qty: 1
+            };
+            break;
+        case 'style-pack':
+            plan_product = {
+                Code: 'STX-STE-BOB',
+                Name: 'Style One-Off',
+                Option1: 'BOB',
+                Option2: 'Style Bomb',
+                Qty: 1
+            };
+            break;
         default:
             return reject( {
                 ok: false,
