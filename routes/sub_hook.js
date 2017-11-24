@@ -63,9 +63,9 @@ router.post( '/', function ( req, res, next ) {
                 }
             } )
             .then( ( ret ) => {
-                //if ( process.env.ENVIRONMENT == 'prod' ) {
-                slack_notifier.send( 'subscription_created', req.body.content.customer, req.body.content.subscription );
-                //}
+                if ( process.env.ENVIRONMENT == 'prod' ) {
+                    slack_notifier.send( 'subscription_created', req.body.content.customer, req.body.content.subscription );
+                }
 
                 logger.info( 'New order complete: ' + req.body.content.subscription.id );
                 res.end();
@@ -138,8 +138,9 @@ router.post( '/', function ( req, res, next ) {
 
                                                 logger.info( 'New sales order created on renewal for subscription_id: ' + subscription_id );
 
-                                                slack_notifier.send( 'subscription_renewed_new_order', customer, subscription );
-
+                                                if ( process.env.ENVIRONMENT == 'prod' ) {
+                                                    slack_notifier.send( 'subscription_renewed_new_order', customer, subscription );
+                                                }
                                             } );
                                         }
                                     } );

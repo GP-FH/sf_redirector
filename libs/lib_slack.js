@@ -35,9 +35,9 @@ function local_send_new_subscriber( first_name, last_name, email, city, sub_plan
             username: 'Good-News-Bot',
             icon_emoji: ':tada:',
             attachments: [ {
-                text: 'Here are the details:',
+                text: 'This person needs a new box! A new sales order has been generated in Cin7. Here are the customer details:',
                 fallback: 'A new subscriber has joined!',
-                title: 'This person needs a new box! A new sales order has been generated in Cin7. Here are the customer details:',
+                title: 'Woo! A new subscriber has joined!',
                 color: 'good',
                 fields: [ {
                     title: 'Name',
@@ -132,7 +132,7 @@ function local_send_renewed_subscriber_new_sales_order( first_name, last_name, e
             icon_emoji: ':tada:',
             attachments: [ {
                 text: 'This person needs a new box! A new sales order has been generated in Cin7. Here are the customer details:',
-                fallback: 'A new subscriber has joined!',
+                fallback: 'An existing subscriber has renewed!',
                 title: 'Woo! An existing subscriber has renewed!',
                 color: '#FFFF00',
                 fields: [ {
