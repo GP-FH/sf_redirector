@@ -63,9 +63,9 @@ router.post( '/', function ( req, res, next ) {
                 }
             } )
             .then( ( ret ) => {
-                if ( process.env.ENVIRONMENT == 'prod' ) {
-                    slack_notifier.send( 'subscription_created', req.body.content.customer, req.body.content.subscription );
-                }
+                //if ( process.env.ENVIRONMENT == 'prod' ) {
+                slack_notifier.send( 'subscription_created', req.body.content.customer, req.body.content.subscription );
+                //}
 
                 logger.info( 'New order complete: ' + req.body.content.subscription.id );
                 res.end();
