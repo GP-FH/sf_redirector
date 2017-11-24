@@ -138,6 +138,8 @@ router.post( '/', function ( req, res, next ) {
 
                                                 logger.info( 'New sales order created on renewal for subscription_id: ' + subscription_id );
 
+                                                slack_notifier.send( 'subscription_renewed_new_order', customer, subscription );
+
                                             } );
                                         }
                                     } );
