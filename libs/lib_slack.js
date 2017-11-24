@@ -134,7 +134,7 @@ function local_send_renewed_subscriber_new_sales_order( first_name, last_name, e
                 text: 'This person needs a new box! A new sales order has been generated in Cin7. Here are the customer details:',
                 fallback: 'A new subscriber has joined!',
                 title: 'Woo! An existing subscriber has renewed!',
-                color: 'yellow',
+                color: '#FFFF00',
                 fields: [ {
                     title: 'Name',
                     value: first_name + ' ' + last_name,
