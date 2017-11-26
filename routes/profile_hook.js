@@ -13,6 +13,7 @@ var mixpanel = require( 'mixpanel' );
 var mp = mixpanel.init( process.env.MIXPANEL_TOKEN );
 var stylist_campaigns = [ 'HW-01-ATTR', 'MD-01-ATTR' ];
 var util = require( 'underscore' );
+var product_plans = require( '../libs/lib_product_plan.js' );
 
 router.get( '/', function ( req, res ) {
 
@@ -56,9 +57,22 @@ router.get( '/', function ( req, res ) {
                 keen = keen.substring( 0, 250 );
             }
 
+            /*
+             * One off gift boxes point to a different thank-you page post purchase (more relevant copy).
+             * Here we set the redirect_url top point to the appropriate page based on the boxtype.
+             */
+
+            var redirect_url = '';
+            if ( product_plans.product_plans_one_offs.includes( req.query.boxtype ) ) {
+                redirect_url = 'https://stitchfox.co.nz/gift-thank-you';
+            }
+            else {
+                redirect_url = 'https://stitchfox.co.nz/thank-you';
+            }
 
             //  get a new checkout page from Chargebee
             chargebee.hosted_page.checkout_new( {
+                redirect_url: redirect_url,
                 embed: false,
                 subscription: {
                     plan_id: req.query.boxtype,

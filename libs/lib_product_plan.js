@@ -20,3 +20,5 @@ var product_plan_is_one_off = ( plan_id ) => {
 };
 
 exports.product_plan_is_one_off = product_plan_is_one_off;
+exports.product_plans_one_offs = product_plans_one_offs;
+exports.product_plans_subscriptions = product_plans_subscriptions;
