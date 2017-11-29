@@ -398,7 +398,8 @@ var cin7_create_customer_record = ( customer, subscription ) => {
                     err_msg: ret.fields[ 0 ].errors.toString(),
                     meta: {
                         customer_id: customer.id,
-                        subscription_id: subscription.id
+                        subscription_id: subscription.id,
+                        function: 'cin7_create_customer_record()'
                     }
                 } );
             }

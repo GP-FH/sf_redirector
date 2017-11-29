@@ -9,6 +9,7 @@ var logger = require( './lib_logger.js' );
  * This function does what it says - it handles the creation of new orders. Currently this means
  * creating/checking referral codes, creating Cin7 contacts/sales orders, setting the renewal count.
  */
+
 var order_create_new_subscription = ( sub, coupons ) => {
     var customer = '';
     var subscription = '';
@@ -86,6 +87,7 @@ var order_create_new_subscription = ( sub, coupons ) => {
  * someone make a purchase: creating Cin7 contacts/sales orders. You'll also notice that there is no tracking of renewal count.
  * As these are one-off purchases, billing cycle is capped at 1, so nothing to keep track of.
  */
+
 var order_create_new_purchase = ( sub ) => {
     var customer = '';
     var subscription = '';
@@ -135,6 +137,23 @@ var order_create_new_purchase = ( sub ) => {
             } );
     } );
 }
+
+/*
+ * This function process all renewals: increments the subscription counts and generates a sales order where
+ * appropriate.
+ */
+
+var order_process_renewal = ( sub ) => {
+    return new Promise( ( resolve, reject ) => {
+        chargebee.chargebee_get_customer_info( sub.customer_id )
+            .then( ( ret ) => {
+
+            } )
+            .catch( ( err ) => {
+
+            } );
+    } );
+};
 
 exports.order_create_new_subscription = order_create_new_subscription;
 exports.order_create_new_purchase = order_create_new_purchase;
