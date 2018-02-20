@@ -6,10 +6,8 @@
  *
  */
 
-//import * as winston from "winston";
-import * as winston from "winston-papertrail";
-
-//const Papertrail = papertrail.Papertrail;
+const winston = require( 'winston' );
+const papertrail = require( 'winston-papertrail' ).Papertrail; // not using imports here intentionally
 
 const winstonPapertrail = new winston.transports.Papertrail( {
     host: 'logs5.papertrailapp.com',
