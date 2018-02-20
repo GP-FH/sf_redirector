@@ -1,6 +1,8 @@
 import * as got from "got";
 import * as VError from "verror";
 
+// gonna have to do something with addresses. Either dedupe via daily cron or check for existance on the fly
+
 export async function tradegecko_create_sales_order () {
   let res;
   try {
@@ -25,7 +27,6 @@ export async function tradegecko_create_sales_order () {
       },
       json: true
     });
-
 
   }
   catch (err) {

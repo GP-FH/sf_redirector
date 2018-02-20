@@ -38,7 +38,6 @@ export async function order_create_new_subscription ( subscription, coupons ) {
 export async function order_create_new_purchase ( subscription ) {
   try {
     const customer = await chargebee_get_customer_info( subscription.customer_id );
-    await tradegecko_add_address_to_stylist();
 
     return await tradegecko_create_sales_order();
   }
