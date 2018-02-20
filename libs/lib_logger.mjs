@@ -6,10 +6,10 @@
  *
  */
 
-import * as winston from "winston";
-import * as papertrail from "winston-papertrail";
+//import * as winston from "winston";
+import * as winston from "winston-papertrail";
 
-const Papertrail = papertrail.Papertrail;
+//const Papertrail = papertrail.Papertrail;
 
 const winstonPapertrail = new winston.transports.Papertrail( {
     host: 'logs5.papertrailapp.com',
