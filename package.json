@@ -1,7 +1,7 @@
 {
-  "name": "form_redirect_node",
+  "name": "stitchfox_redirector",
   "version": "1.0.0",
-  "description": "redirects stitchfox users to checkout post profile creation",
+  "description": "THE PIPES THE PIPES",
   "main": "app.js",
   "dependencies": {
     "body-parser": "^1.17.1",
@@ -10,6 +10,7 @@
     "dotenv": "^4.0.0",
     "express": "^4.15.2",
     "fs": "0.0.1-security",
+    "got": "^8.2.0",
     "https": "^1.0.0",
     "limiter": "^1.1.2",
     "mixpanel": "^0.7.0",
@@ -22,6 +23,7 @@
     "sinon": "^4.1.2",
     "supertest": "^3.0.0",
     "underscore": "^1.8.3",
+    "verror": "^1.10.0",
     "winston": "^2.3.1",
     "winston-papertrail": "^1.0.4"
   },

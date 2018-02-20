@@ -2,26 +2,41 @@ import * as got from "got";
 import * as VError from "verror";
 
 export async function tradegecko_create_sales_order () {
+  let res;
   try {
-    const res = await got.post('https://api.tradegecko.com/orders/', {
+    res = await got.post('https://api.tradegecko.com/orders/', {
       headers:{
         Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
       },
       body: {
-        company_id:"",
-        issues_at:"",
-        billing_address_id:"",
-        shipping_address_id:"",
-        tags:[],
-        status:"",
-        notes:""
+        order:{
+          company_id: "20733937", // this should be the Stylists relationship ID
+          shipping_address: { // the customers address -> this will be automagically added to the Stylists relationship?
+            address1: "1 Test St",
+            suburb: "Teston",
+            city: "Testville",
+            country: "New Zealand"
+          }
+        },
+        issued_at: "21-02-2018", // dd-mm-yyyy
+        tags: ["urban", "deluxe-box"],
+        status: "draft",
+        notes: "Here are some notes"
       },
       json: true
     });
-  }
-  catch (err) {
+
 
   }
+  catch (err) {
+    throw new VError (err, "Error creating sales order via TradeGecko API" );
+  }
+
+  if (res.statusCode !== 200) {
+    throw new VError ( `Error creating sales order via TradeGecko API - non 200 status code: ${res.statusCode}`);
+  }
+
+  return { ok:true };
 }
 
 export async function tradegecko_add_address_to_stylist () {
