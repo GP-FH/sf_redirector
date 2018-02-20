@@ -24,7 +24,7 @@ export async function autopilot_move_contact_to_new_list ( from, to, email ) {
   };
 
   try{
-    request( options, function ( err, response, body ) {
+    request( options, async function ( err, response, body ) {
       if ( err ) {
         throw new VError (err, "Failed to check for contact in Autopilot" );
       }
@@ -58,7 +58,7 @@ function local_autopilot_remove_list_contact( email, list_id ) {
     }
   };
 
-  request( options, function ( err, response, body ) {
+  request( options, async unction ( err, response, body ) {
     if ( err ) {
       throw new VError ( err, "Error removing contact from list in Autopilot" );
     }
@@ -81,7 +81,7 @@ function local_autopilot_add_list_user( email, list_id ) {
     }
   };
 
-  request( options, function ( err, response, body ) {
+  request( options, async function ( err, response, body ) {
     if ( err ) {
       throw new VError ( err, "Error adding contact to list in Autopilot" );
     }
