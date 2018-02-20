@@ -58,7 +58,7 @@ function local_autopilot_remove_list_contact( email, list_id ) {
     }
   };
 
-  request( options, async unction ( err, response, body ) {
+  request( options, async function ( err, response, body ) {
     if ( err ) {
       throw new VError ( err, "Error removing contact from list in Autopilot" );
     }
