@@ -20,7 +20,7 @@ export async function order_create_new_subscription ( subscription, coupons ) {
     }
 
     await chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
-    await subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, customer.id );
+    subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, customer.id );
 
     return await tradegecko_create_sales_order();
   }

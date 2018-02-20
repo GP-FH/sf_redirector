@@ -28,7 +28,7 @@ var logger = require( './lib_logger.js' );
  *  creates count for customer with passed id on monthly plan. Includes test param which is set
  *  to true during (you guessed it) test run
  */
-var set_monthly = function ( customer_id, subscription_id, test = false ) {
+export function set_monthly ( customer_id, subscription_id, test = false ) {
 
     if ( test ) {
         redis = require( 'redis-mock' );
@@ -66,7 +66,7 @@ var set_monthly = function ( customer_id, subscription_id, test = false ) {
  *  creates count for customer with passed id on weekly plan. Includes test param which is set to
  *  true during (you guessed it) test run
  */
-var set_weekly = function ( customer_id, subscription_id, test = false ) {
+export function set_weekly ( customer_id, subscription_id, test = false ) {
 
     if ( test ) {
         redis = require( 'redis-mock' );
@@ -104,7 +104,7 @@ var set_weekly = function ( customer_id, subscription_id, test = false ) {
  *  increments counter for given customer_id and returns boolean indicating whether a new order is required.
  *  Includes test param which is set to true during (you guessed it) test run
  */
-var increment_and_check_monthly = function ( customer_id, subscription_id, plan_id, callback, test = false ) {
+export function increment_and_check_monthly ( customer_id, subscription_id, plan_id, callback, test = false ) {
 
     if ( test ) {
         redis = require( 'redis-mock' );
@@ -170,7 +170,7 @@ var increment_and_check_monthly = function ( customer_id, subscription_id, plan_
  *  increments counter and checks if sales order is required for weekly subscribers.
  *  A sales order is requires every 13 weeks.
  */
-var increment_and_check_weekly = function ( customer_id, subscription_id, plan_id, callback, test = false ) {
+export function increment_and_check_weekly ( customer_id, subscription_id, plan_id, callback, test = false ) {
 
     if ( test ) {
         redis = require( 'redis-mock' );
@@ -339,8 +339,3 @@ export async function subscription_tracker_set_subscription_count ( plan_id, sub
     }
 
 };
-
-exports.set_monthly = set_monthly;
-exports.set_weekly = set_weekly;
-exports.increment_and_check_monthly = increment_and_check_monthly;
-exports.increment_and_check_weekly = increment_and_check_weekly;
