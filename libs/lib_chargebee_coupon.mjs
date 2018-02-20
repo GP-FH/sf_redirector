@@ -33,7 +33,7 @@ export async function chargebee_coupon_create_new ( coupon_id, set_name, custome
  * it adds adds promotional credits to the referrers account in Chargebee. It can do this as the
  * referral code is actually just the customer ID of the referring customer.
  */
-export async function chargebee_coupon_check_and_apply_referral = ( entity_id ) => {
+export async function chargebee_coupon_check_and_apply_referral ( entity_id ) {
   if ( entity_id === undefined ) {
       throw new VError ( "entity_id undefined" );
   }
