@@ -3,13 +3,13 @@
  *  lib_logger: this is the logging service. Allows logs of differing severity levels (info, warn, error)
  *  to be sent to paper trail for viewing/searching through. Also gracefully logs and handles exceptions
  *  without killing the service.
- * 
+ *
  */
 
-var winston = require( 'winston' );
-var papertrail = require( 'winston-papertrail' ).Papertrail;
+import * as winston from "winston";
+import * as papertrail from "winston-papertrail";
 
-var winstonPapertrail = new winston.transports.Papertrail( {
+const winstonPapertrail = new winston.transports.Papertrail( {
     host: 'logs5.papertrailapp.com',
     port: 41600,
     handleExceptions: true,
@@ -19,7 +19,7 @@ var winstonPapertrail = new winston.transports.Papertrail( {
     }
 } );
 
-var logger = new winston.Logger( {
+export const logger = new winston.Logger( {
 
     transports: [
         winstonPapertrail
@@ -27,5 +27,3 @@ var logger = new winston.Logger( {
     exitOnError: false
 
 } );
-
-module.exports = logger;

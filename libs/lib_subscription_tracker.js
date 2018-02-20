@@ -19,6 +19,8 @@
  *
  */
 
+import * as VError from "verror";
+
 var redis = require( 'redis' );
 var logger = require( './lib_logger.js' );
 
@@ -322,18 +324,18 @@ function _validate_subscription_count( plan_id, customer_id, subscription_id, ca
 /*
  * A glimpse into the future - a generic function for setting the sub count
  */
-var subscription_tracker_set_subscription_count = ( plan_id, subscription_id, customer_id ) => {
+export async function subscription_tracker_set_subscription_count ( plan_id, subscription_id, customer_id ) {
     switch ( plan_id ) {
-    case 'deluxe-box':
-    case 'premium-box':
+      case 'deluxe-box':
+      case 'premium-box':
         set_monthly( customer_id, subscription_id );
         break;
-    case 'deluxe-box-weekly':
-    case 'premium-box-weekly':
+      case 'deluxe-box-weekly':
+      case 'premium-box-weekly':
         set_weekly( customer_id, subscription_id );
         break;
-    default:
-        logger.error( 'Failed to set count appropriately as plan not found - subscription_id: ' + subscription_id );
+      default:
+        throw new VError ( "Unexpected plan_id received - cannot set subscription count" );
     }
 
 };
@@ -342,4 +344,3 @@ exports.set_monthly = set_monthly;
 exports.set_weekly = set_weekly;
 exports.increment_and_check_monthly = increment_and_check_monthly;
 exports.increment_and_check_weekly = increment_and_check_weekly;
-exports.subscription_tracker_set_subscription_count = subscription_tracker_set_subscription_count;

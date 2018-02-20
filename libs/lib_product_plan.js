@@ -1,24 +1,13 @@
-var logger = require( './lib_logger.js' );
-var product_plans_one_offs = [ 'style-pack', 'style-chest', 'style-bomb' ];
-var product_plans_subscriptions = [ 'premium-box', 'deluxe-box', 'premium-box-weekly', 'deluxe-box-weekly' ];
+import { logger } from "../libs/lib_logger";
 
-var product_plan_is_one_off = ( plan_id ) => {
-    return new Promise( ( resolve, reject ) => {
-        if ( product_plans_one_offs.includes( plan_id ) ) {
-            return resolve( {
-                ok: true,
-                one_off: true
-            } );
-        }
-        else {
-            return resolve( {
-                ok: true,
-                one_off: false
-            } );
-        }
-    } );
-};
+const product_plans_one_offs = [ 'style-pack', 'style-chest', 'style-bomb' ];
+const product_plans_subscriptions = [ 'premium-box', 'deluxe-box', 'premium-box-weekly', 'deluxe-box-weekly' ];
 
-exports.product_plan_is_one_off = product_plan_is_one_off;
-exports.product_plans_one_offs = product_plans_one_offs;
-exports.product_plans_subscriptions = product_plans_subscriptions;
+export async function product_plan_is_one_off ( plan_id ) {
+  const one_off = product_plans_one_offs.includes( plan_id );
+
+  return {
+      ok: true,
+      one_off: true
+  };
+}
