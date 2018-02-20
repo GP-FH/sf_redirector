@@ -7,7 +7,7 @@
  */
 
 import * as winston from "winston";
-import * as papertrail from "winston-papertrail";
+import { Papertrail } from "winston-papertrail";
 
 const winstonPapertrail = new winston.transports.Papertrail( {
     host: 'logs5.papertrailapp.com',
