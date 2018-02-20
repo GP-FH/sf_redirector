@@ -14,7 +14,7 @@ import * as util from "underscore";
 import { logger } from "../libs/lib_logger";
 import { slack_send } from "../libs/lib_slack";
 import { autopilot_move_contact_to_new_list } from "../libs/lib_autopilot";
-import { order_create_new_purchase, order_create_new_subscription, order_renew_subscription } from "../libs/lib_order";
+import { order_create_new_purchase, order_create_new_subscription, order_process_renewal } from "../libs/lib_order";
 import { product_plan_is_one_off } from "../libs/lib_product_plan";
 
 const router = express.Router();
@@ -65,7 +65,7 @@ router.post( '/', async ( req, res, next ) => {
     const customer = req.body.content.customer;
 
     try {
-      let ret = await order_renew_subscription(subscription);
+      let ret = await order_process_renewal(subscription);
     }
     catch ( err ) {
       // handle error
