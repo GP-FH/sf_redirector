@@ -19,8 +19,8 @@ import { logger } from "./libs/lib_logger";
 /*
  *  initialize routes
  */
-import { sub_hook } from "./routes/sub_hook";
-import { profile_hook } from "./routes/profile_hook";
+import * as sub_hook from "./routes/sub_hook";
+import * as profile_hook from "./routes/profile_hook";
 
 export const app = express();
 const ssl_path = process.env.SSL_PATH;
