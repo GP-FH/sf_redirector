@@ -1,7 +1,7 @@
 var expect = require( 'chai' ).expect;
 var sinon = require( 'sinon' );
 var chargebee = require( 'chargebee' );
-var lib_chargebee_coupon = require( '../libs/lib_chargebee_coupon.js' );
+var lib_chargebee_coupon = require( '../libs/lib_chargebee_coupon.mjs' );
 var proxyquire = require( 'proxyquire' );
 
 describe( 'chargebee_coupon_create_new() - Create new coupon', () => {
