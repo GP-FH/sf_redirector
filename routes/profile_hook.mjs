@@ -5,17 +5,19 @@
  *
  */
 
-var express = require( 'express' );
-var router = express.Router();
-var chargebee = require( '../app.js' ).chargebee;
-var logger = require( '../libs/lib_logger.js' );
-var mixpanel = require( 'mixpanel' );
-var mp = mixpanel.init( process.env.MIXPANEL_TOKEN );
-var stylist_campaigns = [ 'HW-01-ATTR', 'MD-01-ATTR' ];
-var util = require( 'underscore' );
-var product_plans = require( '../libs/lib_product_plan.js' );
+import * as express from "express";
+import * as mixpanel from "mixpanel";
+import * as util from "underscore";
 
-router.get( '/', function ( req, res ) {
+import { product_plan_is_one_off } from "../libs/lib_product_plan";
+import { chargebee_request_checkout } from "../libs/lib_chargebee";
+import { logger } from "../libs/lib_logger";
+
+const router = express.Router();
+const mp = mixpanel.init( process.env.MIXPANEL_TOKEN );
+const stylist_campaigns = [ 'HW-01-ATTR', 'MD-01-ATTR' ];
+
+router.get( '/', async function ( req, res ) {
 
     logger.info( 'Request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) );
 
@@ -28,8 +30,9 @@ router.get( '/', function ( req, res ) {
         } );
 
         //  check for stylist campaign Q param: indicates we should attribute the customer to the stylist
-        var stylist_idx = stylist_campaigns.indexOf( req.query.campaign );
-        var stylist_attr = '';
+        const stylist_idx = stylist_campaigns.indexOf( req.query.campaign );
+        let stylist_attr = '';
+
         if ( stylist_idx != -1 ) {
             stylist_attr = stylist_campaigns[ stylist_idx ];
         }
@@ -38,8 +41,8 @@ router.get( '/', function ( req, res ) {
          *  the cf_palette and cf_keen field in chargebee cap out at 250. These fields can sometimes be longer so this
          *  is a temp fix
          */
-        var palette = req.query.palette;
-        var keen = req.query.keen1 || req.query.keen2 || req.query.keen3;
+        let palette = req.query.palette;
+        let keen = req.query.keen1 || req.query.keen2 || req.query.keen3;
 
         //  if either of these fields is undefined - alert error. A bit heavy handed but need to enforce field mapping
         if ( !keen || !palette ) {
@@ -47,7 +50,6 @@ router.get( '/', function ( req, res ) {
             res.redirect( process.env.BASE_URL + '/error' );
         }
         else {
-
             if ( palette.length > 250 ) {
                 logger.warn( 'Had to truncate palette field string for customer: ' + req.query.email );
                 palette = palette.substring( 0, 250 );
@@ -62,8 +64,10 @@ router.get( '/', function ( req, res ) {
              * Here we set the redirect_url top point to the appropriate page based on the boxtype.
              */
 
-            var redirect_url = '';
-            if ( product_plans.product_plans_one_offs.includes( req.query.boxtype ) ) {
+            let redirect_url = '';
+            const ret = await product_plan_is_one_off (req.query.boxtype );
+
+            if ( ret.one_off ) {
                 redirect_url = 'https://stitchfox.co.nz/gift-thank-you';
             }
             else {

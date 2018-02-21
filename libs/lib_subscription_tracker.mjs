@@ -20,9 +20,9 @@
  */
 
 import * as VError from "verror";
+import * as redis from "redis";
 
-var redis = require( 'redis' );
-var logger = require( './lib_logger.js' );
+import { logger } from "./lib_logger";
 
 /*
  *  creates count for customer with passed id on monthly plan. Includes test param which is set
