@@ -17,7 +17,7 @@ const router = express.Router();
 const mp = mixpanel.init( process.env.MIXPANEL_TOKEN );
 const stylist_campaigns = [ 'HW-01-ATTR', 'MD-01-ATTR' ];
 
-router.get( '/', async function ( req, res ) {
+router.get( '/', async function ( req, res, next) {
 
     logger.info( 'Request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) );
 
@@ -74,62 +74,28 @@ router.get( '/', async function ( req, res ) {
                 redirect_url = 'https://stitchfox.co.nz/thank-you';
             }
 
-            //  get a new checkout page from Chargebee
-            chargebee.hosted_page.checkout_new( {
-                redirect_url: redirect_url,
-                embed: false,
-                subscription: {
-                    plan_id: req.query.boxtype,
-                    cf_gender: req.query.gender,
-                    cf_childname: req.query.hername || req.query.hisname,
-                    cf_childage: req.query.sheage || req.query.heage,
-                    cf_topsize: req.query.shetopsize || req.query.hetopsize,
-                    cf_bottomsize: req.query.shebottomsize || req.query.hebottomsize,
-                    cf_jam: req.query.jam1 || req.query.jam2 || req.query.jam3 || req.query.jam4 || req.query.jam5 || req.query.jam6,
-                    cf_doit: req.query.doit1 || req.query.doit2 || req.query.doit3 || req.query.doit4 || req.query.doit5 || req.query.doit6,
-                    cf_palette: palette,
-                    cf_fave: req.query.fav1 || req.query.fav2,
-                    cf_keen: keen,
-                    cf_else: req.query.else,
-                    cf_notes: req.query.notes
-                },
-                customer: {
-                    email: req.query.email,
-                    first_name: req.query.fname,
-                    last_name: req.query.lname,
-                    phone: req.query.phone,
-                    cf_stylist_attr: stylist_attr
-                },
-                billing_address: {
-                    first_name: req.query.fname,
-                    last_name: req.query.lname,
-                    line1: req.query.streetaddress,
-                    line2: req.query.suburb,
-                    city: req.query.city,
-                    country: "NZ",
-                    phone: req.query.phone
-                }
-            } ).request( function ( error, result ) {
+            let ret;
+            try{
+              ret = await chargebee_request_checkout(req.query, redirect_url, stylist_attr, keen, palette);
+            }
+            catch (err) {
+              logger.error( JSON.stringify(err) );
+              res.redirect( process.env.BASE_URL + '/error' );
+            }
 
-                if ( error ) {
-                    logger.error( 'Failed to get chargebee checkout page on form completion - reason: ' + JSON.stringify( error ) );
-                    res.redirect( process.env.BASE_URL + '/error' );
-                }
-                else {
-
-                    var hosted_page = result.hosted_page;
-                    logger.info( 'Checkout page URL successfully got: ' + JSON.stringify( hosted_page ) );
-
-                    //  redirect the request to the new, shiny, checkout page
-                    res.redirect( hosted_page.url );
-                }
-            } );
+            res.redirect( ret.hosted_page.url );
         }
     }
     else {
         logger.error( 'Incorrect token passed' );
         res.redirect( process.env.BASE_URL + '/error' )
     }
+} );
+
+// error handling for the sub route
+router.use( function ( err, req, res, next ) {
+  res.end();
+  logger.error( JSON.stringify( err ) );
 } );
 
 module.exports = router;
