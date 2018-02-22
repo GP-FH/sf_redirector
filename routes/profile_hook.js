@@ -82,7 +82,7 @@ router.get( '/', async function ( req, res, next) {
               res.redirect( process.env.BASE_URL + '/error' );
             }
 
-            res.redirect( ret.hosted_page.url );
+            res.redirect( ret.url );
         }
     }
     else {
