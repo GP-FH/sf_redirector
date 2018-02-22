@@ -66,7 +66,7 @@ router.get( '/', async function ( req, res, next) {
              */
 
             let redirect_url = '';
-            const ret = await product_plan.product_plan_is_one_off ( req.query.boxtype );
+            let ret = await product_plan.product_plan_is_one_off ( req.query.boxtype );
 
             if ( ret.one_off ) {
                 redirect_url = 'https://stitchfox.co.nz/gift-thank-you';
@@ -75,7 +75,6 @@ router.get( '/', async function ( req, res, next) {
                 redirect_url = 'https://stitchfox.co.nz/thank-you';
             }
 
-            let ret;
             try{
               ret = await chargebee.chargebee_request_checkout(req.query, redirect_url, stylist_attr, keen, palette);
             }
