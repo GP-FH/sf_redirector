@@ -54,11 +54,12 @@ const order_create_new_purchase = async ( subscription ) => {
 const order_process_renewal = async ( subscription ) => {
   try {
     const customer = await chargebee.chargebee_get_customer_info( subscription.customer_id );
+    let new_order;
 
     switch ( subscription.plan_id ) {
       case 'deluxe-box':
       case 'premium-box':
-        const new_order = await subscription_tracker.increment_and_check_monthly(subscription.id, subscription.customer_id, subscription.plan_id);
+        new_order = await subscription_tracker.increment_and_check_monthly(subscription.id, subscription.customer_id, subscription.plan_id);
 
         if ( new_order ) {
           return await tradegecko.tradegecko_create_sales_order();
@@ -67,7 +68,7 @@ const order_process_renewal = async ( subscription ) => {
         break;
       case 'deluxe-box-weekly':
       case 'premium-box-weekly':
-        const new_order = await subscription_tracker.increment_and_check_weelky(subscription.id, subscription.customer_id, subscription.plan_id);
+        new_order = await subscription_tracker.increment_and_check_weelky(subscription.id, subscription.customer_id, subscription.plan_id);
 
         if ( new_order ) {
           return await tradegecko.tradegecko_create_sales_order();
