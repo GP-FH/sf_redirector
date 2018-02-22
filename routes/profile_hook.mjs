@@ -11,7 +11,8 @@ import * as util from "underscore";
 
 import { product_plan_is_one_off } from "../libs/lib_product_plan";
 import { chargebee_request_checkout } from "../libs/lib_chargebee";
-import { logger } from "../libs/lib_logger";
+
+const logger = require("../libs/lib_logger");
 
 const router = express.Router();
 const mp = mixpanel.init( process.env.MIXPANEL_TOKEN );

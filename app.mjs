@@ -14,7 +14,7 @@ import * as express from "express";
 import * as https from "https";
 import * as fs from "fs";
 
-import { logger } from "./libs/lib_logger";
+const logger = require("./libs/lib_logger");
 
 /*
  *  initialize routes

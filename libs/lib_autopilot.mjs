@@ -9,7 +9,7 @@
 import * as request from "request";
 import * as VError from "verror";
 
-import { logger } from "./lib_logger";
+const logger = require("./lib_logger");
 
 export async function autopilot_move_contact_to_new_list ( from, to, email ) {
   //  check if the current user is on the 'from' list

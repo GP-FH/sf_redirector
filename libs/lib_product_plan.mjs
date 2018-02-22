@@ -1,4 +1,4 @@
-import { logger } from "../libs/lib_logger";
+const logger = require("./lib_logger");
 
 const product_plans_one_offs = [ 'style-pack', 'style-chest', 'style-bomb' ];
 const product_plans_subscriptions = [ 'premium-box', 'deluxe-box', 'premium-box-weekly', 'deluxe-box-weekly' ];

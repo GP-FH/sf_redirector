@@ -3,8 +3,9 @@ import * as VError from "verror";
 import { chargebee_coupon_create_new, chargebee_coupon_check_and_apply_referral } from "../libs/lib_chargebee_coupon";
 import { chargebee_get_customer_info, chargebee_get_subscription_info} from "../libs/lib_chargebee";
 import { subscription_tracker_set_subscription_count, increment_and_check_weekly, increment_and_check_monthly } from "../libs/lib_subscription_tracker";
-import { logger } from "../libs/lib_logger";
 import { tradegecko_create_sales_order, tradegecko_add_address_to_stylist } from "../libs/lib_tradegecko";
+
+const logger = require("./lib_logger");
 
 /*
  * This function does what it says - it handles the creation of new orders. Currently this means

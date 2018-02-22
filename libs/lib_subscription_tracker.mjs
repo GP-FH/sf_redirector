@@ -22,7 +22,7 @@
 import * as VError from "verror";
 import * as redis from "redis";
 
-import { logger } from "./lib_logger";
+const logger = require("./lib_logger");
 
 /*
  *  creates count for customer with passed id on monthly plan. Includes test param which is set

@@ -1,7 +1,7 @@
 import * as chargebee from "chargebee";
 import * as VError from "verror";
 
-import { logger } from "../libs/lib_logger";
+const logger = require("./lib_logger");
 
 chargebee.configure( {
     site: process.env.CHARGEBEE_SITE,
