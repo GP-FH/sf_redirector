@@ -75,12 +75,12 @@ router.get( '/', async function ( req, res, next) {
             }
 
             try{
-              ret = await chargebee.chargebee_request_checkout(req.query, redirect_url, stylist_attr, keen, palette);
-              res.redirect( ret.url );
+              let url = await chargebee.chargebee_request_checkout(req.query, redirect_url, stylist_attr, keen, palette);
+              res.redirect( url );
             }
             catch (err) {
               console.log(err);
-              logger.error( JSON.stringify(err) );
+              logger.error( err );
               res.redirect( process.env.BASE_URL + '/error' );
             }
         }
