@@ -79,6 +79,7 @@ router.get( '/', async function ( req, res, next) {
               res.redirect( ret.url );
             }
             catch (err) {
+              console.log(err);
               logger.error( JSON.stringify(err) );
               res.redirect( process.env.BASE_URL + '/error' );
             }
@@ -86,7 +87,7 @@ router.get( '/', async function ( req, res, next) {
     }
     else {
         logger.error( 'Incorrect token passed' );
-        res.redirect( process.env.BASE_URL + '/error' )
+        res.redirect( process.env.BASE_URL + '/error' );
     }
 } );
 
