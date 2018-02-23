@@ -27,7 +27,7 @@ router.get( '/', async function ( req, res, next) {
         //  trigger event in mixpanel to track user
         mp.track( process.env.MIXPANEL_EVENT, {
             distinct_id: req.query.mp_id
-        } ); 
+        } );
 
         //  check for stylist campaign Q param: indicates we should attribute the customer to the stylist
         const stylist_idx = stylist_campaigns.indexOf( req.query.campaign );
@@ -76,13 +76,12 @@ router.get( '/', async function ( req, res, next) {
 
             try{
               ret = await chargebee.chargebee_request_checkout(req.query, redirect_url, stylist_attr, keen, palette);
+              res.redirect( ret.url );
             }
             catch (err) {
               logger.error( JSON.stringify(err) );
               res.redirect( process.env.BASE_URL + '/error' );
             }
-
-            res.redirect( ret.url );
         }
     }
     else {
