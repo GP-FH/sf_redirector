@@ -6,10 +6,10 @@
  *
  */
 
-let winston = require("winston");
-let papertrail = require("winston-papertrail").Papertrail;
+const winston = require("winston");
+const papertrail = require("winston-papertrail").Papertrail;
 
-let winstonPapertrail = new winston.transports.Papertrail( {
+const winstonPapertrail = new winston.transports.Papertrail( {
   host: 'logs5.papertrailapp.com',
   port: 41600,
   handleExceptions: true,
@@ -19,11 +19,11 @@ let winstonPapertrail = new winston.transports.Papertrail( {
   }
 } );
 
-let logger = new winston.Logger( {
+const logger = new winston.Logger( {
   transports: [
     winstonPapertrail
   ],
   exitOnError: false
 } );
 
-exports.logger = logger;
+module.exports = logger;

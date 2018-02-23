@@ -13,7 +13,7 @@ const bodyparser = require("body-parser");
 const express = require("express");
 const https = require("https");
 const fs = require("fs");
-let logger = require("./libs/lib_logger");
+const logger = require("./libs/lib_logger");
 
 /*
  *  initialize routes
