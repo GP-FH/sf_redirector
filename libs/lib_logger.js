@@ -6,7 +6,7 @@
  *
  */
 
-const winston = require("winston");
+let winston = require("winston");
 const papertrail = require("winston-papertrail").Papertrail;
 
 const winstonPapertrail = new winston.transports.Papertrail( {
