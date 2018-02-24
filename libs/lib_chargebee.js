@@ -51,7 +51,8 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
       throw new VError ("Received parameter not defined");
   }
 
-  chargebee.hosted_page.checkout_new( {
+  let url;
+  await chargebee.hosted_page.checkout_new( {
       redirect_url: redirect_url,
       embed: false,
       subscription: {
@@ -90,10 +91,11 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
         throw new VError (err, "Error requesting checkout page in Chargebee");
       }
       else {
-        console.log(ret.hosted_page.url);
-        return ret.hosted_page.url;
+        url = ret.hosted_page.url;
       }
   } );
+
+  return url;
 }
 
 exports.chargebee_get_customer_info = chargebee_get_customer_info;
