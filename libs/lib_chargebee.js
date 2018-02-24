@@ -51,8 +51,8 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
       throw new VError ("Received parameter not defined");
   }
 
-  let url;
-  await chargebee.hosted_page.checkout_new( {
+
+  let url = await chargebee.hosted_page.checkout_new( {
       redirect_url: redirect_url,
       embed: false,
       subscription: {
