@@ -13,14 +13,14 @@ const logger = require("./lib_logger");
 
 const order_create_new_subscription = async ( subscription, coupons ) => {
   try {
-    const customer = await chargebee.chargebee_get_customer_info( subscription.customer_id );
+    const ret = await chargebee.chargebee_get_customer_info( subscription.customer_id );
 
     if ( coupons ) {
       await chargebee_coupon.chargebee_coupon_check_and_apply_referral( coupons[ 0 ].entity_id );
     }
 
     await chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
-    subscription_tracker.subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, customer.id );
+    subscription_tracker.subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, ret.customer.id );
 
     return await tradegecko.tradegecko_create_sales_order();
   }
@@ -37,7 +37,7 @@ const order_create_new_subscription = async ( subscription, coupons ) => {
 
 const order_create_new_purchase = async ( subscription ) => {
   try {
-    const customer = await chargebee.chargebee_get_customer_info( subscription.customer_id );
+    const ret = await chargebee.chargebee_get_customer_info( subscription.customer_id );
 
     return await tradegecko.tradegecko_create_sales_order();
   }
@@ -53,7 +53,7 @@ const order_create_new_purchase = async ( subscription ) => {
 
 const order_process_renewal = async ( subscription ) => {
   try {
-    const customer = await chargebee.chargebee_get_customer_info( subscription.customer_id );
+    const ret = await chargebee.chargebee_get_customer_info( subscription.customer_id );
     let new_order;
 
     switch ( subscription.plan_id ) {

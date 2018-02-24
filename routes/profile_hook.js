@@ -22,7 +22,7 @@ router.get( '/', async function ( req, res, next) {
     logger.info( 'Request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) );
 
     //  check for valid source token
-    if ( req.query.token == process.env.VERIFICATION_TOKEN ) {
+    if ( req.query.token == process.env.VERIFICATION_TOKEN ) { // TODO: move to middleware
 
         //  trigger event in mixpanel to track user
         mp.track( process.env.MIXPANEL_EVENT, {
@@ -85,8 +85,8 @@ router.get( '/', async function ( req, res, next) {
         }
     }
     else {
-        logger.error( 'Incorrect token passed' );
-        res.redirect( process.env.BASE_URL + '/error' );
+        logger.error( 'Request to profile hook with incorrect verification token made.' );
+        res.status( 401 ).send();
     }
 } );
 

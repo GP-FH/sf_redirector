@@ -16,12 +16,10 @@ const chargebee_get_customer_info = async ( customer_id ) => {
     throw new VError ("customer_id not defined");
   }
 
-  chargebee.customer.retrieve( customer_id ).request( ( err, ret ) => {
+  return await chargebee.customer.retrieve( customer_id ).request( ( err, ret ) => {
     if ( err ) {
       throw new VError (err, "Error retrieving customer data from Chargebee");
     }
-
-    return ret.customer
   } );
 };
 
@@ -34,12 +32,10 @@ const chargebee_get_subscription_info = async ( subscription_id ) => {
       throw new VError ("subscription_id not defined");
   }
 
-  chargebee.subscription.retrieve( subscription_id ).request( ( err, ret ) => {
+  return await chargebee.subscription.retrieve( subscription_id ).request( ( err, ret ) => {
       if ( err ) {
         throw new VError (err, "Error retrieving subscription data from Chargebee");
       }
-
-      return ret.subscription
   } );
 };
 

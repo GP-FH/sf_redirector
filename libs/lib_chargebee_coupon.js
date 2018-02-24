@@ -15,7 +15,7 @@ const chargebee_coupon_create_new = async ( coupon_id, set_name, customer_id ) =
       throw new VError ( "Undefined parameter received" );
   }
 
-  chargebee.coupon_code.create( {
+  return await chargebee.coupon_code.create( {
       coupon_id: coupon_id,
       coupon_set_name: set_name,
       code: customer_id
@@ -23,8 +23,6 @@ const chargebee_coupon_create_new = async ( coupon_id, set_name, customer_id ) =
       if ( err ) {
         throw new VError ( err, "Error creating coupon code in Chargebee");
       }
-
-      return;
   } );
 };
 
@@ -41,7 +39,7 @@ const chargebee_coupon_check_and_apply_referral = async ( entity_id ) => {
   if ( entity_id == process.env.FRIEND_REFERRAL_CODE_ID ) {
     var coupon_owner = coupons[ 0 ].description.split( ' ' )[ 0 ];
 
-    chargebee.customer.add_promotional_credits( coupon_owner, {
+    return await chargebee.customer.add_promotional_credits( coupon_owner, {
         amount: 1000,
         description: "refer_a_friend credits"
     } ).request( ( err, ret ) => {
@@ -50,8 +48,6 @@ const chargebee_coupon_check_and_apply_referral = async ( entity_id ) => {
         }
     } );
   }
-
-  return;
 };
 
 exports.chargebee_coupon_create_new = chargebee_coupon_create_new;
