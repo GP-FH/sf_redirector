@@ -86,12 +86,12 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
           phone: qs.phone
       }
   } ).request( function ( err, ret ) {
-
       if ( err ) {
         throw new VError (err, "Error requesting checkout page in Chargebee");
       }
       else {
-          return ret.hosted_page;
+        console.log(JSON.stringify(ret));
+        return ret.hosted_page.url;
       }
   } );
 }
