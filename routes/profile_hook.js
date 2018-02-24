@@ -75,7 +75,7 @@ router.get( '/', async function ( req, res, next) {
             }
 
             try{
-              const url = await chargebee.chargebee_request_checkout(req.query, redirect_url, stylist_attr, keen, palette);
+              let url = await chargebee.chargebee_request_checkout(req.query, redirect_url, stylist_attr, keen, palette);
               console.log(url);
               res.redirect( url );
             }
