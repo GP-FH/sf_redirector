@@ -95,7 +95,7 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
       }
   } );
 
-  return url;
+  return "poop";
 }
 
 exports.chargebee_get_customer_info = chargebee_get_customer_info;
