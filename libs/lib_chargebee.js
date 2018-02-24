@@ -52,7 +52,7 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
   }
 
   let url;
-  chargebee.hosted_page.checkout_new( {
+  await chargebee.hosted_page.checkout_new( {
       redirect_url: redirect_url,
       embed: false,
       subscription: {
@@ -91,9 +91,11 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
         throw new VError (err, "Error requesting checkout page in Chargebee");
       }
       else {
-        return url = "poop";//ret.hosted_page.url;
+        url = "poop";//ret.hosted_page.url;
       }
   } );
+
+  return url;
 }
 
 exports.chargebee_get_customer_info = chargebee_get_customer_info;
