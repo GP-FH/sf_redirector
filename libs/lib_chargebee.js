@@ -91,11 +91,11 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
         throw new VError (err, "Error requesting checkout page in Chargebee");
       }
       else {
-        url = "poop"//ret.hosted_page.url;
+        return url = "poop"//ret.hosted_page.url;
       }
   } );
 
-  return url;
+  // return url;
 }
 
 exports.chargebee_get_customer_info = chargebee_get_customer_info;
