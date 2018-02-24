@@ -86,12 +86,12 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
           country: "NZ",
           phone: qs.phone
       }
-  } ).request( ( err, ret ) => {
+  } ).request( async ( err, ret ) => {
       if ( err ) {
         throw new VError (err, "Error requesting checkout page in Chargebee");
       }
       else {
-        return url = "poop"//ret.hosted_page.url;
+        return url = "poop";//ret.hosted_page.url;
       }
   } );
 
