@@ -76,11 +76,9 @@ router.get( '/', async function ( req, res, next) {
 
             try{
               let url = await chargebee.chargebee_request_checkout(req.query, redirect_url, stylist_attr, keen, palette);
-              console.log(url);
               res.redirect( url );
             }
             catch (err) {
-              console.log(err);
               logger.error( err );
               res.redirect( process.env.BASE_URL + '/error' );
             }

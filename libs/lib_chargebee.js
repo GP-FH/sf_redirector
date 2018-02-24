@@ -90,6 +90,7 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
         throw new VError (err, "Error requesting checkout page in Chargebee");
       }
       else {
+        console.log(ret.hosted_page.url);
         return ret.hosted_page.url;
       }
   } );
