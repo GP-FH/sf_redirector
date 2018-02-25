@@ -25,7 +25,11 @@ const order_create_new_subscription = async ( subscription, coupons ) => {
     return await tradegecko.tradegecko_create_sales_order();
   }
   catch ( err ) {
-    !VError.findCauseByName(err, "redis") ? throw new VError (err, "Error occurred while creating new subscription") : logger.error( `Redis error: ${err}` );
+    if(!VError.findCauseByName(err, "redis")) {
+      throw new VError (err, "Error occurred while creating new subscription")
+    }
+
+    logger.error( `Redis error: ${err}` );
   }
 }
 
@@ -79,7 +83,11 @@ const order_process_renewal = async ( subscription ) => {
       }
   }
   catch ( err ) {
-    !VError.findCauseByName(err, "redis") ? throw new VError (err, "Error occurred while trying to process subscription renewal") : logger.error( `Redis error: ${err}` );
+    if(!VError.findCauseByName(err, "redis")) {
+      throw new VError (err, "Error occurred while trying to process subscription renewal");
+    }
+
+    logger.error( `Redis error: ${err}` );
   }
 }
 
