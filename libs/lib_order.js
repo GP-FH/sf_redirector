@@ -22,8 +22,6 @@ const order_create_new_subscription = async ( subscription, coupons ) => {
     await chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
     await tradegecko.tradegecko_create_sales_order();
     await subscription_tracker.subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, ret.customer.id );
-
-    return { ok:true };
   }
   catch ( err ) {
     if(!VError.findCauseByName(err, "redis")) {
@@ -32,6 +30,8 @@ const order_create_new_subscription = async ( subscription, coupons ) => {
 
     logger.error( `Redis error: ${err}` );
   }
+
+  return { ok:true };
 }
 
 /*
@@ -78,10 +78,11 @@ const order_process_renewal = async ( subscription ) => {
         if ( new_order ) {
           await tradegecko.tradegecko_create_sales_order();
         }
+
         break;
       default:
         throw new VError ("Unexpect plan_id received when trying to renew subscription");
-      }
+    }
   }
   catch ( err ) {
     if(!VError.findCauseByName(err, "redis")) {
