@@ -287,6 +287,8 @@ const subscription_tracker_set_subscription_count = async ( plan_id, subscriptio
       default:
         throw new VError ( "Unexpected plan_id received - cannot set subscription count" );
     }
+
+    return;
 };
 
 exports.increment_and_check_monthly = increment_and_check_monthly;

@@ -20,9 +20,10 @@ const order_create_new_subscription = async ( subscription, coupons ) => {
     }
 
     await chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
-    subscription_tracker.subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, ret.customer.id );
+    await tradegecko.tradegecko_create_sales_order();
+    await subscription_tracker.subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, ret.customer.id );
 
-    return await tradegecko.tradegecko_create_sales_order();
+    return { ok:true };
   }
   catch ( err ) {
     if(!VError.findCauseByName(err, "redis")) {
@@ -66,7 +67,7 @@ const order_process_renewal = async ( subscription ) => {
         new_order = await subscription_tracker.increment_and_check_monthly(subscription.id, subscription.customer_id, subscription.plan_id);
 
         if ( new_order ) {
-          return await tradegecko.tradegecko_create_sales_order();
+          await tradegecko.tradegecko_create_sales_order();
         }
 
         break;
@@ -75,7 +76,7 @@ const order_process_renewal = async ( subscription ) => {
         new_order = await subscription_tracker.increment_and_check_weelky(subscription.id, subscription.customer_id, subscription.plan_id);
 
         if ( new_order ) {
-          return await tradegecko.tradegecko_create_sales_order();
+          await tradegecko.tradegecko_create_sales_order();
         }
         break;
       default:
@@ -89,6 +90,8 @@ const order_process_renewal = async ( subscription ) => {
 
     logger.error( `Redis error: ${err}` );
   }
+
+  return { ok: true };
 }
 
 exports.order_create_new_subscription = order_create_new_subscription;

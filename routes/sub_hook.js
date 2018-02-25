@@ -65,11 +65,12 @@ router.post( '/', async ( req, res, next ) => {
     const subscription = req.body.content.subscription;
     const customer = req.body.content.customer;
 
+    let ret;
     try {
-      let ret = await order.order_process_renewal(subscription);
+      ret = await order.order_process_renewal(subscription);
     }
     catch ( err ) {
-      // handle error
+      next(err);
     }
 
     if ( process.env.ENVIRONMENT == 'prod' && ret.ok ) {
@@ -80,7 +81,6 @@ router.post( '/', async ( req, res, next ) => {
     /*
      * For notifying in Slack when a subscription has been cancelled
      */
-
     const customer = req.body.content.customer;
     const subscription = req.body.content.subscription;
 
