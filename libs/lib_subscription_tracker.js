@@ -29,37 +29,24 @@ const logger = require("./lib_logger");
  *  to true during (you guessed it) test run
  */
 const set_monthly = ( customer_id, subscription_id, test = false ) => {
+  if ( test ) {
+    redis = require( 'redis-mock' );
+  }
 
-    if ( test ) {
-        redis = require( 'redis-mock' );
-    }
+  const options = {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT
+  };
 
-    var options = {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT
-    };
+  const client = redis.createClient( options );
 
-    var client = redis.createClient( options );
+  client.on( 'error', ( err ) => {
+    client.quit();
+    throw new VError({name:'redis', cause: err});
+  } );
 
-    //  listen for errors
-    client.on( 'error', function ( err ) {
-
-        logger.error( 'Error with Redis: ' + err );
-        client.quit();
-
-    } );
-
-    client.hset( customer_id, subscription_id, 2, function ( err, res ) {
-
-        if ( err ) {
-
-            logger.error( 'Error setting initial count for subscription - reason: ' + err + '. For customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-            client.quit();
-
-        }
-
-        client.quit();
-    } );
+  client.hset( customer_id, subscription_id, 2);
+  client.quit();
 };
 
 /*
@@ -67,103 +54,84 @@ const set_monthly = ( customer_id, subscription_id, test = false ) => {
  *  true during (you guessed it) test run
  */
 const set_weekly = ( customer_id, subscription_id, test = false ) => {
+  if ( test ) {
+    redis = require( 'redis-mock' );
+  }
 
-    if ( test ) {
-        redis = require( 'redis-mock' );
-    }
+  const options = {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT
+  };
 
-    var options = {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT
-    };
+  const client = redis.createClient( options );
 
-    var client = redis.createClient( options );
+  //  listen for errors
+  client.on( 'error', ( err ) => {
+    client.quit();
+    throw new VError({name:'redis', cause: err});
+  } );
 
-    //  listen for errors
-    client.on( 'error', function ( err ) {
-
-        logger.error( 'Error with Redis: ' + err );
-        client.quit();
-
-    } );
-
-    client.hset( customer_id, subscription_id, 6, function ( err, res ) {
-
-        if ( err ) {
-
-            logger.error( 'Error setting initial count for subscription - reason: ' + err + '. For customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-            client.quit();
-
-        }
-
-        client.quit();
-    } );
+  client.hset( customer_id, subscription_id, 6);
+  client.quit();
 };
 
 /*
  *  increments counter for given customer_id and returns boolean indicating whether a new order is required.
  *  Includes test param which is set to true during (you guessed it) test run
  */
-const increment_and_check_monthly = ( customer_id, subscription_id, plan_id, callback, test = false ) => {
+const increment_and_check_monthly = async ( customer_id, subscription_id, plan_id, test = false ) => {
+  if ( test ) {
+    redis = require( 'redis-mock' );
+  }
 
-    if ( test ) {
-        redis = require( 'redis-mock' );
-    }
+  const options = {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT
+  };
 
-    var options = {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT
-    };
+  const client = redis.createClient( options );
 
-    var client = redis.createClient( options );
+  //  listen for errors
+  client.on( 'error', ( err ) => {
+    client.quit();
+    throw new VError({name:'redis', cause: err});
+  } );
 
-    //  listen for errors
-    client.on( 'error', function ( err ) {
+  let increment;
+  try {
+    increment = await _validate_subscription_count( plan_id, customer_id, subscription_id );
+  }
+  catch(err) {
+    throw new VError({name:'redis', cause: err}, "error validating subscription count");
+  }
 
-        logger.error( 'Error with Redis: ' + err );
-        client.quit();
+  let new_order = false;
+  if ( increment ) {
+    //  increment user count and decide whether to generate a Sales Order in Cin7
+    client.hincrby( customer_id, subscription_id, 1, ( err, reply ) => {
+      if ( err ) {
+        throw new VError({name:'redis', cause: err});
+      }
 
+      //  if reply is 4, reset the counter to 1
+      if ( reply == 4 ) {
+        client.hset( customer_id, subscription_id, 1 );
+        logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+        new_order = false;
+
+      } // if reply is 2 then a new sales order is required
+      else if ( reply == 2 ) {
+        logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
+        new_order = true;
+      }
+
+      logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+      new_order = false;
     } );
+  }
 
-    _validate_subscription_count( plan_id, customer_id, subscription_id, function ( err, result ) {
-        if ( err ) {
-            logger.error( 'Error validating subscription count for subscription_id: ' + subscription_id + ' with error: ' + err );
-        }
-        else if ( result ) {
-
-            //  increment user count and decide whether to generate a Sales Order in Cin7
-            client.hincrby( customer_id, subscription_id, 1, function ( err, reply ) {
-
-                if ( err ) {
-
-                    logger.error( 'Error incrementing count for subscription - reason: ' + err + '. For customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-                    return callback( err );
-
-                }
-
-                //  if reply is 4, reset the counter to 1
-                if ( reply == 4 ) {
-
-                    client.hset( customer_id, subscription_id, 1 );
-                    logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-                    client.quit();
-                    return callback( null, false );
-
-                } // if reply is 2 then a new sales order is required
-                else if ( reply == 2 ) {
-
-                    logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
-                    client.quit();
-                    return callback( null, true );
-
-                }
-
-                logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-                client.quit();
-                return callback( null, false );
-            } );
-        }
-    } );
+  client.quit();
+  return new_order;
 };
 
 /*
@@ -171,66 +139,55 @@ const increment_and_check_monthly = ( customer_id, subscription_id, plan_id, cal
  *  A sales order is requires every 13 weeks.
  */
 const increment_and_check_weekly = ( customer_id, subscription_id, plan_id, callback, test = false ) => {
+  if ( test ) {
+      redis = require( 'redis-mock' );
+  }
 
-    if ( test ) {
-        redis = require( 'redis-mock' );
-    }
+  var options = {
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT
+  };
 
-    var options = {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT
-    };
+  var client = redis.createClient( options );
 
-    var client = redis.createClient( options );
+  //  listen for errors
+  client.on( 'error', ( err ) => {
+    client.quit();
+    throw new VError({name:'redis', cause: err});
+  } );
 
-    //  listen for errors
-    client.on( 'error', function ( err ) {
+  let increment;
+  try {
+    increment = await _validate_subscription_count( plan_id, customer_id, subscription_id);
+  }
+  catch(err) {
+    throw new VError({name:'redis', cause: err}, "error validating subscription count");
+  }
 
-        logger.error( 'Error with Redis: ' + err );
-        client.quit();
+  let new_order = false;
+  if ( increment ) {
+    //  increment user count and decide whether to generate a Sales Order in Cin7
+    client.hincrby( customer_id, subscription_id, 1, ( err, reply ) => {
+      if ( err ) {
+        throw new VError({name:'redis', cause: err});
+      }
 
+      //  if reply is 18, reset the counter to 5
+      if ( reply == 18 ) {
+        client.hset( customer_id, subscription_id, 5 );
+        logger.info( 'Reset counter to 5 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+        new_order = false;
+      } // if reply is 6 then a new sales order is required
+      else if ( reply == 6 ) {
+        logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
+        new_order = true;
+      }
+
+      logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+      client.quit();
+      return new_order;
     } );
-
-    _validate_subscription_count( plan_id, customer_id, subscription_id, function ( err, result ) {
-        if ( err ) {
-            logger.error( 'Error validating subscription count for subscription_id: ' + subscription_id + ' with error: ' + err );
-        }
-        else if ( result ) {
-
-            //  increment user count and decide whether to generate a Sales Order in Cin7
-            client.hincrby( customer_id, subscription_id, 1, function ( err, reply ) {
-
-                if ( err ) {
-
-                    logger.error( 'Error incrementing count for subscription - reason: ' + err + '. For customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-                    return callback( err );
-
-                }
-
-                //  if reply is 18, reset the counter to 5
-                if ( reply == 18 ) {
-
-                    client.hset( customer_id, subscription_id, 5 );
-                    logger.info( 'Reset counter to 5 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-                    client.quit();
-                    return callback( null, false );
-
-                } // if reply is 6 then a new sales order is required
-                else if ( reply == 6 ) {
-
-                    logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
-                    client.quit();
-                    return callback( null, true );
-
-                }
-
-                logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-                client.quit();
-                return callback( null, false );
-            } );
-
-        }
-    } );
+  }
 };
 
 /*
@@ -243,82 +200,75 @@ const increment_and_check_weekly = ( customer_id, subscription_id, plan_id, call
  *  give myself options.
  *
  */
-function _validate_subscription_count( plan_id, customer_id, subscription_id, callback, test = false ) {
+async function _validate_subscription_count( plan_id, customer_id, subscription_id, test = false ) {
+  if ( test ) {
+    redis = require( 'redis-mock' );
+  }
 
+  const options = {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT
+  };
 
-    if ( test ) {
-        redis = require( 'redis-mock' );
+  const client = redis.createClient( options );
+
+  //  listen for errors
+  client.on( 'error', ( err ) => {
+    client.quit();
+    throw new VError({name:'redis', cause: err});
+  } );
+
+  client.hget( customer_id, subscription_id, ( err, reply ) => {
+    if ( err ) {
+      throw new VError({name:'redis', cause: err});
     }
 
-    var options = {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT
-    };
+    let count_to_set = '0';
 
-    var client = redis.createClient( options );
+    //  means customer has changed to weekly plan on this renewal...
+    if ( reply < 5 && ( plan_id == 'deluxe-box-weekly' || plan_id == 'premium-box-weekly' ) ) {
+      /*
+       *  map the current month to the last week in the monthly period and return true. This way the count
+       *  will be incremented and the appropriate action taken
+       */
+      if ( reply == 1 ) {
+        count_to_set = 5;
+      }
+      else if ( reply == 2 ) {
+        count_to_set = 9;
+      }
+      else {
+        count_to_set = 13;
+      }
 
-    //  listen for errors
-    client.on( 'error', function ( err ) {
+      client.hset( customer_id, subscription_id, count_to_set );
 
-        logger.error( 'Error with Redis: ' + err );
-        client.quit();
+      return true;
 
-    } );
+    } // ... and vice versa
+    else if ( reply > 4 && ( plan_id == 'deluxe-box' || plan_id == 'premium-box' ) ) {
+      /*
+       *  maps weekly ranges to monthly counts. This assumes manual handling of the switch is correct (seeing out
+       *  weekly renewals for the rest of the current month and scheduling plan change on a renewal date the same
+       *  as the plan creation date - (ugh))
+       */
+      if ( reply > 5 && reply < 10 ) {
+        count_to_set = 2;
+      }
+      else if ( reply > 9 && reply < 14 ) {
+        count_to_set = 3;
+      }
+      else {
+        count_to_set = 1;
+      }
 
-    client.hget( customer_id, subscription_id, function ( err, reply ) {
+      client.hset( customer_id, subscription_id, count_to_set );
+      return true;
 
-        if ( err ) {
-            return callback( err );
-        }
-        var count_to_set = '0';
+    }
 
-        //  means customer has changed to weekly plan on this renewal...
-        if ( reply < 5 && ( plan_id == 'deluxe-box-weekly' || plan_id == 'premium-box-weekly' ) ) {
-
-            /*
-             *  map the current month to the last week in the monthly period and return true. This way the count
-             *  will be incremented and the appropriate action taken
-             */
-            if ( reply == 1 ) {
-                count_to_set = 5;
-            }
-            else if ( reply == 2 ) {
-                count_to_set = 9;
-            }
-            else {
-                count_to_set = 13;
-            }
-
-            client.hset( customer_id, subscription_id, count_to_set );
-
-            return callback( null, true );
-
-        } // ... and vice versa
-        else if ( reply > 4 && ( plan_id == 'deluxe-box' || plan_id == 'premium-box' ) ) {
-
-            /*
-             *  maps weekly ranges to monthly counts. This assumes manual handling of the switch is correct (seeing out
-             *  weekly renewals for the rest of the current month and scheduling plan change on a renewal date the same
-             *  as the plan creation date - (ugh))
-             */
-            if ( reply > 5 && reply < 10 ) {
-                count_to_set = 2;
-            }
-            else if ( reply > 9 && reply < 14 ) {
-                count_to_set = 3;
-            }
-            else {
-                count_to_set = 1;
-            }
-
-            client.hset( customer_id, subscription_id, count_to_set );
-            return callback( null, true );
-
-        }
-
-        return callback( null, true );
-
-    } );
+    return true ;
+  } );
 }
 
 /*
@@ -337,7 +287,6 @@ const subscription_tracker_set_subscription_count = async ( plan_id, subscriptio
       default:
         throw new VError ( "Unexpected plan_id received - cannot set subscription count" );
     }
-
 };
 
 exports.increment_and_check_monthly = increment_and_check_monthly;
