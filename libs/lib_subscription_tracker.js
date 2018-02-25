@@ -138,7 +138,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
  *  increments counter and checks if sales order is required for weekly subscribers.
  *  A sales order is requires every 13 weeks.
  */
-const increment_and_check_weekly = ( customer_id, subscription_id, plan_id, callback, test = false ) => {
+const increment_and_check_weekly = async ( customer_id, subscription_id, plan_id, callback, test = false ) => {
   if ( test ) {
       redis = require( 'redis-mock' );
   }
