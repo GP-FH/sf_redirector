@@ -34,8 +34,6 @@ router.post( '/', async ( req, res, next ) => {
     const coupons = req.body.content.invoice.discounts || false;
     const subscription = req.body.content.subscription;
 
-    logger.info(`Here is the customer: ${JSON.stringify(customer)}. And here is the subscription: ${JSON.stringify(subscription)}`);
-
     let ret = await product_plan.product_plan_is_one_off( subscription.plan_id );
 
     try {

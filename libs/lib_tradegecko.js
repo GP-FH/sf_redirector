@@ -30,10 +30,6 @@ const tradegecko_create_sales_order = async ( subscription, customer ) => {
     throw new VError (err, "Error creating sales order via TradeGecko API" );
   }
 
-  if (res.statusCode !== 200) {
-    throw new VError ( `Error creating sales order via TradeGecko API - non 200 status code: ${res.statusCode}`);
-  }
-
   return { ok:true };
 }
 
