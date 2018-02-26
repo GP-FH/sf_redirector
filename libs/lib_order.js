@@ -22,11 +22,7 @@ const order_create_new_subscription = async ( subscription, customer, coupons ) 
     await subscription_tracker.subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, ret.customer.id );
   }
   catch ( err ) {
-    if(!VError.findCauseByName(err, "redis")) {
-      throw new VError (err, "Error occurred while creating new subscription")
-    }
-
-    logger.error( `Redis error: ${err}` );
+    throw new VError (err, "Error occurred while creating new subscription")
   }
 
   return { ok:true };
@@ -40,13 +36,11 @@ const order_create_new_subscription = async ( subscription, customer, coupons ) 
 
 const order_create_new_purchase = async ( subscription, customer ) => {
   try {
-    await tradegecko.tradegecko_create_sales_order( subscription, customer );
+     return await tradegecko.tradegecko_create_sales_order( subscription, customer );
   }
   catch ( err ) {
     throw new VError (err, "Error occurred while creating new one-off purchase");
   }
-
-  return { ok:true };
 }
 
 /*
@@ -64,7 +58,7 @@ const order_process_renewal = async ( subscription, customer ) => {
         new_order = await subscription_tracker.increment_and_check_monthly(subscription.id, subscription.customer_id, subscription.plan_id);
 
         if ( new_order ) {
-          await tradegecko.tradegecko_create_sales_order( subscription, customer );
+          return await tradegecko.tradegecko_create_sales_order( subscription, customer );
         }
 
         break;
@@ -73,7 +67,7 @@ const order_process_renewal = async ( subscription, customer ) => {
         new_order = await subscription_tracker.increment_and_check_weekly(subscription.id, subscription.customer_id, subscription.plan_id);
 
         if ( new_order ) {
-          await tradegecko.tradegecko_create_sales_order( subscription, customer );
+          return await tradegecko.tradegecko_create_sales_order( subscription, customer );
         }
 
         break;
@@ -82,14 +76,8 @@ const order_process_renewal = async ( subscription, customer ) => {
     }
   }
   catch ( err ) {
-    if(!VError.findCauseByName(err, "redis")) {
-      throw new VError (err, "Error occurred while trying to process subscription renewal");
-    }
-
-    logger.error( `Redis error: ${err}` );
+    throw new VError (err, "Error occurred while trying to process subscription renewal");
   }
-
-  return { ok: true };
 }
 
 exports.order_create_new_subscription = order_create_new_subscription;

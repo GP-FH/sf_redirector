@@ -42,7 +42,8 @@ const set_monthly = ( customer_id, subscription_id, test = false ) => {
 
   client.on( 'error', ( err ) => {
     client.quit();
-    throw new VError({name:'redis', cause: err});
+    throw new VError(err, `Error setting subscription counter. Please note: this won't have stopped the creation of the subscription so will need to be manually fixed for subscription: ${subscription_id}` );
+
   } );
 
   client.hset( customer_id, subscription_id, 2);
@@ -68,7 +69,7 @@ const set_weekly = ( customer_id, subscription_id, test = false ) => {
   //  listen for errors
   client.on( 'error', ( err ) => {
     client.quit();
-    throw new VError({name:'redis', cause: err});
+    throw new VError(err, `Error setting subscription counter. Please note: this won't have stopped the creation of the subscription so will need to be manually fixed for subscription: ${subscription_id}` );
   } );
 
   client.hset( customer_id, subscription_id, 6);
@@ -94,7 +95,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
   //  listen for errors
   client.on( 'error', ( err ) => {
     client.quit();
-    throw new VError({name:'redis', cause: err});
+    throw new VError(err);
   } );
 
   let increment;
@@ -102,7 +103,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
     increment = await _validate_subscription_count( plan_id, customer_id, subscription_id );
   }
   catch(err) {
-    throw new VError({name:'redis', cause: err}, "error validating subscription count");
+    throw new VError(err, `Error validating subscription count for ${subscription_id}`);
   }
 
   let new_order = false;
@@ -110,7 +111,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
     //  increment user count and decide whether to generate a Sales Order in Cin7
     client.hincrby( customer_id, subscription_id, 1, ( err, reply ) => {
       if ( err ) {
-        throw new VError({name:'redis', cause: err});
+        throw new VError(err);
       }
 
       //  if reply is 4, reset the counter to 1
@@ -153,7 +154,7 @@ const increment_and_check_weekly = async ( customer_id, subscription_id, plan_id
   //  listen for errors
   client.on( 'error', ( err ) => {
     client.quit();
-    throw new VError({name:'redis', cause: err});
+    throw new VError(err);
   } );
 
   let increment;
@@ -161,7 +162,7 @@ const increment_and_check_weekly = async ( customer_id, subscription_id, plan_id
     increment = await _validate_subscription_count( plan_id, customer_id, subscription_id);
   }
   catch(err) {
-    throw new VError({name:'redis', cause: err}, "error validating subscription count");
+    throw new VError(err, `Error validating subscription count for ${subscription_id}` );
   }
 
   let new_order = false;
@@ -169,7 +170,7 @@ const increment_and_check_weekly = async ( customer_id, subscription_id, plan_id
     //  increment user count and decide whether to generate a Sales Order in Cin7
     client.hincrby( customer_id, subscription_id, 1, ( err, reply ) => {
       if ( err ) {
-        throw new VError({name:'redis', cause: err});
+        throw new VError(err, `Error incrementing subscription count for ${subscription_id}` );
       }
 
       //  if reply is 18, reset the counter to 5
@@ -215,12 +216,12 @@ async function _validate_subscription_count( plan_id, customer_id, subscription_
   //  listen for errors
   client.on( 'error', ( err ) => {
     client.quit();
-    throw new VError({name:'redis', cause: err});
+    throw new VError(err);
   } );
 
   client.hget( customer_id, subscription_id, ( err, reply ) => {
     if ( err ) {
-      throw new VError({name:'redis', cause: err});
+      throw new VError(err);
     }
 
     let count_to_set = '0';
