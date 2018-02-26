@@ -41,11 +41,11 @@ router.post( '/', async ( req, res, next ) => {
     try {
       if ( ret.one_off ) {
         await autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_E427B712-F86E-4864-80F5-C8C5AC335E17', customer.email );
-        ret = await order.order_create_new_purchase( subscription );
+        ret = await order.order_create_new_purchase( subscription, customer );
       }
       else {
         await autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', customer.email );
-        ret = await order.order_create_new_subscription( subscription, coupons );
+        ret = await order.order_create_new_subscription( subscription, customer, coupons );
       }
     }
     catch ( err ) {
@@ -67,7 +67,7 @@ router.post( '/', async ( req, res, next ) => {
 
     let ret;
     try {
-      ret = await order.order_process_renewal(subscription);
+      ret = await order.order_process_renewal( subscription, customer );
     }
     catch ( err ) {
       next(err);

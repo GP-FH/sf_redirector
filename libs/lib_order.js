@@ -11,16 +11,14 @@ const logger = require("./lib_logger");
  * creating/checking referral codes, creating Cin7 contacts/sales orders, setting the renewal count.
  */
 
-const order_create_new_subscription = async ( subscription, coupons ) => {
+const order_create_new_subscription = async ( subscription, customer, coupons ) => {
   try {
-    const ret = await chargebee.chargebee_get_customer_info( subscription.customer_id );
-
     if ( coupons ) {
       await chargebee_coupon.chargebee_coupon_check_and_apply_referral( coupons[ 0 ].entity_id );
     }
 
     await chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
-    await tradegecko.tradegecko_create_sales_order();
+    await tradegecko.tradegecko_create_sales_order( subscription, customer );
     await subscription_tracker.subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, ret.customer.id );
   }
   catch ( err ) {
@@ -40,15 +38,15 @@ const order_create_new_subscription = async ( subscription, coupons ) => {
  * As these are one-off purchases, billing cycle is capped at 1, so nothing to keep track of.
  */
 
-const order_create_new_purchase = async ( subscription ) => {
+const order_create_new_purchase = async ( subscription, customer ) => {
   try {
-    const ret = await chargebee.chargebee_get_customer_info( subscription.customer_id );
-
-    return await tradegecko.tradegecko_create_sales_order();
+    await tradegecko.tradegecko_create_sales_order( subscription, customer );
   }
   catch ( err ) {
     throw new VError (err, "Error occurred while creating new one-off purchase");
   }
+
+  return { ok:true };
 }
 
 /*
@@ -56,9 +54,8 @@ const order_create_new_purchase = async ( subscription ) => {
  * appropriate.
  */
 
-const order_process_renewal = async ( subscription ) => {
+const order_process_renewal = async ( subscription, customer ) => {
   try {
-    const ret = await chargebee.chargebee_get_customer_info( subscription.customer_id );
     let new_order;
 
     switch ( subscription.plan_id ) {
@@ -67,7 +64,7 @@ const order_process_renewal = async ( subscription ) => {
         new_order = await subscription_tracker.increment_and_check_monthly(subscription.id, subscription.customer_id, subscription.plan_id);
 
         if ( new_order ) {
-          await tradegecko.tradegecko_create_sales_order();
+          await tradegecko.tradegecko_create_sales_order( subscription, customer );
         }
 
         break;
@@ -76,7 +73,7 @@ const order_process_renewal = async ( subscription ) => {
         new_order = await subscription_tracker.increment_and_check_weekly(subscription.id, subscription.customer_id, subscription.plan_id);
 
         if ( new_order ) {
-          await tradegecko.tradegecko_create_sales_order();
+          await tradegecko.tradegecko_create_sales_order( subscription, customer );
         }
 
         break;

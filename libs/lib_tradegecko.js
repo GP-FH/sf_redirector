@@ -3,7 +3,9 @@ const VError = require("verror");
 
 // gonna have to do something with addresses. Either dedupe via daily cron or check for existance on the fly
 
-const tradegecko_create_sales_order = async () => {
+const tradegecko_create_sales_order = async ( subscription, customer ) => {
+  const { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
+
   let res;
   try {
     res = await got.post('https://api.tradegecko.com/orders/', {
@@ -13,18 +15,11 @@ const tradegecko_create_sales_order = async () => {
       body: {
         "order":{
           "company_id": "20733937", // this should be the Stylists relationship ID
-          "shipping_address": { // the customers address -> this will be automagically added to the Stylists relationship
-            "address1": "1 Test St",
-            "suburb": "Teston",
-            "city": "Testville",
-            "country": "New Zealand",
-            "label":"test@test.com", // should be the customewrs email (for identification)
-            "email":"test@test.com"
-          },
+          "shipping_address": shipping_address,
           "issued_at": "26-02-2018", // dd-mm-yyyy
-          "tags": ["deluxe-box"],
+          "tags": tags,
           "status": "draft",
-          "notes": "Here are some notes"
+          "notes": notes
         }
       },
       json: true
@@ -42,8 +37,28 @@ const tradegecko_create_sales_order = async () => {
   return { ok:true };
 }
 
-function _prep_style_profile_args_for_sending () {
-
+function _prep_subscription_for_sending ( subscription, customer ) {
+  return {
+    "shipping_address": { // the customers address -> this will be automagically added to the Stylists relationship
+      "address1": subscription.shipping_address.line1,
+      "suburb": subscription.shipping_address.line1,
+      "city": subscription.shipping_address.city,
+      "country": subscription.shipping_address.city,
+      "label": subscription.shipping_address.first_name + " " + subscription.shipping_address.last_name, //TODO: may need to switch to email
+      "email": customer.email
+    },
+    "notes":`Gender: ${subscription.cf_gender}
+    Name: ${subscription.cf_childname}
+    DOB: ${subscription.cf_childage}
+    Top Size: ${subscription.cf_topsize}
+    Bottom Size: ${subscription.cf_bottomsize}
+    Which looks are their jam: ${subscription.cf_jam}
+    Which looks do it for them: ${subscription.cf_doit}
+    Palette: ${subscription.cf_palette}
+    Favourite Style: ${subscription.cf_fave}
+    Types of clothes they are keen on: ${subscription.cf_keen}`,
+    "tags":[subscription.plan_id]
+  };
 }
 
 exports.tradegecko_create_sales_order = tradegecko_create_sales_order;
