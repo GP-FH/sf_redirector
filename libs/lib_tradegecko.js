@@ -27,10 +27,10 @@ const tradegecko_create_sales_order = async ( subscription, customer ) => {
 
   }
   catch (err) {
-    console.log(JSON.stringify(err));
+    console.log(JSON.stringify(`Err: ${err}`));
     throw new VError (err, "Error creating sales order via TradeGecko API" );
   }
-  console.log(JSON.stringify(res));
+  console.log(JSON.stringify(`Res: ${res}`));
   return { ok:true };
 }
 
