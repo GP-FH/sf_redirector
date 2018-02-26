@@ -6,9 +6,16 @@ const product_plans_subscriptions = [ 'premium-box', 'deluxe-box', 'premium-box-
 const product_plan_is_one_off = async ( plan_id ) => {
   const one_off = product_plans_one_offs.includes( plan_id );
 
+  if ( one_off ) {
+    return {
+        ok: true,
+        one_off: true
+    };
+  }
+
   return {
       ok: true,
-      one_off: true
+      one_off: false
   };
 }
 
