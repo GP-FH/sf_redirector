@@ -27,13 +27,14 @@ const tradegecko_create_sales_order = async ( subscription, customer ) => {
 
   }
   catch (err) {
+    console.log(JSON.stringify(err));
     throw new VError (err, "Error creating sales order via TradeGecko API" );
   }
   console.log(JSON.stringify(res));
   return { ok:true };
 }
 
-function _prep_subscription_for_sending ( subscription, customer ) {
+async function _prep_subscription_for_sending ( subscription, customer ) {
   return {
     "shipping_address": { // the customers address -> this will be automagically added to the Stylists relationship
       "address1": subscription.shipping_address.line1,
