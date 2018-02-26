@@ -30,10 +30,11 @@ router.post( '/', async ( req, res, next ) => {
      * On subscription creation, a new customer and a new sales order is
      * created in Cin7
      */
-
     const customer = req.body.content.customer;
     const coupons = req.body.content.invoice.discounts || false;
     const subscription = req.body.content.subscription;
+
+    logger.info(`Here is the customer: ${JSON.stringify(customer)}. And here is the subscription: ${JSON.stringify(subscription)}`);
 
     let ret = await product_plan.product_plan_is_one_off( subscription.plan_id );
 
@@ -61,7 +62,6 @@ router.post( '/', async ( req, res, next ) => {
      * create a sales order in cin7. If not a delivery time, increment
      * the subscription count.
      */
-
     const subscription = req.body.content.subscription;
     const customer = req.body.content.customer;
 
@@ -95,7 +95,6 @@ router.post( '/', async ( req, res, next ) => {
 // error handling for the sub route
 router.use( function ( err, req, res, next ) {
   res.end();
-  logger.error( JSON.stringify( err ) );
 } );
 
 module.exports = router;

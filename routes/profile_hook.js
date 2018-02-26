@@ -19,7 +19,7 @@ const stylist_campaigns = [ 'HW-01-ATTR', 'MD-01-ATTR' ];
 
 router.get( '/', async function ( req, res, next) {
 
-    logger.info( 'Request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) );
+    logger.info( 'Request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) ); // TODO: move to middleware
 
     //  check for valid source token
     if ( req.query.token == process.env.VERIFICATION_TOKEN ) { // TODO: move to middleware
@@ -30,7 +30,7 @@ router.get( '/', async function ( req, res, next) {
         } );
 
         //  check for stylist campaign Q param: indicates we should attribute the customer to the stylist
-        const stylist_idx = stylist_campaigns.indexOf( req.query.campaign );
+        const stylist_idx = stylist_campaigns.indexOf( req.query.campaign ); // TODO: move campaign stuff to dedicated lib
         let stylist_attr = '';
 
         if ( stylist_idx != -1 ) {

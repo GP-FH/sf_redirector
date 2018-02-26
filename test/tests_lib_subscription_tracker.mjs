@@ -2,9 +2,8 @@
  *  Test suite for the subscription_tracker library.
  */
 
-var expect = require( 'chai' ).expect;
-var nock = require( 'nock' );
-var sub_tracker = require( '../libs/lib_subscription_tracker.mjs' );
+const expect = require( 'chai' ).expect;
+const sub_tracker = require( '../libs/lib_subscription_tracker.mjs' );
 
 sub_tracker.set_weekly( 'test_id_weekly', 'test_sub_id_weekly', true );
 sub_tracker.set_monthly( 'test_id_monthly', 'test_sub_id', true );
