@@ -18,7 +18,7 @@ const tradegecko_create_sales_order = async () => {
             "suburb": "Teston",
             "city": "Testville",
             "country": "New Zealand",
-            "label":"test@test.com" // should be the customewrs email (for identification)
+            "label":"test@test.com", // should be the customewrs email (for identification)
             "email":"test@test.com"
           },
           "issued_at": "26-02-2018", // dd-mm-yyyy
