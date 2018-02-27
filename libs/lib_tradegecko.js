@@ -14,9 +14,9 @@ const tradegecko_create_sales_order = async ( subscription, customer ) => {
       },
       body: {
         "order":{
-          "company_id": "20733937", // this should be the Stylists relationship ID
+          "company_id": "20733937",
           "shipping_address": shipping_address,
-          "issued_at": "26-02-2018", // dd-mm-yyyy
+          "issued_at": "26-02-2018",
           "tags": tags,
           "status": "draft",
           "notes": notes
@@ -27,9 +27,11 @@ const tradegecko_create_sales_order = async ( subscription, customer ) => {
 
   }
   catch (err) {
+    console.log(` Error from TD API: ${JSON.stringify(err)}`);
     throw new VError (err, `Error creating sales order via TradeGecko API. Note: will need to be manually created for subscription ${subscription.id}` );
   }
 
+  console.log(` Response from TD API: ${JSON.stringify(res)}`);
   return { ok:true };
 }
 
@@ -40,7 +42,7 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
       "suburb": subscription.shipping_address.line1,
       "city": subscription.shipping_address.city,
       "country": subscription.shipping_address.city,
-      "label": customer.email, //TODO: may need to switch to email
+      "label": customer.email,
       "email": customer.email
     },
     "notes":`  Gender: ${subscription.cf_gender}
