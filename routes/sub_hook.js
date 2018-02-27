@@ -86,7 +86,6 @@ router.post( '/', async ( req, res, next ) => {
       //  notify Slack
       slack.slack_send( 'subscription_cancelled', customer, subscription );
     }
-
   }
 } );
 
