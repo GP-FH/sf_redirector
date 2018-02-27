@@ -63,6 +63,8 @@ router.post( '/', async ( req, res, next ) => {
     const subscription = req.body.content.subscription;
     const customer = req.body.content.customer;
 
+    console.log(`Making it into the sub renewal conditional`);
+
     let ret;
     try {
       ret = await order.order_process_renewal( subscription, customer );
