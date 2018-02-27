@@ -57,6 +57,8 @@ const order_process_renewal = async ( subscription, customer ) => {
       case 'premium-box':
         new_order = await subscription_tracker.increment_and_check_monthly(subscription.id, subscription.customer_id, subscription.plan_id);
 
+        console.log(`making it into appropriate switch case. new order should be false. new_order = ${new_order}`);
+
         if ( new_order ) {
           return await tradegecko.tradegecko_create_sales_order( subscription, customer );
         }
