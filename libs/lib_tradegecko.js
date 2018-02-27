@@ -40,10 +40,10 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
       "suburb": subscription.shipping_address.line1,
       "city": subscription.shipping_address.city,
       "country": subscription.shipping_address.city,
-      "label": subscription.shipping_address.first_name + " " + subscription.shipping_address.last_name, //TODO: may need to switch to email
+      "label": customer.email, //TODO: may need to switch to email
       "email": customer.email
     },
-    "notes":`Gender: ${subscription.cf_gender}
+    "notes":`  Gender: ${subscription.cf_gender}
     Name: ${subscription.cf_childname}
     DOB: ${subscription.cf_childage}
     Top Size: ${subscription.cf_topsize}
@@ -53,7 +53,7 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
     Palette: ${subscription.cf_palette}
     Favourite Style: ${subscription.cf_fave}
     Types of clothes they are keen on: ${subscription.cf_keen}`,
-    "tags":[subscription.plan_id]
+    "tags":[subscription.plan_id,subscription.cf_fave]
   };
 }
 

@@ -19,7 +19,7 @@ const order_create_new_subscription = async ( subscription, customer, coupons ) 
 
     await chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
     await tradegecko.tradegecko_create_sales_order( subscription, customer );
-    await subscription_tracker.subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, ret.customer.id );
+    await subscription_tracker.subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, customer.id );
   }
   catch ( err ) {
     throw new VError (err, "Error occurred while creating new subscription")
