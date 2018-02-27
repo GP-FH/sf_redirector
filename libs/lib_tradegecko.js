@@ -43,16 +43,20 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
       "label": customer.email,
       "email": customer.email
     },
-    "notes":`  Gender: ${subscription.cf_gender}
-    Name: ${subscription.cf_childname}
-    DOB: ${subscription.cf_childage}
-    Top Size: ${subscription.cf_topsize}
-    Bottom Size: ${subscription.cf_bottomsize}
-    Which looks are their jam: ${subscription.cf_jam}
-    Which looks do it for them: ${subscription.cf_doit}
-    Palette: ${subscription.cf_palette}
-    Favourite Style: ${subscription.cf_fave}
-    Types of clothes they are keen on: ${subscription.cf_keen}`,
+    "notes":`
+      Chargebee Subscription ID: ${subscription.id}
+      Name: ${subscription.cf_childname}
+      DOB: ${subscription.cf_childage}
+      Gender: ${subscription.cf_gender}
+      Top Size: ${subscription.cf_topsize}
+      Bottom Size: ${subscription.cf_bottomsize}
+      Which looks are their jam: ${subscription.cf_jam}
+      Which looks do it for them: ${subscription.cf_doit}
+      Palette: ${subscription.cf_palette}
+      Favourite Style: ${subscription.cf_fave}
+      Types of clothes they are keen on: ${subscription.cf_keen}
+
+      Follow this link to start filling this order: https://link_to_b2b.com`,
     "tags":[subscription.plan_id, subscription.cf_fave]
   };
 }

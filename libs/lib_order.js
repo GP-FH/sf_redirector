@@ -72,7 +72,7 @@ const order_process_renewal = async ( subscription, customer ) => {
 
         break;
       default:
-        throw new VError ("Unexpect plan_id received when trying to renew subscription");
+        throw new VError ("Unexpected plan_id received when trying to renew subscription");
     }
   }
   catch ( err ) {

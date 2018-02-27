@@ -22,7 +22,6 @@ const router = express.Router();
 
 router.post( '/', async ( req, res, next ) => {
   res.status( 200 ).send();
-  console.log(`chargebee webhoom req received: ${JSON.stringify(req.body)}`);
 
   const event_type = req.body.event_type;
 
