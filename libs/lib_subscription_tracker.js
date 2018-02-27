@@ -219,6 +219,7 @@ async function _validate_subscription_count( plan_id, customer_id, subscription_
     throw new VError(err);
   } );
 
+  let increment = true;
   client.hget( customer_id, subscription_id, ( err, reply ) => {
     if ( err ) {
       throw new VError(err);
@@ -244,7 +245,7 @@ async function _validate_subscription_count( plan_id, customer_id, subscription_
 
       client.hset( customer_id, subscription_id, count_to_set );
 
-      return true;
+      increment =  true;
 
     } // ... and vice versa
     else if ( reply > 4 && ( plan_id == 'deluxe-box' || plan_id == 'premium-box' ) ) {
@@ -264,12 +265,12 @@ async function _validate_subscription_count( plan_id, customer_id, subscription_
       }
 
       client.hset( customer_id, subscription_id, count_to_set );
-      return true;
+      increment = true;
 
     }
-
-    return true ;
   } );
+
+  return increment;
 }
 
 /*
