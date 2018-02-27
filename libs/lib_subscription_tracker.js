@@ -105,7 +105,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
   catch(err) {
     throw new VError(err, `Error validating subscription count for ${subscription_id}`);
   }
-
+  console.log(`validating current subscription count. increment is expected to be true. increment is ${increment}`);
   let new_order = false;
   if ( increment ) {
     //  increment user count and decide whether to generate a Sales Order in Cin7
@@ -113,7 +113,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
       if ( err ) {
         throw new VError(err);
       }
-
+      console.log(`incrementing count. reply is expected to be 3. reply is ${reply}`);
       //  if reply is 4, reset the counter to 1
       if ( reply == 4 ) {
         client.hset( customer_id, subscription_id, 1 );

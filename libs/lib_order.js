@@ -49,15 +49,12 @@ const order_create_new_purchase = async ( subscription, customer ) => {
  */
 
 const order_process_renewal = async ( subscription, customer ) => {
+  let new_order;
   try {
-    let new_order;
-
     switch ( subscription.plan_id ) {
       case 'deluxe-box':
       case 'premium-box':
         new_order = await subscription_tracker.increment_and_check_monthly(subscription.id, subscription.customer_id, subscription.plan_id);
-
-        console.log(`making it into appropriate switch case. new order should be false. new_order = ${new_order}`);
 
         if ( new_order ) {
           return await tradegecko.tradegecko_create_sales_order( subscription, customer );
@@ -80,6 +77,8 @@ const order_process_renewal = async ( subscription, customer ) => {
   catch ( err ) {
     throw new VError (err, "Error occurred while trying to process subscription renewal");
   }
+
+  return { ok:true, new_order:new_order };
 }
 
 exports.order_create_new_subscription = order_create_new_subscription;
