@@ -53,7 +53,7 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
     Palette: ${subscription.cf_palette}
     Favourite Style: ${subscription.cf_fave}
     Types of clothes they are keen on: ${subscription.cf_keen}`,
-    "tags":[subscription.plan_id,subscription.cf_fave]
+    "tags":[subscription.plan_id, subscription.cf_fave]
   };
 }
 
