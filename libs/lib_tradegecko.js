@@ -27,11 +27,9 @@ const tradegecko_create_sales_order = async ( subscription, customer ) => {
 
   }
   catch (err) {
-    console.log(` Error from TD API: ${JSON.stringify(err)}`);
     throw new VError (err, `Error creating sales order via TradeGecko API. Note: will need to be manually created for subscription ${subscription.id}` );
   }
 
-  console.log(` Response from TD API: ${JSON.stringify(res)}`);
   return { ok:true };
 }
 
