@@ -120,15 +120,14 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
         client.hset( customer_id, subscription_id, 1 );
         logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
         new_order = false;
-
       } // if reply is 2 then a new sales order is required
       else if ( reply == 2 ) {
         logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
         new_order = true;
+      } else {
+        logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+        new_order = false;
       }
-
-      logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-      new_order = false;
     } );
   }
 
