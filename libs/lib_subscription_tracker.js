@@ -113,7 +113,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
       if ( err ) {
         throw new VError(err);
       }
-
+      console.log("INCREMENT!");
       //  if reply is 4, reset the counter to 1
       if ( reply == 4 ) { //TODO: this no work no idea why yet
         console.log(`customer id : ${customer_id}. subscription_id : ${subscription_id}`);
