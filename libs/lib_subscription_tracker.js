@@ -111,19 +111,15 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
     //  increment user count and decide whether to generate a Sales Order in Cin7
     client.hincrby( customer_id, subscription_id, 1, ( err, reply ) => {
       if ( err ) {
+        client.quit();
         throw new VError(err);
       }
-      console.log("INCREMENT!");
+
       //  if reply is 4, reset the counter to 1
-      if ( reply == 4 ) { //TODO: this no work no idea why yet
-        console.log(`customer id : ${customer_id}. subscription_id : ${subscription_id}`);
-        client.hset( customer_id, subscription_id, 1, (err, reply) =>{
-          console.log(`this is the err: ${err} and this is the reply ${reply}`);
-
-          logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-          new_order = false;
-        } );
-
+      if ( reply == 4 ) {
+        client.hset( customer_id, subscription_id, 1);
+        logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+        new_order = false;
       } // if reply is 2 then a new sales order is required
       else if ( reply == 2 ) {
         logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
@@ -132,10 +128,11 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
         logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
         new_order = false;
       }
+
+      client.quit();
     } );
   }
 
-  client.quit();
   return new_order;
 };
 
