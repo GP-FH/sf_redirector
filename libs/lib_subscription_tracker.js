@@ -105,7 +105,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
   catch(err) {
     throw new VError(err, `Error validating subscription count for ${subscription_id}`);
   }
-  console.log(`validating current subscription count. increment is expected to be true. increment is ${increment}`);
+
   let new_order = false;
   if ( increment ) {
     //  increment user count and decide whether to generate a Sales Order in Cin7
@@ -113,9 +113,10 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
       if ( err ) {
         throw new VError(err);
       }
-      console.log(`incrementing count. reply is expected to be 3. reply is ${reply}`);
+
       //  if reply is 4, reset the counter to 1
-      if ( reply == 4 ) {
+      if ( reply == 4 ) { //TODO: this no work no idea why yet
+        console.log(`customer id : ${customer_id}. subscription_id : ${subscription_id}`);
         client.hset( customer_id, subscription_id, 1 );
         logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
         new_order = false;
@@ -192,14 +193,13 @@ const increment_and_check_weekly = async ( customer_id, subscription_id, plan_id
 };
 
 /*
- *  this function is used to detect whether a customer has changed their plan from weekly to monthly (or vice versa).
+ *  This function is used to detect whether a customer has changed their plan from weekly to monthly (or vice versa).
  *  It looks at the plan id and verifies that they have the correct count range (monthly 1-3, weekly 5-17). If it detects
  *  that the count range does not match the plan_id this indicates the person has changed plans on renewal and the
  *  correct count is set.
  *
  *  Returns True indicating that the count is fine to increment. Currently no clear case for False but, ya know, wanted to
  *  give myself options.
- *
  */
 async function _validate_subscription_count( plan_id, customer_id, subscription_id, test = false ) {
   if ( test ) {
