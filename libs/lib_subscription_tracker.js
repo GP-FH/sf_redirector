@@ -129,11 +129,10 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
         new_order = false;
       }
 
+      return new_order;
       client.quit();
     } );
   }
-
-  return new_order;
 };
 
 /*
