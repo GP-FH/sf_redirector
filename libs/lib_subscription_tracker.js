@@ -129,10 +129,10 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
       client.quit();
       return result;
     });
-  }
 
-  console.log(`new_order is ${new_order}`);
-  return new_order;
+    console.log(`new_order is ${new_order}`);
+    return new_order;
+  }
 };
 
 /*
