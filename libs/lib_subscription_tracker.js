@@ -114,6 +114,8 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
         client.quit();
         throw new VError(err);
       }
+
+      return reply;
     } );
 
     console.log(`count is ${count}`);
