@@ -116,6 +116,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
       }
     } );
 
+    console.log(`count is ${count}`);
     //  if reply is 4, reset the counter to 1
     if ( count == 4 ) {
       await client.hset( customer_id, subscription_id, 1);
