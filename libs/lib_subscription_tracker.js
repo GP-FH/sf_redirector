@@ -106,31 +106,33 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
     throw new VError(err, `Error validating subscription count for ${subscription_id}`);
   }
 
+  let new_order;
   if ( increment ) {
     //  increment user count and decide whether to generate a Sales Order in Cin7
-    const test = await client.hincrby( customer_id, subscription_id, 1, async (err, reply) => {
-      let new_order = false;
+    new_order = await client.hincrby( customer_id, subscription_id, 1, async (err, reply) => {
       console.log(`reply is ${reply} or err is ${err}`);
+      let result;
       //  if reply is 4, reset the counter to 1
       if ( reply == 4 ) {
         await client.hset( customer_id, subscription_id, 1);
         logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-        new_order = false;
+        result = "reset";
       } // if reply is 2 then a new sales order is required
       else if ( reply == 2 ) {
         logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
-        new_order = true;
+        result = "new order"
       } else {
         logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-        new_order = false;
+        result = "keep incrementing";
       }
-      return new_order;
+
       client.quit();
+      return result;
     });
   }
 
-  console.log(`test is ${test}`);
-  return test;
+  console.log(`new_order is ${new_order}`);
+  return new_order;
 };
 
 /*
