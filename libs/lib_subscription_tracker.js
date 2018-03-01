@@ -133,7 +133,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
     return result;*/
   }
   console.log(`new_order outside if statement: ${new_order}`);
-  return;
+  return; 
 };
 
 /*
