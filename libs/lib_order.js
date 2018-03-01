@@ -57,16 +57,16 @@ const order_process_renewal = async ( subscription, customer ) => {
         new_order = await subscription_tracker.increment_and_check_monthly(subscription.id, subscription.customer_id, subscription.plan_id);
 
         if ( new_order ) {
-          return await tradegecko.tradegecko_create_sales_order( subscription, customer );
+          await tradegecko.tradegecko_create_sales_order( subscription, customer );
         }
 
         break;
       case 'deluxe-box-weekly':
       case 'premium-box-weekly':
         new_order = await subscription_tracker.increment_and_check_weekly(subscription.id, subscription.customer_id, subscription.plan_id);
-
+        console.log(`new_order on renewal is ${new_order}`);
         if ( new_order ) {
-          return await tradegecko.tradegecko_create_sales_order( subscription, customer );
+          await tradegecko.tradegecko_create_sales_order( subscription, customer );
         }
 
         break;
