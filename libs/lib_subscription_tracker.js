@@ -108,7 +108,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
 
   if ( increment ) {
     //  increment user count and decide whether to generate a Sales Order in Cin7
-    const test = await client.hincrby( customer_id, subscription_id, 1, (err, reply) => {
+    const test = await client.hincrby( customer_id, subscription_id, 1, async (err, reply) => {
       let new_order = false;
       console.log(`reply is ${reply} or err is ${err}`);
       //  if reply is 4, reset the counter to 1
