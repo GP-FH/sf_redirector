@@ -107,50 +107,32 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
       throw new VError(err, `Error validating subscription count for ${subscription_id}`);
     }
 
-    let new_order;
     if ( increment ) {
-      let result;
       /*
        * Increment user count and decide whether to generate a Sales Order in Cin7
        */
       client.hincrby( customer_id, subscription_id, 1, (err, reply) => {
+        if (err) {
+          throw new VError( err );
+        }
 
-        //  if reply is 4, reset the counter to 1
+        let result;
         if ( reply == 4 ) {
           client.hset( customer_id, subscription_id, 1);
           logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-          result = "reset";
-        } // if reply is 2 then a new sales order is required
+          result = false;
+        } 
         else if ( reply == 2 ) {
           logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
-          result = "new order"
+          result = true
         } else {
           logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-          result = "keep incrementing";
+          result = false;
         }
-        resolve(result);
+
         client.quit();
+        resolve(result);
       });
-
-      /*console.log(`reply is ${reply} or err is ${err}`);
-      let result;
-      //  if reply is 4, reset the counter to 1
-      if ( reply == 4 ) {
-        client.hset( customer_id, subscription_id, 1);
-        logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-        result = "reset";
-      } // if reply is 2 then a new sales order is required
-      else if ( reply == 2 ) {
-        logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
-        result = "new order"
-      } else {
-        logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-        result = "keep incrementing";
-      }
-
-      client.quit();
-      console.log(`result is ${result}`);
-      return result;*/
     }
   });
 };
