@@ -121,7 +121,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
           client.hset( customer_id, subscription_id, 1);
           logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
           result = false;
-        } 
+        }
         else if ( reply == 2 ) {
           logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
           result = true
@@ -142,55 +142,58 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
  *  A sales order is requires every 13 weeks.
  */
 const increment_and_check_weekly = async ( customer_id, subscription_id, plan_id, callback, test = false ) => {
-  if ( test ) {
-      redis = require( 'redis-mock' );
-  }
+  return new Promise( async (resolve, reject) => {
+    if ( test ) {
+        redis = require( 'redis-mock' );
+    }
 
-  var options = {
-      host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT
-  };
+    var options = {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT
+    };
 
-  var client = redis.createClient( options );
+    var client = redis.createClient( options );
 
-  //  listen for errors
-  client.on( 'error', ( err ) => {
-    client.quit();
-    throw new VError(err);
-  } );
-
-  let increment;
-  try {
-    increment = await _validate_subscription_count( plan_id, customer_id, subscription_id);
-  }
-  catch(err) {
-    throw new VError(err, `Error validating subscription count for ${subscription_id}` );
-  }
-
-  let new_order = false;
-  if ( increment ) {
-    //  increment user count and decide whether to generate a Sales Order in Cin7
-    client.hincrby( customer_id, subscription_id, 1, ( err, reply ) => {
-      if ( err ) {
-        throw new VError(err, `Error incrementing subscription count for ${subscription_id}` );
-      }
-
-      //  if reply is 18, reset the counter to 5
-      if ( reply == 18 ) {
-        client.hset( customer_id, subscription_id, 5 );
-        logger.info( 'Reset counter to 5 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-        new_order = false;
-      } // if reply is 6 then a new sales order is required
-      else if ( reply == 6 ) {
-        logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
-        new_order = true;
-      }
-
-      logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+    //  listen for errors
+    client.on( 'error', ( err ) => {
       client.quit();
-      return new_order;
+      throw new VError(err);
     } );
-  }
+
+    let increment;
+    try {
+      increment = await _validate_subscription_count( plan_id, customer_id, subscription_id);
+    }
+    catch(err) {
+      throw new VError(err, `Error validating subscription count for ${subscription_id}` );
+    }
+
+    if ( increment ) {
+      //  increment user count and decide whether to generate a Sales Order in Cin7
+      client.hincrby( customer_id, subscription_id, 1, ( err, reply ) => {
+        if ( err ) {
+          throw new VError(err, `Error incrementing subscription count for ${subscription_id}` );
+        }
+
+        let result;
+        if ( reply == 18 ) {
+          client.hset( customer_id, subscription_id, 5 );
+          logger.info( 'Reset counter to 5 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+          result = false;
+        }
+        else if ( reply == 6 ) {
+          logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
+          result = true;
+        }else{
+          logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+          result = false;
+        }
+
+        client.quit();
+        resolve(result);
+      } );
+    }
+  });
 };
 
 /*
