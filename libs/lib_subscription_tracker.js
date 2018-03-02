@@ -141,6 +141,8 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
     console.log(`result is ${result}`);
     return result;*/
   }
+
+  console.log(`poop`);
 };
 
 /*
