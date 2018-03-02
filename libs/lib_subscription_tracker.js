@@ -111,7 +111,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
     /*
      * Increment user count and decide whether to generate a Sales Order in Cin7
      */
-    let result = await client.hincrby( customer_id, subscription_id, 1, (err, reply) => {
+    let result = await client.hincrby( customer_id, subscription_id, 1, async (err, reply) => {
       return "poop";
     });
 
@@ -138,7 +138,6 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
     return result;*/
   }
 
-  console.log(`poop`);
   return result;
 };
 
