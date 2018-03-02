@@ -81,7 +81,7 @@ const set_weekly = ( customer_id, subscription_id, test = false ) => {
  *  Includes test param which is set to true during (you guessed it) test run
  */
 const increment_and_check_monthly = async ( customer_id, subscription_id, plan_id, test = false ) => {
-  return new Promise( (resolve, reject) => {
+  return new Promise( async (resolve, reject) => {
     if ( test ) {
       redis = require( 'redis-mock' );
     }
