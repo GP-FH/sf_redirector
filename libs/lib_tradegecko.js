@@ -56,6 +56,11 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
       Favourite Style: ${subscription.cf_fave}
       Types of clothes they are keen on: ${subscription.cf_keen}
 
+      Address:
+      "address1": ${subscription.shipping_address.line1}
+      "suburb": ${subscription.shipping_address.line1}
+      "city": ${subscription.shipping_address.city}
+
       Follow this link to start filling this order: https://stitchfox.gogecko.com/?q=${subscription.cf_jam}%20${subscription.cf_doit}%20${subscription.cf_palette}%20${subscription.cf_fave}`,
     "tags":[subscription.plan_id, subscription.cf_fave]
   };
