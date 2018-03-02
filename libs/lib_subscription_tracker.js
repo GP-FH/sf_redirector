@@ -81,39 +81,59 @@ const set_weekly = ( customer_id, subscription_id, test = false ) => {
  *  Includes test param which is set to true during (you guessed it) test run
  */
 const increment_and_check_monthly = async ( customer_id, subscription_id, plan_id, test = false ) => {
-  if ( test ) {
-    redis = require( 'redis-mock' );
-  }
+  return new Promise( (resolve, reject) => {
+    if ( test ) {
+      redis = require( 'redis-mock' );
+    }
 
-  const options = {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT
-  };
+    const options = {
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT
+    };
 
-  const client = redis.createClient( options );
+    const client = redis.createClient( options );
 
-  //  listen for errors
-  client.on( 'error', ( err ) => {
-    client.quit();
-    throw new VError(err);
-  } );
+    //  listen for errors
+    client.on( 'error', ( err ) => {
+      client.quit();
+      throw new VError(err);
+    } );
 
-  let increment;
-  try {
-    increment = await _validate_subscription_count( plan_id, customer_id, subscription_id );
-  }
-  catch(err) {
-    throw new VError(err, `Error validating subscription count for ${subscription_id}`);
-  }
+    let increment;
+    try {
+      increment = await _validate_subscription_count( plan_id, customer_id, subscription_id );
+    }
+    catch(err) {
+      throw new VError(err, `Error validating subscription count for ${subscription_id}`);
+    }
 
-  let new_order;
-  if ( increment ) {
-    let result;
-    /*
-     * Increment user count and decide whether to generate a Sales Order in Cin7
-     */
-    await client.hincrby( customer_id, subscription_id, 1, (err, reply) => {
+    let new_order;
+    if ( increment ) {
+      let result;
+      /*
+       * Increment user count and decide whether to generate a Sales Order in Cin7
+       */
+      client.hincrby( customer_id, subscription_id, 1, (err, reply) => {
 
+        //  if reply is 4, reset the counter to 1
+        if ( reply == 4 ) {
+          client.hset( customer_id, subscription_id, 1);
+          logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+          result = "reset";
+        } // if reply is 2 then a new sales order is required
+        else if ( reply == 2 ) {
+          logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
+          result = "new order"
+        } else {
+          logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+          result = "keep incrementing";
+        }
+        resolve(result);
+        client.quit();
+      });
+
+      /*console.log(`reply is ${reply} or err is ${err}`);
+      let result;
       //  if reply is 4, reset the counter to 1
       if ( reply == 4 ) {
         client.hset( customer_id, subscription_id, 1);
@@ -129,30 +149,10 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
       }
 
       client.quit();
-    });
-
-
-    console.log(`result is ${result}`);
-    /*console.log(`reply is ${reply} or err is ${err}`);
-    let result;
-    //  if reply is 4, reset the counter to 1
-    if ( reply == 4 ) {
-      client.hset( customer_id, subscription_id, 1);
-      logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-      result = "reset";
-    } // if reply is 2 then a new sales order is required
-    else if ( reply == 2 ) {
-      logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
-      result = "new order"
-    } else {
-      logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-      result = "keep incrementing";
+      console.log(`result is ${result}`);
+      return result;*/
     }
-
-    client.quit();
-    console.log(`result is ${result}`);
-    return result;*/
-  }
+  });
 };
 
 /*
