@@ -108,11 +108,12 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
 
   let new_order;
   if ( increment ) {
+    let result;
     /*
      * Increment user count and decide whether to generate a Sales Order in Cin7
      */
-    client.hincrby( customer_id, subscription_id, 1, (err, reply) => {
-      let result;
+    await client.hincrby( customer_id, subscription_id, 1, (err, reply) => {
+
       //  if reply is 4, reset the counter to 1
       if ( reply == 4 ) {
         client.hset( customer_id, subscription_id, 1);
@@ -128,10 +129,10 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
       }
 
       client.quit();
-      console.log(`result is ${result}`);
-      return result;
     });
 
+
+    console.log(`result is ${result}`);
     /*console.log(`reply is ${reply} or err is ${err}`);
     let result;
     //  if reply is 4, reset the counter to 1
