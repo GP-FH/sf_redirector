@@ -81,6 +81,10 @@ const set_weekly = ( customer_id, subscription_id, test = false ) => {
  *  Includes test param which is set to true during (you guessed it) test run
  */
 const increment_and_check_monthly = async ( customer_id, subscription_id, plan_id, test = false ) => {
+  return new Promise( (reject, resolve) => {
+
+  });
+
   if ( test ) {
     redis = require( 'redis-mock' );
   }
@@ -111,7 +115,9 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
     /*
      * Increment user count and decide whether to generate a Sales Order in Cin7
      */
-    let result = await client.hincrby( customer_id, subscription_id, 1);
+    let result = await client.hincrby( customer_id, subscription_id, 1, (err, reply) => {
+      return "poop";
+    });
 
     console.log(`result is ${result}`);
 
