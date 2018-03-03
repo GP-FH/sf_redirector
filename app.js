@@ -1,6 +1,6 @@
 /*
  *
- *  Stitchfox Redirector: This service bridges typeform->cin7->chargebee.
+ *  Stitchfox Redirector: This service bridges Typeform->TradeGecko->Chargebee->Slack->Squarespace.
  *  See README for more detailed information
  *
  */

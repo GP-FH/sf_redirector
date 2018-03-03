@@ -8,7 +8,7 @@ const logger = require("./lib_logger");
 
 /*
  * This function does what it says - it handles the creation of new orders. Currently this means
- * creating/checking referral codes, creating Cin7 contacts/sales orders, setting the renewal count.
+ * creating/checking referral codes, creating a draft sales order in TradeGecko, setting the renewal count.
  */
 
 const order_create_new_subscription = async ( subscription, customer, coupons ) => {
@@ -30,7 +30,7 @@ const order_create_new_subscription = async ( subscription, customer, coupons ) 
 
 /*
  * Different to a 'subscription', a 'purchase' is a one-off box. The below function handles the backend shenanigans required when
- * someone make a purchase: creating Cin7 contacts/sales orders. You'll also notice that there is no tracking of renewal count.
+ * someone make a purchase: creating a draft sales order in TradeGecko. You'll also notice that there is no tracking of renewal count.
  * As these are one-off purchases, billing cycle is capped at 1, so nothing to keep track of.
  */
 

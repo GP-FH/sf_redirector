@@ -109,7 +109,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
 
     if ( increment ) {
       /*
-       * Increment user count and decide whether to generate a Sales Order in Cin7
+       * Increment user count and decide whether to generate a draft Sales Order in TradeGecko
        */
       client.hincrby( customer_id, subscription_id, 1, (err, reply) => {
         if (err) {
@@ -169,7 +169,7 @@ const increment_and_check_weekly = async ( customer_id, subscription_id, plan_id
     }
 
     if ( increment ) {
-      //  increment user count and decide whether to generate a Sales Order in Cin7
+      //  increment user count and decide whether to generate a draft Sales Order in TradeGecko
       client.hincrby( customer_id, subscription_id, 1, ( err, reply ) => {
         if ( err ) {
           throw new VError(err, `Error incrementing subscription count for ${subscription_id}` );

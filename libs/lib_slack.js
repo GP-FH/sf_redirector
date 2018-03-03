@@ -33,7 +33,7 @@ function local_send_new_subscriber( first_name, last_name, email, city, sub_plan
         username: 'Good-News-Bot',
         icon_emoji: ':tada:',
         attachments: [ {
-          text: 'This person needs a new box! A new sales order has been generated in Cin7. Here are the customer details:',
+          text: 'This person needs a new box! A draft sales order has been generated in TradeGecko for styling. Here are the customer details:',
           fallback: 'A new subscriber has joined!',
           title: 'Woo! A new subscriber has joined!',
           color: 'good',
@@ -122,7 +122,7 @@ function local_send_renewed_subscriber_new_sales_order( first_name, last_name, e
       username: 'Good-News-Bot',
       icon_emoji: ':tada:',
       attachments: [ {
-        text: 'This person needs a new box! A new sales order has been generated in Cin7. Here are the customer details:',
+        text: 'This person needs a new box! A draft sales order has been generated in TradeGecko for styling. Here are the customer details:',
         fallback: 'An existing subscriber has renewed!',
         title: 'Woo! An existing subscriber has renewed!',
         color: '#FFFF00',

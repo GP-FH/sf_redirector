@@ -28,7 +28,7 @@ router.post( '/', async ( req, res, next ) => {
   if ( event_type == 'subscription_created' ) {
     /*
      * On subscription creation, a new customer and a new sales order is
-     * created in Cin7
+     * created in TradeGecko
      */
     const customer = req.body.content.customer;
     const coupons = req.body.content.invoice.discounts || false;
@@ -57,7 +57,7 @@ router.post( '/', async ( req, res, next ) => {
   else if ( event_type == 'subscription_renewed' ) {
     /*
      * On subscription renewal check whether it's delivery time. If so,
-     * create a sales order in cin7. If not a delivery time, increment
+     * create a sales order in TradewGecko. If not a delivery time, increment
      * the subscription count.
      */
     const subscription = req.body.content.subscription;
