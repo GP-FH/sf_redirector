@@ -1,4 +1,11 @@
-const chargebee =require("chargebee");
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * lib_chargebee_coupon: this library exposes functions for managing coupons and credits in Chargebee
+ * e.g creating new coupons & adding promotional credits to customer accounts
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+const chargebee = require("chargebee");
 const VError = require("verror");
 
 chargebee.configure( {

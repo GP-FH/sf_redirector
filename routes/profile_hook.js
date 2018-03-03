@@ -1,9 +1,9 @@
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  this route handles incoming style profile information as it is submitted by new subscribers.
  *  Information is sent to Chargebee and the new subscriber is redirected to a checkout page
  *
- */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const express = require("express");
 const mixpanel = require("mixpanel");

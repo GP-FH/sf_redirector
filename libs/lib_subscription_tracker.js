@@ -1,4 +1,4 @@
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  lib_subscription_tracker: this lib handles keeping track of the number of billing cycles completed per subscription.
  *  This is necessary as we bill monthly & weekly but only deliver quarterly, so we need a way to know when to generate a sales
@@ -17,7 +17,7 @@
  *  change only takes effect on next renewal), these differing ranges allow us to detect when someone has changed plans
  *  (their count range doesn't match their plan payment frequency) + it's easy to map the ranges to eachother.
  *
- */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const VError = require("verror");
 const redis = require("redis");

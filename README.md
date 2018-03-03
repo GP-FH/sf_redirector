@@ -47,6 +47,7 @@ To accurately track people moving through our subscription creation flow we fire
 - move stylist attribution into it's own lib
 - cron to renew SSL certs in dev and prod
 - create standard return format for all `lib_*.js` functions. Currently all over the place.
+- move away from request module to got module for http requests
 - using zapier for autopilot makes no sense and results in incomplete data making it into autopilot profiles. We can handle this much better: details in Slack - https://stitchfox.slack.com/archives/C4AAT050A/p1503763459000009
 - tests need a proper rewrite. Should focus on function inputs and outputs from the perspective of the calling party. got stuck testing 3rd party calls which is dumb in this case
 - proper queueing system for calls to third party APIs with retry strategies

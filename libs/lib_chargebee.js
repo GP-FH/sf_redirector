@@ -1,3 +1,10 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * lib_chargebee: this lib exposes key Chargebee API functionality relating to customers and
+ * subscriptions.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 const chargebee =require("chargebee");
 const VError = require("verror");
 const logger = require("./lib_logger");
@@ -8,7 +15,7 @@ chargebee.configure( {
 } );
 
 /*
- * This function is a promise wrapper for the customer retrieval functions of the chargebee module.
+ * This function exposes the customer retrieval functions of the chargebee module.
  * It returns a customer object full of useful information.
  */
 const chargebee_get_customer_info = async ( customer_id ) => {
@@ -24,7 +31,7 @@ const chargebee_get_customer_info = async ( customer_id ) => {
 };
 
 /*
- * This function is a promise wrapper for the subscription retrieval functions of the chargebee module.
+ * This function exposes the subscription retrieval functions of the chargebee module.
  * Similar to the above function it returns a subscription object full of good stuff.
  */
 const chargebee_get_subscription_info = async ( subscription_id ) => {

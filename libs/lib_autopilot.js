@@ -1,10 +1,10 @@
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  lib_autopilot: this library provides an interface for interacting with the Autopilot API.
  *  Currently the only external function it provides allows you to move a contact from 1 list
  *  to another.
  *
- */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const request = require("request");
 const VError = require("verror");

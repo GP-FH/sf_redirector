@@ -1,13 +1,15 @@
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  lib_slack: this lib handles sending messages into Slack via incoming webhook. Nothing too fancy going
  *  on here.
  *
- *
- */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const request = require("request");
 
+/*
+ * Exposes ability to send messages into Slack based on the 'reason'
+ */
 const slack_send  = ( reason, customer, subscription ) => {
   switch ( reason ) {
     case 'subscription_created':
@@ -24,6 +26,9 @@ const slack_send  = ( reason, customer, subscription ) => {
     }
 };
 
+/*
+ * Send a message indicating that a net new subscription has been created
+ */
 function local_send_new_subscriber( first_name, last_name, email, city, sub_plan, sub_id ) {
     const options = {
       method: 'POST',
@@ -71,6 +76,9 @@ function local_send_new_subscriber( first_name, last_name, email, city, sub_plan
 
 }
 
+/*
+ * Send message to Slack indicating that a subscription has been cancelled 
+ */
 function local_send_cancelled_subscription( first_name, last_name, email, city, sub_plan ) {
   const options = {
     method: 'POST',
@@ -113,6 +121,9 @@ function local_send_cancelled_subscription( first_name, last_name, email, city, 
   } );
 }
 
+/*
+ * Send a message indicating that a renewal has occurred requiring a new box
+ */
 function local_send_renewed_subscriber_new_sales_order( first_name, last_name, email, city, sub_plan, sub_id ) {
   const options = {
     method: 'POST',

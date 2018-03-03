@@ -1,3 +1,10 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * lib_product_plan: this is a helper lib for differentiating between recurring subscriptions
+ * and one-off boxes based on the plan received from Chargebee.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 const logger = require("./lib_logger");
 
 const product_plans_one_offs = [ 'style-pack', 'style-chest', 'style-bomb' ];

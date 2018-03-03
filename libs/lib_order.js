@@ -1,3 +1,11 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * lib_order: this lib provides functions for creating and renewing subscriptions.
+ * As these actions require multiple steps, this lib was intended as a way to
+ * provide some abstraction
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 const  VError = require("verror");
 
 const chargebee_coupon = require("../libs/lib_chargebee_coupon");

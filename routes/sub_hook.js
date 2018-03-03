@@ -1,21 +1,19 @@
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  * This route handles webhook events sent = from Chargebee. Current events
  * handled:
  *  - subscription_created
  *  - subscription_renewed
+ *  - subscription_cancelled
  *
- */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const express = require("express");
-const request = require("request");
-const util = require("underscore");
 
 const slack = require( "../libs/lib_slack");
 const autopilot = require( "../libs/lib_autopilot");
 const order = require( "../libs/lib_order");
 const product_plan = require( "../libs/lib_product_plan");
-
 const logger = require("../libs/lib_logger");
 
 const router = express.Router();

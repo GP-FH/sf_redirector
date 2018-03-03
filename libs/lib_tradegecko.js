@@ -1,8 +1,17 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * lib_tradegecko: this lib exposes the TradeGecko API. Currently it only provides the ability to
+ * create a new Sales order.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 const got = require("got");
 const VError = require("verror");
 
-// gonna have to do something with addresses. Either dedupe via daily cron or check for existance on the fly
-
+/*
+ * This function exposes the ability to create a Sales Order containing all the information and Stylist
+ * needs to fill it
+ */
 const tradegecko_create_sales_order = async ( subscription, customer ) => {
   const { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
 
@@ -33,6 +42,10 @@ const tradegecko_create_sales_order = async ( subscription, customer ) => {
   return { ok:true };
 }
 
+/*
+ * This helper function takes customer and subsctiption info and preps it for being sent
+ * into Tradegecko via a new Sales Order.
+ */
 async function _prep_subscription_for_sending ( subscription, customer ) {
   return {
     "shipping_address": { // the customers address -> this will be automagically added to the Stylists relationship

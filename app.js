@@ -1,9 +1,9 @@
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  Stitchfox Redirector: This service bridges Typeform->TradeGecko->Chargebee->Slack->Squarespace.
  *  See README for more detailed information
  *
- */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const dotenv = require("dotenv");
 dotenv.config( {
