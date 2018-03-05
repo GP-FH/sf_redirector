@@ -15,7 +15,7 @@ const util = require('util');
  */
 const tradegecko_create_sales_order = async ( subscription, customer ) => {
   const { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
-
+  
   let res;
   try {
     res = await got.post('https://api.tradegecko.com/orders/', {
