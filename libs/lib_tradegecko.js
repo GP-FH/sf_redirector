@@ -15,7 +15,7 @@ const util = require('util');
  */
 const tradegecko_create_sales_order = async ( subscription, customer ) => {
   const { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
-  
+
   let res;
   try {
     res = await got.post('https://api.tradegecko.com/orders/', {
@@ -73,7 +73,7 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
 
       Address:
       address1: ${subscription.shipping_address.line1}
-      suburb: ${subscription.shipping_address.line1}
+      suburb: ${subscription.shipping_address.line2}
       city: ${subscription.shipping_address.city}
 
       Follow this link to start filling this order: https://stitchfox.gogecko.com/variants?q=${subscription.cf_jam}%20${subscription.cf_doit}%20${subscription.cf_palette}%20${subscription.cf_fave}`,
