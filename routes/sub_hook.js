@@ -9,7 +9,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const express = require("express");
-const activeHandles = require('active-handles');
 
 const slack = require( "../libs/lib_slack");
 const autopilot = require( "../libs/lib_autopilot");
@@ -52,8 +51,6 @@ router.post( '/', async ( req, res, next ) => {
     if ( process.env.ENVIRONMENT == 'prod' && ret.ok ) {
       slack.slack_send( 'subscription_created', customer, subscription );
     }
-
-    activeHandles.print();
   }
   else if ( event_type == 'subscription_renewed' ) {
     /*
@@ -75,8 +72,6 @@ router.post( '/', async ( req, res, next ) => {
     if ( process.env.ENVIRONMENT == 'prod' && ret.ok && ret.new_order) {
       slack.slack_send( 'subscription_renewed', customer, subscription );
     }
-
-    activeHandles.print();
   }
   else if ( event_type == 'subscription_cancelled' ) {
     /*
@@ -90,6 +85,8 @@ router.post( '/', async ( req, res, next ) => {
       slack.slack_send( 'subscription_cancelled', customer, subscription );
     }
   }
+
+  res.end();
 } );
 
 // error handling for the sub route
