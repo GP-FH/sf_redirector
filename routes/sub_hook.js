@@ -9,7 +9,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const express = require("express");
-const log = require('why-is-node-running')
 
 const slack = require( "../libs/lib_slack");
 const autopilot = require( "../libs/lib_autopilot");
@@ -52,7 +51,6 @@ router.post( '/', async ( req, res, next ) => {
     if ( process.env.ENVIRONMENT == 'prod' && ret.ok ) {
       slack.slack_send( 'subscription_created', customer, subscription );
     }
-    log();
   }
   else if ( event_type == 'subscription_renewed' ) {
     /*
@@ -74,7 +72,6 @@ router.post( '/', async ( req, res, next ) => {
     if ( process.env.ENVIRONMENT == 'prod' && ret.ok && ret.new_order) {
       slack.slack_send( 'subscription_renewed', customer, subscription );
     }
-    log();
   }
   else if ( event_type == 'subscription_cancelled' ) {
     /*
