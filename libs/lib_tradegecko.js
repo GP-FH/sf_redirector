@@ -14,7 +14,7 @@ const VError = require("verror");
  */
 const tradegecko_create_sales_order = async ( subscription, customer ) => {
   const { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
-
+  console.log("Hello tradegecko");
   let res;
   try {
     res = await got.post('https://api.tradegecko.com/orders/', {
@@ -36,9 +36,11 @@ const tradegecko_create_sales_order = async ( subscription, customer ) => {
 
   }
   catch (err) {
+    console.log(`err from TG is ${err}`);
     throw new VError (err, `Error creating sales order via TradeGecko API. Note: will need to be manually created for subscription ${subscription.id}` );
   }
 
+  console.log(`res from TG is ${res}`);
   return { ok:true };
 }
 
