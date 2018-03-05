@@ -24,7 +24,6 @@
     "supertest": "^3.0.0",
     "underscore": "^1.8.3",
     "verror": "^1.10.0",
-    "why-is-node-running": "^2.0.1",
     "winston": "^2.3.1",
     "winston-papertrail": "^1.0.4"
   },
