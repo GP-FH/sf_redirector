@@ -7,7 +7,6 @@
 
 const got = require("got");
 const VError = require("verror");
-const util = require('util');
 
 /*
  * This function exposes the ability to create a Sales Order containing all the information and Stylist
@@ -45,7 +44,7 @@ const tradegecko_create_sales_order = async ( subscription, customer ) => {
 }
 
 /*
- * This helper function takes customer and subsctiption info and preps it for being sent
+ * This helper function takes customer and subscription info and preps it for being sent
  * into Tradegecko via a new Sales Order.
  */
 async function _prep_subscription_for_sending ( subscription, customer ) {
