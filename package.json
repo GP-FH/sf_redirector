@@ -4,6 +4,7 @@
   "description": "THE PIPES THE PIPES",
   "main": "app.js",
   "dependencies": {
+    "active-handles": "^1.1.0",
     "body-parser": "^1.17.1",
     "chai": "^4.1.0",
     "chargebee": "^2.2.0",
