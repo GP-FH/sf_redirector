@@ -7,10 +7,7 @@
 const logger = require("../libs/lib_logger");
 
 const request_logger = (req, res, next) => {
-  logger.info(
-    `INCOMING_REQUEST: Payload: ${JSON.stringify( req.query )}.
-    Query String: ${req.url}
-    Headers: ${JSON.stringify( req.headers )}`
+  logger.info(`INCOMING_REQUEST: Payload: ${JSON.stringify( req.query )}. Query String: ${req.url}. Headers: ${JSON.stringify( req.headers )}`
   );
 
   next();
