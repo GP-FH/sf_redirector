@@ -4,6 +4,7 @@
  * by the stitchfox redirector
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+const logger = require("../libs/lib_logger");
 
 const request_logger = (req, res, next) => {
   logger.info(
