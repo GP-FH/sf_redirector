@@ -16,10 +16,15 @@ const fs = require("fs");
 const logger = require("./libs/lib_logger");
 
 /*
- *  initialize routes
+ * Initialize routes
  */
 const sub_hook = require("./routes/sub_hook");
 const profile_hook = require("./routes/profile_hook");
+
+/*
+ * Initialize middleware
+ */
+const request_logger = require("./middleware/mw_request_logger");
 
 const app = express();
 const ssl_path = process.env.SSL_PATH;
@@ -35,6 +40,7 @@ app.use( bodyparser.json() );
 app.use( bodyparser.urlencoded( {
     extended: true
 } ) );
+app.use(request_logger);
 
 /*
  *  map endpoints to route files

@@ -18,10 +18,6 @@ const mp = mixpanel.init( process.env.MIXPANEL_TOKEN );
 const stylist_campaigns = [ 'HW-01-ATTR', 'MD-01-ATTR' ];
 
 router.get( '/', async function ( req, res, next) {
-
-    logger.info( 'Request received: ' + JSON.stringify( req.body ) + ' ' + JSON.stringify( req.query ) + ' ' + req.url + ' ' + JSON.stringify( req.headers ) ); // TODO: move to middleware
-
-    //  check for valid source token
     if ( req.query.token == process.env.VERIFICATION_TOKEN ) { // TODO: move to middleware
 
         //  trigger event in mixpanel to track user
