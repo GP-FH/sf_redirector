@@ -25,6 +25,7 @@ const profile_hook = require("./routes/profile_hook");
  * Initialize middleware
  */
 const request_logger = require("./middleware/mw_request_logger").request_logger;
+const token_check = require("./middleware/mw_verification_token_check").verification_token_check;
 
 const app = express();
 const ssl_path = process.env.SSL_PATH;
@@ -41,6 +42,7 @@ app.use( bodyparser.urlencoded( {
     extended: true
 } ) );
 app.use(request_logger);
+app.use(token_check);
 
 /*
  *  map endpoints to route files
