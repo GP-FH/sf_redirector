@@ -28,6 +28,10 @@ const request_logger = require("./middleware/mw_request_logger").request_logger;
 const token_check = require("./middleware/mw_verification_token_check").verification_token_check;
 
 const app = express();
+
+/*
+ * NOTE: this needs to disappear with the move to a load balancer
+ */
 const ssl_path = process.env.SSL_PATH;
 const key = process.env.SSL_KEY;
 const cert = process.env.SSL_CERT;
@@ -35,6 +39,7 @@ const options = {
     key: fs.readFileSync( ssl_path + key ),
     cert: fs.readFileSync( ssl_path + cert )
 };
+
 const server = https.createServer( options, app );
 
 app.use( bodyparser.json() );
