@@ -24,7 +24,7 @@ const profile_hook = require("./routes/profile_hook");
 /*
  * Initialize middleware
  */
-const request_logger = require("./middleware/mw_request_logger");
+const request_logger = require("./middleware/mw_request_logger").request_logger;
 
 const app = express();
 const ssl_path = process.env.SSL_PATH;
