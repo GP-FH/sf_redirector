@@ -1,45 +1,53 @@
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- *  Stitchfox Redirector: This service bridges typeform->cin7->chargebee.
+ *  Stitchfox Redirector: This service bridges Typeform->TradeGecko->Chargebee->Slack->Squarespace.
  *  See README for more detailed information
  *
- */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-require( 'dotenv' ).config( {
+const dotenv = require("dotenv");
+dotenv.config( {
     path: '/home/dev/redirect_node/current/config/config.env'
 } );
-var logger = require( './libs/lib_logger.js' );
-var chargebee = require( 'chargebee' );
-var bodyparser = require( 'body-parser' );
-var app = require( 'express' )();
-var https = require( 'https' );
-var fs = require( 'fs' );
-var ssl_path = process.env.SSL_PATH;
-var key = process.env.SSL_KEY;
-var cert = process.env.SSL_CERT;
-var options = {
+const bodyparser = require("body-parser");
+const express = require("express");
+const https = require("https");
+const fs = require("fs");
+const logger = require("./libs/lib_logger");
+
+/*
+ * Initialize routes
+ */
+const sub_hook = require("./routes/sub_hook");
+const profile_hook = require("./routes/profile_hook");
+
+/*
+ * Initialize middleware
+ */
+const request_logger = require("./middleware/mw_request_logger").request_logger;
+const token_check = require("./middleware/mw_verification_token_check").verification_token_check;
+
+const app = express();
+
+/*
+ * NOTE: this needs to disappear with the move to a load balancer
+ */
+const ssl_path = process.env.SSL_PATH;
+const key = process.env.SSL_KEY;
+const cert = process.env.SSL_CERT;
+const options = {
     key: fs.readFileSync( ssl_path + key ),
     cert: fs.readFileSync( ssl_path + cert )
 };
-var server = https.createServer( options, app );
 
-chargebee.configure( {
-    site: process.env.CHARGEBEE_SITE,
-    api_key: process.env.CHARGEBEE_API_KEY
-} );
-
-exports.chargebee = chargebee;
+const server = https.createServer( options, app );
 
 app.use( bodyparser.json() );
 app.use( bodyparser.urlencoded( {
     extended: true
 } ) );
-
-/*
- *  initialize routes
- */
-var sub_hook = require( './routes/sub_hook' );
-var profile_hook = require( './routes/profile_hook' );
+app.use(request_logger);
+app.use(token_check);
 
 /*
  *  map endpoints to route files
@@ -54,23 +62,21 @@ app.use( '/profile_hook', profile_hook );
 // development error handler
 // will print stacktrace
 if ( process.env.ENVIRONMENT == 'dev' ) {
-    app.use( function ( err, req, res, next ) {
-        res.status( err.status || 500 );
-        logger.error( 'ERROR: ' + err + 'MESSAGE: ' + err.message );
-    } );
+  app.use( function ( err, req, res, next ) {
+    res.status( err.status || 500 );
+    logger.error( 'ERROR: ' + err + 'MESSAGE: ' + err.message );
+  } );
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use( function ( err, req, res, next ) {
-    logger.error( 'Error: ' + err.message + '. Status: ' + err.status );
+  logger.error( 'Error: ' + err.message + '. Status: ' + err.status );
 } );
 
 /*
  *  start the engine
  */
-server.listen( 443, function () {
-    logger.info( 'Server started and listening' );
+server.listen( 443, () => {
+  logger.info( 'Server started and listening' );
 } );
-
-module.exports = app;

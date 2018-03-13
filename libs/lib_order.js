@@ -1,141 +1,54 @@
-var chargebee_coupon = require( './lib_chargebee_coupon.js' );
-var chargebee = require( './lib_chargebee.js' );
-var cin7 = require( './lib_cin7.js' );
-var slack = require( './lib_slack.js' );
-var subscription_tracker = require( './lib_subscription_tracker.js' );
-var logger = require( './lib_logger.js' );
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * lib_order: this lib provides functions for creating and renewing subscriptions.
+ * As these actions require multiple steps, this lib was intended as a way to
+ * provide some abstraction
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+const  VError = require("verror");
+
+const chargebee_coupon = require("../libs/lib_chargebee_coupon");
+const chargebee = require("../libs/lib_chargebee");
+const subscription_tracker = require("../libs/lib_subscription_tracker");
+const tradegecko = require("../libs/lib_tradegecko");
+const logger = require("./lib_logger");
 
 /*
  * This function does what it says - it handles the creation of new orders. Currently this means
- * creating/checking referral codes, creating Cin7 contacts/sales orders, setting the renewal count.
+ * creating/checking referral codes, creating a draft sales order in TradeGecko, setting the renewal count.
  */
 
-var order_create_new_subscription = ( sub, coupons ) => {
-    var customer = '';
-    var subscription = '';
+const order_create_new_subscription = async ( subscription, customer, coupons ) => {
+  try {
+    if ( coupons ) {
+      await chargebee_coupon.chargebee_coupon_check_and_apply_referral( coupons[ 0 ].entity_id );
+    }
 
-    return new Promise( ( resolve, reject ) => {
-        chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, sub.customer_id )
-            .then( ( ret ) => {
-                logger.info( 'Created referral coupon code: subscription_id: ' + sub.id );
-                return chargebee.chargebee_get_customer_info( sub.customer_id );
-            } )
-            .then( ( ret ) => {
-                customer = ret.customer;
-                return cin7.cin7_check_customer_exists( customer.email )
-            } )
-            .then( ( ret ) => {
-                /*
-                 * If the customer exists in Cin7 then we can jump straight to creating a sales order.
-                 * Otherwise we need to mine Chargbee for some extra info so we can create a new customer in Cin7
-                 */
+    await chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
+    await tradegecko.tradegecko_create_sales_order( subscription, customer );
+    await subscription_tracker.subscription_tracker_set_subscription_count( subscription.plan_id, subscription.id, customer.id );
+  }
+  catch ( err ) {
+    throw new VError (err, "Error occurred while creating new subscription")
+  }
 
-                if ( !ret.exists ) {
-                    logger.info( 'New customer. Creating new contact in Cin7: ' + sub.id );
-                    return chargebee.chargebee_get_subscription_info( sub.id );
-                }
-                else if ( ret.exists ) {
-                    logger.info( 'Existing customer. Creating new sales order in Cin7: ' + sub.id );
-                    return cin7.cin7_create_sales_order( ret.id, sub.plan_id, sub.id, sub.cf_topsize, sub.cf_bottomsize, 'NOT_SET' );
-                }
-            } )
-            .then( ( ret ) => {
-                if ( ret.resolve ) {
-                    subscription_tracker.subscription_tracker_set_subscription_count( sub.plan_id, sub.id, customer.id );
-                    return resolve( {
-                        ok: true
-                    } );
-                }
-
-                subscription = ret.subscription;
-                return cin7.cin7_create_customer_record( customer, subscription );
-            } )
-            .then( ( ret ) => {
-                logger.info( 'Creating new sales order in Cin7: ' + sub.id );
-                cin7.cin7_create_sales_order( ret.id, sub.plan_id, sub.id, sub.cf_topsize, sub.cf_bottomsize, 'NOT_SET' );
-            } )
-            .then( ( ret ) => {
-                subscription_tracker.subscription_tracker_set_subscription_count( sub.plan_id, sub.id, customer.id );
-
-                /*
-                 * If a coupon code was used by the customer we want to check whether it was a referral as
-                 * we owe these peeps some credits.
-                 */
-
-                if ( coupons ) {
-                    logger.info( 'Checking if customer used referral code: ' + sub.id );
-                    return chargebee_coupon.chargebee_coupon_check_and_apply_referral( coupons[ 0 ].entity_id );
-                }
-
-                return resolve( {
-                    ok: true
-                } );
-            } )
-            .then( ( ret ) => {
-                return resolve( {
-                    ok: true
-                } );
-            } )
-            .catch( ( err ) => {
-                reject( err );
-            } );
-    } );
-};
+  return { ok:true };
+}
 
 /*
  * Different to a 'subscription', a 'purchase' is a one-off box. The below function handles the backend shenanigans required when
- * someone make a purchase: creating Cin7 contacts/sales orders. You'll also notice that there is no tracking of renewal count.
+ * someone make a purchase: creating a draft sales order in TradeGecko. You'll also notice that there is no tracking of renewal count.
  * As these are one-off purchases, billing cycle is capped at 1, so nothing to keep track of.
  */
 
-var order_create_new_purchase = ( sub ) => {
-    var customer = '';
-    var subscription = '';
-
-    return new Promise( ( resolve, reject ) => {
-        chargebee.chargebee_get_customer_info( sub.customer_id )
-            .then( ( ret ) => {
-                customer = ret.customer;
-                return cin7.cin7_check_customer_exists( customer.email );
-            } )
-            .then( ( ret ) => {
-                /*
-                 * If the customer exists in Cin7 then we can jump straight to creating a sales order.
-                 * Otherwise we need to mine Chargbee for some extra info so we can create a new customer in Cin7
-                 */
-
-                if ( !ret.exists ) {
-                    logger.info( 'New customer. Creating new contact in Cin7: ' + sub.id );
-                    return chargebee.chargebee_get_subscription_info( sub.id );
-                }
-                else if ( ret.exists ) {
-                    logger.info( 'Existing customer. Creating new sales order in Cin7: ' + sub.id );
-                    return cin7.cin7_create_sales_order( ret.id, sub.plan_id, sub.id, sub.cf_topsize, sub.cf_bottomsize, 'NOT_SET' );
-                }
-            } )
-            .then( ( ret ) => {
-                if ( ret.resolve ) {
-                    return resolve( {
-                        ok: true
-                    } );
-                }
-
-                subscription = ret.subscription;
-                return cin7.cin7_create_customer_record( customer, subscription );
-            } )
-            .then( ( ret ) => {
-                logger.info( 'Creating new sales order in Cin7: ' + sub.id );
-                cin7.cin7_create_sales_order( ret.id, sub.plan_id, sub.id, sub.cf_topsize, sub.cf_bottomsize, 'NOT_SET' );
-            } )
-            .then( ( ret ) => {
-                return resolve( {
-                    ok: true
-                } );
-            } )
-            .catch( ( err ) => {
-                reject( err );
-            } );
-    } );
+const order_create_new_purchase = async ( subscription, customer ) => {
+  try {
+     return await tradegecko.tradegecko_create_sales_order( subscription, customer );
+  }
+  catch ( err ) {
+    throw new VError (err, "Error occurred while creating new one-off purchase");
+  }
 }
 
 /*
@@ -143,17 +56,39 @@ var order_create_new_purchase = ( sub ) => {
  * appropriate.
  */
 
-var order_process_renewal = ( sub ) => {
-    return new Promise( ( resolve, reject ) => {
-        chargebee.chargebee_get_customer_info( sub.customer_id )
-            .then( ( ret ) => {
+const order_process_renewal = async ( subscription, customer ) => {
+  let new_order;
+  try {
+    switch ( subscription.plan_id ) {
+      case 'deluxe-box':
+      case 'premium-box':
+        new_order = await subscription_tracker.increment_and_check_monthly(subscription.id, subscription.customer_id, subscription.plan_id);
 
-            } )
-            .catch( ( err ) => {
+        if ( new_order ) {
+          await tradegecko.tradegecko_create_sales_order( subscription, customer );
+        }
 
-            } );
-    } );
-};
+        break;
+      case 'deluxe-box-weekly':
+      case 'premium-box-weekly':
+        new_order = await subscription_tracker.increment_and_check_weekly(subscription.id, subscription.customer_id, subscription.plan_id);
+
+        if ( new_order ) {
+          await tradegecko.tradegecko_create_sales_order( subscription, customer );
+        }
+
+        break;
+      default:
+        throw new VError ("Unexpected plan_id received when trying to renew subscription");
+    }
+  }
+  catch ( err ) {
+    throw new VError (err, "Error occurred while trying to process subscription renewal");
+  }
+
+  return { ok:true, new_order:new_order };
+}
 
 exports.order_create_new_subscription = order_create_new_subscription;
 exports.order_create_new_purchase = order_create_new_purchase;
+exports.order_process_renewal = order_process_renewal;
