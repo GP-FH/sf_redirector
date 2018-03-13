@@ -25,7 +25,7 @@ const tradegecko_create_sales_order = async ( subscription, customer ) => {
         "order":{
           "company_id": "21313869", // TODO: put in config file (should think about whether we should have some config in the repo instead so it's subject to PR process)
           "shipping_address": shipping_address,
-          "issued_at": "26-02-2018",
+          "issued_at": "13-03-2018",
           "tags": tags,
           "status": "draft",
           "notes": notes
