@@ -139,7 +139,7 @@ const tradegecko_upload_product_images = async (product_id, variant_ids, image_u
   catch (err) {
     return {ok:false, err:err}; // doesn't throw error here as failures are not unlikely with current use
   }
-  console.log(JSON.stringify(res.body));
+  
   return {ok:true};
 };
 
