@@ -74,9 +74,75 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
       suburb: ${subscription.shipping_address.line2}
       city: ${subscription.shipping_address.city}
 
-      Follow this link to start filling this order: https://stitchfox.gogecko.com/variants?q=${subscription.cf_jam}%20${subscription.cf_doit}%20${subscription.cf_palette}%20${subscription.cf_fave}`,
+      Follow this link to start filling this order: https://stitchfox.gogecko.com?q=${subscription.cf_jam}%20${subscription.cf_doit}%20${subscription.cf_palette}%20${subscription.cf_fave}`,
     "tags":[subscription.plan_id, subscription.cf_fave]
   };
 }
 
+/*
+ * This function lists all product variants. It is a recursive function and keeps making
+ * API calls until it has been through all pages
+ */
+const tradegecko_get_product_variants = async (storage=[], page=1) => {
+  let concat_storage = [];
+  let res;
+
+  try {
+    res = await got.get('https://api.tradegecko.com/variants/', {
+      headers:{
+        Authorization: `Bearer 8202e22ca6f1a3d3353c11d70ef6e92f3f1d01365b5b609072c825f3666a9117`
+      },
+      query:{
+        limit:250,
+        page:page
+      },
+      json: true
+    });
+
+  }
+  catch (err) {
+    throw new VError (err, `Error listing variants via TradeGecko API.` );
+  }
+
+  concat_storage = storage.concat(res.body.variants);
+  const pagination_info = JSON.parse(res.headers["x-pagination"]);
+
+  if(!pagination_info.last_page){
+    return tradegecko_get_product_variants(concat_storage, ++page);
+  }
+
+  return concat_storage;
+};
+
+/*
+ * This function uploads product images to Tradegecko.
+ */
+const tradegecko_upload_product_images = async (product_id, variant_ids, image_url) => {
+  let res;
+
+  try {
+    res = await got.post('https://api.tradegecko.com/images/', {
+      headers:{
+        Authorization: `Bearer 8202e22ca6f1a3d3353c11d70ef6e92f3f1d01365b5b609072c825f3666a9117`
+      },
+      body: {
+        "image":{
+          "product_id":product_id,
+          "variant_ids":variant_ids,
+          "url":image_url
+        }
+      },
+      json: true
+    });
+
+  }
+  catch (err) {
+    return {ok:false, err:err}; // doesn't throw error here as failures are not unlikely with current use
+  }
+  console.log(JSON.stringify(res.body));
+  return {ok:true};
+};
+
 exports.tradegecko_create_sales_order = tradegecko_create_sales_order;
+exports.tradegecko_get_product_variants = tradegecko_get_product_variants;
+exports.tradegecko_upload_product_images = tradegecko_upload_product_images;
