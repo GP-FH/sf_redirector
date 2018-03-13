@@ -90,7 +90,7 @@ const tradegecko_get_product_variants = async (storage=[], page=1) => {
   try {
     res = await got.get('https://api.tradegecko.com/variants/', {
       headers:{
-        Authorization: `Bearer 8202e22ca6f1a3d3353c11d70ef6e92f3f1d01365b5b609072c825f3666a9117`
+        Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
       },
       query:{
         limit:250,
@@ -123,7 +123,7 @@ const tradegecko_upload_product_images = async (product_id, variant_ids, image_u
   try {
     res = await got.post('https://api.tradegecko.com/images/', {
       headers:{
-        Authorization: `Bearer 8202e22ca6f1a3d3353c11d70ef6e92f3f1d01365b5b609072c825f3666a9117`
+        Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
       },
       body: {
         "image":{
