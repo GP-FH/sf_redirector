@@ -86,7 +86,7 @@ const order_process_renewal = async ( subscription, customer ) => {
   catch ( err ) {
     throw new VError (err, "Error occurred while trying to process subscription renewal");
   }
-  console.log(`new_order is ${new_order}`);
+
   return { ok:true, new_order:new_order };
 }
 
