@@ -57,28 +57,28 @@ const order_create_new_purchase = async ( subscription, customer ) => {
  */
 
 const order_process_renewal = async ( subscription, customer ) => {
-  try {
-    let new_order;
+  let new_order;
 
+  try {
     switch ( subscription.plan_id ) {
       case 'deluxe-box':
       case 'premium-box':
         new_order = await subscription_tracker.increment_and_check_monthly(subscription.id, subscription.customer_id, subscription.plan_id);
-        console.log(`new_order is ${new_order}`);
+
         if ( new_order ) {
           await tradegecko.tradegecko_create_sales_order( subscription, customer );
         }
 
-        return { ok:true, new_order:new_order };
+        break;
       case 'deluxe-box-weekly':
       case 'premium-box-weekly':
         new_order = await subscription_tracker.increment_and_check_weekly(subscription.id, subscription.customer_id, subscription.plan_id);
-        console.log(`new_order is ${new_order}`);
+
         if ( new_order ) {
           await tradegecko.tradegecko_create_sales_order( subscription, customer );
         }
 
-        return { ok:true, new_order:new_order };
+        break;
       default:
         throw new VError ("Unexpected plan_id received when trying to renew subscription");
     }
@@ -86,6 +86,8 @@ const order_process_renewal = async ( subscription, customer ) => {
   catch ( err ) {
     throw new VError (err, "Error occurred while trying to process subscription renewal");
   }
+  console.log(`new_order is ${new_order}`);
+  return { ok:true, new_order:new_order };
 }
 
 exports.order_create_new_subscription = order_create_new_subscription;
