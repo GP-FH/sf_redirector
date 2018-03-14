@@ -69,8 +69,7 @@ router.post( '/', async ( req, res, next ) => {
       next(err);
     }
 
-    //if ( process.env.ENVIRONMENT == 'prod' && ret.ok && ret.new_order) {
-    if (ret.ok && ret.new_order) {
+    if ( process.env.ENVIRONMENT == 'prod' && ret.ok && ret.new_order) {
       slack.slack_send( 'subscription_renewed_new_order', customer, subscription );
     }
   }
