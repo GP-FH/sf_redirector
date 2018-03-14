@@ -20,7 +20,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const VError = require("verror");
-const redis = require("redis");
+let redis = require("redis");
 
 const logger = require("./lib_logger");
 

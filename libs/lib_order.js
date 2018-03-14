@@ -58,6 +58,7 @@ const order_create_new_purchase = async ( subscription, customer ) => {
 
 const order_process_renewal = async ( subscription, customer ) => {
   let new_order;
+
   try {
     switch ( subscription.plan_id ) {
       case 'deluxe-box':

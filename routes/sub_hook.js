@@ -70,7 +70,7 @@ router.post( '/', async ( req, res, next ) => {
     }
 
     if ( process.env.ENVIRONMENT == 'prod' && ret.ok && ret.new_order) {
-      slack.slack_send( 'subscription_renewed', customer, subscription );
+      slack.slack_send( 'subscription_renewed_new_order', customer, subscription );
     }
   }
   else if ( event_type == 'subscription_cancelled' ) {
