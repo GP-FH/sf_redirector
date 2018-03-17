@@ -29,19 +29,6 @@ const token_check = require("./middleware/mw_verification_token_check").verifica
 
 const app = express();
 
-/*
- * NOTE: this needs to disappear with the move to a load balancer
- */
-const ssl_path = process.env.SSL_PATH;
-const key = process.env.SSL_KEY;
-const cert = process.env.SSL_CERT;
-const options = {
-    key: fs.readFileSync( ssl_path + key ),
-    cert: fs.readFileSync( ssl_path + cert )
-};
-
-const server = https.createServer( options, app );
-
 app.use( bodyparser.json() );
 app.use( bodyparser.urlencoded( {
     extended: true
@@ -75,8 +62,25 @@ app.use( function ( err, req, res, next ) {
 } );
 
 /*
- *  start the engine
+ * Dev environment is currently a single server and terminates SSL itself.
+ * Production servers are behind a load balancer
  */
-server.listen( 443, () => {
-  logger.info( 'Server started and listening' );
-} );
+if (process.env.ENVIRONMENT != 'dev'){
+  const ssl_path = process.env.SSL_PATH;
+  const key = process.env.SSL_KEY;
+  const cert = process.env.SSL_CERT;
+  const options = {
+      key: fs.readFileSync( ssl_path + key ),
+      cert: fs.readFileSync( ssl_path + cert )
+  };
+
+  const server = https.createServer( options, app );
+
+  server.listen(443, () => {
+    logger.info( 'Development server started and listening' );
+  } );
+}else{
+  app.listen(80, () => {
+    logger.info( 'Production server started and listening' );
+  });
+}
