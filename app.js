@@ -20,6 +20,7 @@ const logger = require("./libs/lib_logger");
  */
 const sub_hook = require("./routes/sub_hook");
 const profile_hook = require("./routes/profile_hook");
+const health_check = require("./routes/health_check");
 
 /*
  * Initialize middleware
@@ -39,8 +40,9 @@ app.use(token_check);
 /*
  *  map endpoints to route files
  */
-app.use( '/sub_hook', sub_hook );
-app.use( '/profile_hook', profile_hook );
+app.use("/sub_hook", sub_hook);
+app.use("/profile_hook", profile_hook);
+app.use("/health_check", health_check);
 
 /*
  * App level error handlers
@@ -48,8 +50,8 @@ app.use( '/profile_hook', profile_hook );
 
 // development error handler
 // will print stacktrace
-if ( process.env.ENVIRONMENT == 'dev' ) {
-  app.use( function ( err, req, res, next ) {
+if (process.env.ENVIRONMENT == 'dev'){
+  app.use(function (err, req, res, next){
     res.status( err.status || 500 );
     logger.error( 'ERROR: ' + err + 'MESSAGE: ' + err.message );
   } );
