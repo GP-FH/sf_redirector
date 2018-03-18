@@ -9,6 +9,7 @@ const dotenv = require("dotenv");
 dotenv.config( {
     path: '/home/dev/redirect_node/current/config/config.env'
 } );
+const os = require("os");
 const bodyparser = require("body-parser");
 const express = require("express");
 const https = require("https");
@@ -77,10 +78,10 @@ if (process.env.ENVIRONMENT != 'dev'){
   const server = https.createServer( options, app );
 
   server.listen(443, () => {
-    logger.info( 'Development server started and listening' );
+    logger.info(`${os.hostname()} started and listening`);
   } );
 }else{
   app.listen(80, () => {
-    logger.info( 'Production server started and listening' );
+    logger.info(`${os.hostname()} started and listening`);
   });
 }
