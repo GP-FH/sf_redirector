@@ -18,8 +18,8 @@ const logger = require("../libs/lib_logger");
 
 // router level middleware
 const token_check = require("../middleware/mw_verification_token_check").verification_token_check;
-
 const router = express.Router();
+router.use(token_check);
 
 router.post( '/', async ( req, res, next ) => {
   res.status( 200 ).send();

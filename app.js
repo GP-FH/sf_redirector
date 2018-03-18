@@ -34,7 +34,6 @@ app.use( bodyparser.urlencoded( {
     extended: true
 } ) );
 app.use(request_logger);
-app.use(token_check);
 
 /*
  *  map endpoints to route files

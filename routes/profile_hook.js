@@ -15,8 +15,9 @@ const logger = require("../libs/lib_logger");
 
 // router level middleware
 const token_check = require("../middleware/mw_verification_token_check").verification_token_check;
-
 const router = express.Router();
+router.use(token_check);
+
 const mp = mixpanel.init( process.env.MIXPANEL_TOKEN );
 const stylist_campaigns = [ 'HW-01-ATTR', 'MD-01-ATTR' ];
 
