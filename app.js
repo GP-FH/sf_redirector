@@ -23,10 +23,9 @@ const profile_hook = require("./routes/profile_hook");
 const health_check = require("./routes/health_check");
 
 /*
- * Initialize middleware
+ * Initialize Application level middleware
  */
 const request_logger = require("./middleware/mw_request_logger").request_logger;
-const token_check = require("./middleware/mw_verification_token_check").verification_token_check;
 
 const app = express();
 
