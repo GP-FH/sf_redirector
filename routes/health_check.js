@@ -6,9 +6,11 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const express = require("express");
+const os = require("os");
 const router = express.Router();
 
-router.get( '/', function ( req, res, next) {
+router.get( '/', function (req, res, next) {
+  console.log(`REQUEST RECEIVED FOR HEALTH CHECK ${os.hostname()}`);
   res.status( 200 ).end();
 });
 
