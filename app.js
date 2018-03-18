@@ -66,7 +66,7 @@ app.use( function ( err, req, res, next ) {
  * Dev environment is currently a single server and terminates SSL itself.
  * Production servers are behind a load balancer
  */
-if (process.env.ENVIRONMENT != 'dev'){
+if (process.env.ENVIRONMENT == 'dev'){
   const ssl_path = process.env.SSL_PATH;
   const key = process.env.SSL_KEY;
   const cert = process.env.SSL_CERT;
