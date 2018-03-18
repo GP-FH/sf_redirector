@@ -16,7 +16,10 @@ const order = require( "../libs/lib_order");
 const product_plan = require( "../libs/lib_product_plan");
 const logger = require("../libs/lib_logger");
 
+// router level middleware
+const token_check = require("../middleware/mw_verification_token_check").verification_token_check;
 const router = express.Router();
+router.use(token_check);
 
 router.post( '/', async ( req, res, next ) => {
   res.status( 200 ).send();
