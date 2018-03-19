@@ -5,12 +5,17 @@
  *
  * Arguments:
  * -l | --list: path to csv file with list of products and accompanying bulk_upload_product_images
- *   FORMAT: 2 columns - Variation + Image
+ *   FORMAT: 2 columns - Variant + Image
  *
  * -b | --bucket: digitalocean space with the images to upload (named the same as the spreadsheet)
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+
+const dotenv = require("dotenv");
+dotenv.config( {
+  path: '/home/dev/redirect_node/current/config/config.env'
+} );
 const csv = require("csvtojson");
 const command_line_args = require("command-line-args");
 
@@ -59,10 +64,10 @@ if (help){
     **Pre-requisites**
     - An online accessible place that the images are stored. An s3 bucket or DO space is ideal.
     - A spreadsheet with the product variant names (as they are in TG) and the image file names (as they are in your online storage)
-      FORMAT: 2 columns - Variation + Image
+      FORMAT: 2 columns - Variant + Image
 
     **Arguments**
-    -l | --list: path to csv file with list of products and accompanying bulk_upload_product_images
+    -l | --list: path to csv file with list of products and accompanying bulk_upload_product_images.
     -b | --bucket: bucket/folder url where the images are stored e.g https://tg-product-images.sgp1.digitaloceanspaces.com/
     -v | --verbose: gets you some extra logging along the way
     -h | --help: gets you this message
@@ -88,9 +93,25 @@ async function main(){
     parsed_list = await parse_list(list_file);
     const variations = await trade_gecko.tradegecko_get_product_variants();
     await match_ids_to_products(variations, parsed_list);
-    await upload_images(parsed_list, bucket_base_url);
+    const results = await upload_images(parsed_list, bucket_base_url);
 
-    console.log("Upload completed successfully");
+    console.log("################# Script Complete #################");
+    console.log(`
+
+      Total requests attempted: ${results.total}
+      Request failures: ${results.failures.length}
+      Failed Requests:
+
+      `);
+
+    for(let i = 0; i < results.failures.length; i++){
+      console.log(`
+        ${i} -  Variant: ${results.failures[i].variant}
+            Image_URL: ${results.failures[i].image}
+            Error: ${results.failures[i].error.statusCode} ${results.failures[i].error.statusMessage}
+        `);
+    }
+
     process.exit(0);
   }catch(err){
     console.log(`Error running script: ${err}`);
@@ -124,19 +145,25 @@ function match_ids_to_products(ids, products){
 }
 
 async function upload_images(list, base_url){
+  let failures = [];
   for(let i = 0; i < list.length; i++){
     if (verbose){console.log(`${list[i].product_id}, ${list[i].variant_id[0]}, ${base_url}${list[i].Image}`)};
 
-    let ret = trade_gecko.tradegecko_upload_product_images(list[i].product_id, list[i].variant_id, `${base_url}${list[i].Image}`)
+    let ret = await trade_gecko.tradegecko_upload_product_images(list[i].product_id, list[i].variant_id, `${base_url}${list[i].Image}`)
 
-    if (!ret.ok && verbose){
-      console.log(`Error on upload: ${ret.err}`);
+    if (!ret.ok){
+      if(verbose){
+        console.log(`Error on upload: ${ret.err}`);
+      }
+      failures.push({variant:list[i].Variant, image:list[i].Image, error:ret.err});
     }else if (verbose){
       console.log(`Uploaded ${base_url}${list[i].Image} to TG`)
     };
 
     await sleep(1000);
   }
+
+  return {total: list.length, failures: failures};
 }
 
 // helper
