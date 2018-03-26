@@ -58,7 +58,10 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
     },
     "notes":`
       Chargebee Subscription ID: ${subscription.id}
-      Name: ${subscription.cf_childname}
+      First Name: ${customer.first_name}
+      Last Name: ${customer.last_name}
+      Phone Number: ${customer.phone}
+      Child Name: ${subscription.cf_childname}
       DOB: ${subscription.cf_childage}
       Gender: ${subscription.cf_gender}
       Top Size: ${subscription.cf_topsize}

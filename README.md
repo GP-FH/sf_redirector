@@ -52,7 +52,3 @@ To accurately track people moving through our subscription creation flow we fire
 - tests need a proper rewrite. Should focus on function inputs and outputs from the perspective of the calling party. got stuck testing 3rd party calls which is dumb in this case
 - proper queueing system for calls to third party APIs with retry strategies
 - perf instrumentation via middleware
-- general request logs via middleware
-- verification token checks via middleware
-- add load balancer and terminate ssl there. this will provide flexibility to swap servers in and out
-- use API images for new boxes - not complicated runbooks
