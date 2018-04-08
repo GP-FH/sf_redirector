@@ -101,7 +101,7 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
 
     let increment;
     try {
-      increment = await _validate_subscription_count( plan_id, customer_id, subscription_id );
+      increment = await _validate_subscription_count( plan_id, customer_id, subscription_id, test);
     }
     catch(err) {
       throw new VError(err, `Error validating subscription count for ${subscription_id}`);
@@ -157,22 +157,22 @@ const increment_and_check_weekly = async ( customer_id, subscription_id, plan_id
     //  listen for errors
     client.on( 'error', ( err ) => {
       client.quit();
-      throw new VError(err);
+      reject(new VError(err));
     } );
 
     let increment;
     try {
-      increment = await _validate_subscription_count( plan_id, customer_id, subscription_id);
+      increment = await _validate_subscription_count( plan_id, customer_id, subscription_id, test);
     }
     catch(err) {
-      throw new VError(err, `Error validating subscription count for ${subscription_id}` );
+      reject(new VError(err, `Error validating subscription count for ${subscription_id}` ));
     }
 
     if ( increment ) {
       //  increment user count and decide whether to generate a draft Sales Order in TradeGecko
       client.hincrby( customer_id, subscription_id, 1, ( err, reply ) => {
         if ( err ) {
-          throw new VError(err, `Error incrementing subscription count for ${subscription_id}` );
+          reject(new VError(err, `Error incrementing subscription count for ${subscription_id}` ));
         }
 
         let result;
@@ -232,7 +232,7 @@ async function _validate_subscription_count( plan_id, customer_id, subscription_
     let count_to_set = '0';
 
     //  means customer has changed to weekly plan on this renewal...
-    if ( reply < 5 && ( plan_id == 'deluxe-box-weekly' || plan_id == 'premium-box-weekly' ) ) {
+    if ( reply < 5 && ( plan_id == 'deluxe-box-weekly' || plan_id == 'premium-box-weekly' || plan_id == 'style-up-weekly' || plan_id == 'luxe-weekly' || plan_id == 'premium-weekly' ) ) {
       /*
        *  map the current month to the last week in the monthly period and return true. This way the count
        *  will be incremented and the appropriate action taken
@@ -252,7 +252,7 @@ async function _validate_subscription_count( plan_id, customer_id, subscription_
       increment =  true;
 
     } // ... and vice versa
-    else if ( reply > 4 && ( plan_id == 'deluxe-box' || plan_id == 'premium-box' ) ) {
+    else if ( reply > 4 && ( plan_id == 'deluxe-box' || plan_id == 'premium-box' || plan_id == 'style-up' || plan_id == 'luxe' || plan_id == 'premium') ) {
       /*
        *  maps weekly ranges to monthly counts. This assumes manual handling of the switch is correct (seeing out
        *  weekly renewals for the rest of the current month and scheduling plan change on a renewal date the same
@@ -284,10 +284,16 @@ const subscription_tracker_set_subscription_count = async ( plan_id, subscriptio
     switch ( plan_id ) {
       case 'deluxe-box':
       case 'premium-box':
+      case 'style-up':
+      case 'luxe':
+      case 'premium':
         set_monthly( customer_id, subscription_id );
         break;
       case 'deluxe-box-weekly':
       case 'premium-box-weekly':
+      case 'style-up-weekly':
+      case 'luxe-weekly':
+      case 'premium-weekly':
         set_weekly( customer_id, subscription_id );
         break;
       default:
@@ -302,4 +308,4 @@ exports.increment_and_check_weekly = increment_and_check_weekly;
 exports.subscription_tracker_set_subscription_count = subscription_tracker_set_subscription_count;
 
 exports.set_monthly = set_monthly; // These 2 are exported for test setup. This could be done better.
-exports.set_monthly = set_monthly;
+exports.set_weekly = set_weekly;

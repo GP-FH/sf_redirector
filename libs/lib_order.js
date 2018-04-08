@@ -63,6 +63,9 @@ const order_process_renewal = async ( subscription, customer ) => {
     switch ( subscription.plan_id ) {
       case 'deluxe-box':
       case 'premium-box':
+      case 'style-up':
+      case 'luxe':
+      case 'premium':
         new_order = await subscription_tracker.increment_and_check_monthly(subscription.id, subscription.customer_id, subscription.plan_id);
 
         if ( new_order ) {
@@ -72,6 +75,9 @@ const order_process_renewal = async ( subscription, customer ) => {
         break;
       case 'deluxe-box-weekly':
       case 'premium-box-weekly':
+      case 'style-up-weekly':
+      case 'luxe-weekly':
+      case 'premium-weekly':
         new_order = await subscription_tracker.increment_and_check_weekly(subscription.id, subscription.customer_id, subscription.plan_id);
 
         if ( new_order ) {
@@ -80,7 +86,7 @@ const order_process_renewal = async ( subscription, customer ) => {
 
         break;
       default:
-        throw new VError ("Unexpected plan_id received when trying to renew subscription");
+        throw new VError (`Unexpected plan_id ${subscription.plan_id} received when trying to renew subscription`);
     }
   }
   catch ( err ) {
