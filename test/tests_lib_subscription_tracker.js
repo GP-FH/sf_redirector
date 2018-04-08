@@ -179,5 +179,4 @@ describe( 'Subscription changed from weekly to monthly on renewal changes count 
     let ret = await sub_tracker.increment_and_check_monthly( 'test_id_switch_weekly', 'test_sub_id_switch_weekly', 'deluxe-box', true );
     expect( ret ).to.be.true;
   } );
-
 } );
