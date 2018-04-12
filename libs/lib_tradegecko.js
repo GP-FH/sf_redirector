@@ -58,6 +58,7 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
     },
     "notes":`
       Chargebee Subscription ID: ${subscription.id}
+      Box Type: ${subscription.plan_id}
       First Name: ${customer.first_name}
       Last Name: ${customer.last_name}
       Phone Number: ${customer.phone}
@@ -75,9 +76,7 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
       Address:
       address1: ${subscription.shipping_address.line1}
       suburb: ${subscription.shipping_address.line2}
-      city: ${subscription.shipping_address.city}
-
-      Follow this link to start filling this order: https://stitchfox.gogecko.com?q=${subscription.cf_jam}%20${subscription.cf_doit}%20${subscription.cf_palette}%20${subscription.cf_fave}`,
+      city: ${subscription.shipping_address.city}`,
     "tags":[subscription.plan_id, subscription.cf_fave]
   };
 }
