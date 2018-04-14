@@ -22,6 +22,7 @@ const logger = require("./libs/lib_logger");
 const sub_hook = require("./routes/sub_hook");
 const profile_hook = require("./routes/profile_hook");
 const health_check = require("./routes/health_check");
+const hq = require("./routes/hq");
 
 /*
  * Initialize Application level middleware
@@ -42,6 +43,7 @@ app.use(request_logger);
 app.use("/sub_hook", sub_hook);
 app.use("/profile_hook", profile_hook);
 app.use("/health_check", health_check);
+app.use("/hq", hq);
 
 /*
  * App level error handlers
