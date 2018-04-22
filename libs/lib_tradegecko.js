@@ -161,7 +161,6 @@ const tradegecko_create_company = async (customer, company_type) => {
 /*
  * This function creates an accompanying 'consumer' company for new sales orders
  */
-)
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
   const address = {
     "address1": subscription.shipping_address.line1,
