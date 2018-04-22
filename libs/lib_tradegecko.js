@@ -227,8 +227,8 @@ async function _tradegecko_create_address (company_id, address){
           "suburb": address.suburb,
           "city": address.city,
           "zip_code": address.zip || "",
-          "country": address.country,
-          "label": "shipping address"
+          "country": "New Zealand",
+          "label": "Shipping Address"
         }
       },
       json: true
