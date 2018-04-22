@@ -12,7 +12,7 @@ const VError = require("verror");
  * This function exposes the ability to create a Sales Order containing all the information and Stylist
  * needs to fill it
  */
-const tradegecko_create_sales_order = async ( subscription, customer ) => {
+const tradegecko_create_sales_order = async ( subscription, customer, company_id = "21313869" ) => {
   const { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
 
   let res;
@@ -23,7 +23,7 @@ const tradegecko_create_sales_order = async ( subscription, customer ) => {
       },
       body: {
         "order":{
-          "company_id": "21313869", // TODO: put in config file (should think about whether we should have some config in the repo instead so it's subject to PR process)
+          "company_id": company_id, // defaults to Stylist
           "shipping_address": shipping_address,
           "issued_at": "13-03-2018",
           "tags": tags,
@@ -50,8 +50,9 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
   return {
     "shipping_address": { // the customers address -> this will be automagically added to the Stylists relationship
       "address1": subscription.shipping_address.line1,
-      "suburb": subscription.shipping_address.line1,
+      "suburb": subscription.shipping_address.line2,
       "city": subscription.shipping_address.city,
+      "zip": subscription.shipping_address.zip,
       "country": "New Zealand",
       "label": customer.email,
       "email": customer.email
@@ -145,6 +146,111 @@ const tradegecko_upload_product_images = async (product_id, variant_ids, image_u
   return {ok:true};
 };
 
+/*
+ * This function creates a company in TradeGecko (a 'company' being a supplier, business, or consumer
+ * contact).
+ */
+const tradegecko_create_company = async (customer, company_type) => {
+  try{
+    return await _tradegecko_create_company(company_type, customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
+  }catch(err){
+    throw new VError (err, `customer_id: ${customer.id}`);
+  }
+};
+
+/*
+ * This function creates an accompanying 'consumer' company for new sales orders
+ */
+)
+const tradegecko_create_sales_order_contact = async (subscription, customer) => {
+  const address = {
+    "address1": subscription.shipping_address.line1,
+    "suburb": subscription.shipping_address.line2,
+    "city": subscription.shipping_address.city,
+    "zip_code": subscription.shipping_address.zip || "",
+    "country": address.country
+  };
+
+  try{
+    const company = await _tradegecko_create_company("consumer", customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
+    const address = await _tradegecko_create_address(company.id, address);
+
+    return {ok:true, company:company, address:address};
+
+  }catch(err){
+    throw new VError(err, `subscription_id: ${subscription.id}`);
+  }
+};
+
+async function _tradegecko_create_company (company_type, email, name, phone_number){
+  let res;
+  try {
+    res = await got.post('https://api.tradegecko.com/companies/', {
+      headers:{
+        Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
+      },
+      body: {
+        "company":{
+          "company_type": company_type,
+          "email": email,
+          "name": name,
+          "phone_number": phone_number,
+        }
+      },
+      json: true
+    });
+
+  }
+  catch (err) {
+    throw new VError (err, `Error creating new company in TradeGecko`);
+  }
+
+  return {ok:true, company:res.body.company};
+}
+
+/*
+ * This function takes an address object and company_id anmd creates an address
+ *
+ * address object:
+ *   {
+ *    address1:string,
+ *    suburb:string,
+ *    city:string,
+ *    zip_code:string,
+ *    country:string
+ *   }
+ *
+ */
+async function _tradegecko_create_address (company_id, address){
+  let res;
+  try {
+    res = await got.post('https://api.tradegecko.com/addresses/', {
+      headers:{
+        Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
+      },
+      body: {
+        "address":{
+          "company_id": company_id,
+          "address1": address.address1,
+          "suburb": address.suburb,
+          "city": address.city,
+          "zip_code": address.zip_code,
+          "country": address.country
+        }
+      },
+      json: true
+    });
+
+  }
+  catch (err) {
+    throw new VError (err, `Error creating new address in TradeGecko`);
+  }
+
+  return {ok:true, address:res.body.address};
+}
+
 exports.tradegecko_create_sales_order = tradegecko_create_sales_order;
 exports.tradegecko_get_product_variants = tradegecko_get_product_variants;
 exports.tradegecko_upload_product_images = tradegecko_upload_product_images;
+exports.tradegecko_create_company = tradegecko_create_company;
+exports.tradegecko_create_sales_order_contact = tradegecko_create_sales_order_contact;
