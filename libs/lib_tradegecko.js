@@ -7,12 +7,13 @@
 
 const got = require("got");
 const VError = require("verror");
+const logger = require("../libs/lib_logger");
 
 /*
  * This function exposes the ability to create a Sales Order containing all the information and Stylist
  * needs to fill it
  */
-const tradegecko_create_sales_order = async ( subscription, customer, company_id = "21313869" ) => {
+const tradegecko_create_sales_order = async ( subscription, customer, company_id = " " ) => {
   const { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
 
   let res;
@@ -164,6 +165,7 @@ const tradegecko_create_company = async (customer, company_type) => {
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
   try{
     const company = await _tradegecko_create_company("consumer", customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
+    logger.info(`company id? ${company.id}`);
     const tg_address = await _tradegecko_create_address(company.id, subscription.shipping_address);
 
     return {ok:true, company:company, address:address};
@@ -226,7 +228,8 @@ async function _tradegecko_create_address (company_id, address){
           "suburb": address.suburb,
           "city": address.city,
           "zip_code": address.zip || "",
-          "country": address.country
+          "country": address.country,
+          "label": "shipping address"
         }
       },
       json: true
