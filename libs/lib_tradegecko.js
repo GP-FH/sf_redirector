@@ -167,7 +167,7 @@ const tradegecko_create_sales_order_contact = async (subscription, customer) => 
     "suburb": subscription.shipping_address.line2,
     "city": subscription.shipping_address.city,
     "zip_code": subscription.shipping_address.zip || "",
-    "country": address.country
+    "country": subscription.shipping_address.country
   };
 
   try{
