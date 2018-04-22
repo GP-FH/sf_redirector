@@ -165,7 +165,7 @@ const tradegecko_create_company = async (customer, company_type) => {
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
   try{
     const ret1 = await _tradegecko_create_company("consumer", customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
-    const ret2 = await _tradegecko_create_address(ret.company.id, subscription.shipping_address);
+    const ret2 = await _tradegecko_create_address(ret1.company.id, subscription.shipping_address);
 
     return {ok:true, company:ret1.company, address:ret2.address};
 
