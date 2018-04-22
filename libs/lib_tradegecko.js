@@ -162,17 +162,9 @@ const tradegecko_create_company = async (customer, company_type) => {
  * This function creates an accompanying 'consumer' company for new sales orders
  */
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
-  const address = {
-    "address1": subscription.shipping_address.line1,
-    "suburb": subscription.shipping_address.line2,
-    "city": subscription.shipping_address.city,
-    "zip_code": subscription.shipping_address.zip || "",
-    "country": subscription.shipping_address.country
-  };
-
   try{
     const company = await _tradegecko_create_company("consumer", customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
-    const address = await _tradegecko_create_address(company.id, address);
+    const tg_address = await _tradegecko_create_address(company.id, subscription.shipping_address);
 
     return {ok:true, company:company, address:address};
 
@@ -233,7 +225,7 @@ async function _tradegecko_create_address (company_id, address){
           "address1": address.address1,
           "suburb": address.suburb,
           "city": address.city,
-          "zip_code": address.zip_code,
+          "zip_code": address.zip || "",
           "country": address.country
         }
       },
