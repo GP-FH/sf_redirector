@@ -219,6 +219,7 @@ async function _tradegecko_create_company (company_type, email, name, phone_numb
  */
 async function _tradegecko_create_address (company_id, address){
   let res;
+  logger.info(`company id received to create address: ${company_id}`);
   try {
     res = await got.post('https://api.tradegecko.com/addresses/', {
       headers:{
