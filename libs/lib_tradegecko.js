@@ -165,7 +165,6 @@ const tradegecko_create_company = async (customer, company_type) => {
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
   try{
     const ret1 = await _tradegecko_create_company("consumer", customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
-    logger.info(`returned from TG customer creation function call: ${JSON.stringify(ret1)}. shipping address: ${JSON.stringify(subscription.shipping_address)}`);
     const ret2 = await _tradegecko_create_address(ret1.company.id, subscription.shipping_address);
 
     return {ok:true, company:ret1.company, address:ret2.address};
@@ -200,7 +199,7 @@ async function _tradegecko_create_company (company_type, email, name, phone_numb
 
   logger.info(`returned from TG customer creation API call: ${JSON.stringify(res.body)}`);
 
-  return {ok:true, company:res.body.company};
+  return {ok:true, company:JSON.parse(res.body.company)};
 }
 
 /*
