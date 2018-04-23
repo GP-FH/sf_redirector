@@ -164,6 +164,8 @@ const tradegecko_create_company = async (customer, company_type) => {
  */
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
   try{
+    // need to add check here for preexisting company using email as the identifier
+
     const ret = await _tradegecko_create_company("consumer", customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
     const company = ret.company;
 
@@ -197,27 +199,15 @@ async function _tradegecko_create_company (company_type, email, name, phone_numb
     throw new VError (err, `Error creating new company in TradeGecko`);
   }
 
-  logger.info(`returned from TG customer creation API call: ${JSON.stringify(res.body)}`);
-
   return {ok:true, company:res.body.company};
 }
 
 /*
  * This function takes an address object and company_id anmd creates an address
- *
- * address object:
- *   {
- *    address1:string,
- *    suburb:string,
- *    city:string,
- *    zip_code:string,
- *    country:string
- *   }
- *
  */
 async function _tradegecko_create_address (company_id, address){
   let res;
-  logger.info(`company id received to create address: ${company_id}`);
+
   try {
     res = await got.post('https://api.tradegecko.com/addresses/', {
       headers:{
