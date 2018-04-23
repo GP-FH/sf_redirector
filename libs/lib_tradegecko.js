@@ -25,7 +25,7 @@ const tradegecko_create_sales_order = async ( subscription, customer, company_id
       body: {
         "order":{
           "company_id": company_id, // defaults to Stylist
-          //"shipping_address": shipping_address,
+          "shipping_address": shipping_address,
           "issued_at": "13-03-2018",
           "tags": tags,
           "status": "draft",
@@ -53,9 +53,9 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
       "address1": subscription.shipping_address.line1,
       "suburb": subscription.shipping_address.line2,
       "city": subscription.shipping_address.city,
-      "zip": subscription.shipping_address.zip,
+      "zip_code": subscription.shipping_address.zip || "",
       "country": "New Zealand",
-      "label": customer.email,
+      "label": "Shipping Address",
       "email": customer.email
     },
     "notes":`
@@ -164,12 +164,12 @@ const tradegecko_create_company = async (customer, company_type) => {
  */
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
   try{
-    const ret1 = await _tradegecko_create_company("consumer", customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
-    const company = ret1.company;
+    const ret = await _tradegecko_create_company("consumer", customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
+    const company = ret.company;
 
-    const ret2 = await _tradegecko_create_address(company.id, subscription.shipping_address);
+    //const ret2 = await _tradegecko_create_address(company.id, subscription.shipping_address);
 
-    return {ok:true, company:ret1.company, address:ret2.address};
+    return {ok:true, company:company};
 
   }catch(err){
     throw new VError(err, `subscription_id: ${subscription.id}`);
