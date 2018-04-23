@@ -25,7 +25,7 @@ const tradegecko_create_sales_order = async ( subscription, customer, company_id
       body: {
         "order":{
           "company_id": company_id, // defaults to Stylist
-          "shipping_address": shipping_address,
+          //"shipping_address": shipping_address,
           "issued_at": "13-03-2018",
           "tags": tags,
           "status": "draft",
