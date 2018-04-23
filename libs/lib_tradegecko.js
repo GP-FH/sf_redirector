@@ -165,7 +165,7 @@ const tradegecko_create_company = async (customer, company_type) => {
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
   try{
     const ret1 = await _tradegecko_create_company("consumer", customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
-    logger.info(`customer id: ${ret1.customer.id}. shipping address: ${subscription.shipping_address}`);
+    logger.info(`customer id: ${ret1.customer.id}. shipping address: ${JSON.stringify(subscription.shipping_address)}`);
     const ret2 = await _tradegecko_create_address(ret1.company.id, subscription.shipping_address);
 
     return {ok:true, company:ret1.company, address:ret2.address};
@@ -197,6 +197,8 @@ async function _tradegecko_create_company (company_type, email, name, phone_numb
   catch (err) {
     throw new VError (err, `Error creating new company in TradeGecko`);
   }
+
+  logger.info(`returned from TG customer creation: ${JSON.stringify(res.body)}`);
 
   return {ok:true, company:res.body.company};
 }
