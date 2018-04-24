@@ -50,7 +50,7 @@ const order_create_new_purchase = async ( subscription, customer ) => {
     const ret = await tradegecko.tradegecko_create_sales_order_contact(subscription, customer);
     const company = ret.company;
 
-    return await tradegecko.tradegecko_create_sales_order( subscription, customer );
+    return await tradegecko.tradegecko_create_sales_order( subscription, customer, company.id);
   }
   catch ( err ) {
     throw new VError (err, "Error occurred while creating new one-off purchase");
@@ -78,7 +78,7 @@ const order_process_renewal = async ( subscription, customer ) => {
         if ( new_order ) {
           const ret = await tradegecko.tradegecko_create_sales_order_contact(subscription, customer);
           const company = ret.company;
-          await tradegecko.tradegecko_create_sales_order( subscription, customer, company.id );
+          await tradegecko.tradegecko_create_sales_order( subscription, customer, company.id);
         }
 
         break;
@@ -92,7 +92,7 @@ const order_process_renewal = async ( subscription, customer ) => {
         if ( new_order ) {
           const ret = await tradegecko.tradegecko_create_sales_order_contact(subscription, customer);
           const company = ret.company;
-          await tradegecko.tradegecko_create_sales_order( subscription, customer, company.id );
+          await tradegecko.tradegecko_create_sales_order( subscription, customer, company.id);
         }
 
         break;

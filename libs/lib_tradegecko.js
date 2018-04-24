@@ -14,7 +14,21 @@ const logger = require("../libs/lib_logger");
  * needs to fill it
  */
 const tradegecko_create_sales_order = async ( subscription, customer, company_id = "21313869" ) => {
-  const { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
+  let { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
+  let order = {
+    "company_id": company_id, // defaults to Stylist
+    "issued_at": "13-03-2018",
+    "tags": tags,
+    "status": "draft",
+    "notes": notes
+  };
+
+  const ret = await _tradegecko_check_for_existing_address(shipping_address, company_id);
+  if (ret.exists){
+    order["shipping_address_id"] = ret.address_id;
+  }else{
+    order["shipping_address"] = shipping_address;
+  }
 
   let res;
   try {
@@ -23,14 +37,7 @@ const tradegecko_create_sales_order = async ( subscription, customer, company_id
         Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
       },
       body: {
-        "order":{
-          "company_id": company_id, // defaults to Stylist
-          "shipping_address": shipping_address,
-          "issued_at": "13-03-2018",
-          "tags": tags,
-          "status": "draft",
-          "notes": notes
-        }
+        "order": order
       },
       json: true
     });
@@ -279,6 +286,41 @@ async function _tradegecko_check_for_existing_company (email, page=1){
 
   return {ok:true, exists:exists, company:company};
 };
+
+async function _tradegecko_check_for_existing_address (address, company_id){
+  let res;
+
+  try {
+    res = await got.get('https://api.tradegecko.com/addresses/', {
+      headers:{
+        Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
+      },
+      query:{
+        limit:250,
+        company_id = company_id
+      },
+      json: true
+    });
+
+  }
+  catch (err) {
+    throw new VError (err, `Error listing variants via TradeGecko API.` );
+  }
+
+  let address_id = null;
+  let exists = false;
+  const addresses = res.body.addresses;
+
+  for (let a of addresses){
+    if (a.address1 == address.line1 && a.suburb == address.line2 && a.city == address.city && a.zip_code == address.zip && a.country == address.country){
+      address_id = a.id;
+      exists = true;
+      break;
+    }
+  }
+
+  return {ok:true, exists:exists, address_id: address_id};
+}
 
 exports.tradegecko_create_sales_order = tradegecko_create_sales_order;
 exports.tradegecko_get_product_variants = tradegecko_get_product_variants;
