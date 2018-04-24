@@ -312,7 +312,10 @@ async function _tradegecko_check_for_existing_address (address, company_id){
   const addresses = res.body.addresses;
 
   for (let a of addresses){
+    logger.info(`TG address: ${JSON.stringify(a, null, 2)}`);
+    logger.info(`CB address: ${JSON.stringify(address, null, 2)}`);
     if (a.address1 == address.line1 && a.suburb == address.line2 && a.city == address.city && a.zip_code == address.zip && a.country == address.country){
+      logger.info('A MATCH!!');
       address_id = a.id;
       exists = true;
       break;
