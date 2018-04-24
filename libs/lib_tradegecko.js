@@ -163,17 +163,22 @@ const tradegecko_create_company = async (customer, company_type) => {
  * This function creates an accompanying 'consumer' company for new sales orders
  */
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
+  let company;
+
   try{
-    // need to add check here for preexisting company using email as the identifier
+    const ret = await _tradegecko_check_for_existing_company(customer.email);
 
-    const ret = await _tradegecko_create_company("consumer", customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
-    const company = ret.company;
-
-    return {ok:true, company:company};
-
+    if (ret.exists){
+      company = ret.company;
+    }else{
+      const ret1 = await _tradegecko_create_company("consumer", customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
+      company = ret1.company;
+    }
   }catch(err){
     throw new VError(err, `subscription_id: ${subscription.id}`);
   }
+
+  return {ok:true, company:company};
 };
 
 async function _tradegecko_create_company (company_type, email, name, phone_number){
@@ -234,6 +239,45 @@ async function _tradegecko_create_address (company_id, address){
 
   return {ok:true, address:res.body.address};
 }
+
+async function _tradegecko_check_for_existing_company (email, page=1){
+  let res;
+
+  try {
+    res = await got.get('https://api.tradegecko.com/companies/', {
+      headers:{
+        Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
+      },
+      query:{
+        limit:250,
+        page:page
+      },
+      json: true
+    });
+
+  }
+  catch (err) {
+    throw new VError (err, `Error listing variants via TradeGecko API.` );
+  }
+
+  let company = null;
+  const companies = res.body.companies;
+
+  for (let c of companies){
+    if (c.email == email){
+      company = c;
+      break;
+    }
+  }
+
+  const pagination_info = JSON.parse(res.headers["x-pagination"]);
+
+  if(!pagination_info.last_page && !!company){
+    return _tradegecko_check_for_existing_company(email, ++page);
+  }
+
+  return {ok:true, exists:true, company:company};
+};
 
 exports.tradegecko_create_sales_order = tradegecko_create_sales_order;
 exports.tradegecko_get_product_variants = tradegecko_get_product_variants;
