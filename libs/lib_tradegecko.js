@@ -297,7 +297,7 @@ async function _tradegecko_check_for_existing_address (address, company_id){
       },
       query:{
         limit:250,
-        company_id = company_id
+        company_id: company_id
       },
       json: true
     });
