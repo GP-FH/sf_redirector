@@ -164,7 +164,6 @@ const tradegecko_create_company = async (customer, company_type) => {
  */
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
   let company;
-
   try{
     const ret = await _tradegecko_check_for_existing_company(customer.email);
 
@@ -261,11 +260,13 @@ async function _tradegecko_check_for_existing_company (email, page=1){
   }
 
   let company = null;
+  let exists = false;
   const companies = res.body.companies;
 
   for (let c of companies){
     if (c.email == email){
       company = c;
+      exists = true;
       break;
     }
   }
@@ -276,7 +277,7 @@ async function _tradegecko_check_for_existing_company (email, page=1){
     return _tradegecko_check_for_existing_company(email, ++page);
   }
 
-  return {ok:true, exists:true, company:company};
+  return {ok:true, exists:exists, company:company};
 };
 
 exports.tradegecko_create_sales_order = tradegecko_create_sales_order;
