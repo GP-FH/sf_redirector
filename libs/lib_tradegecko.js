@@ -23,6 +23,10 @@ const tradegecko_create_sales_order = async ( subscription, customer, company_id
     "notes": notes
   };
 
+  /*
+   * Here we compare the address received from CB to the addresses attached to the customer in TG.
+   * If any matches are found we send the address ID in the sales order to avoid creating dupe addresses
+   */
   const ret = await _tradegecko_check_for_existing_address(shipping_address, company_id);
   if (ret.exists){
     order["shipping_address_id"] = ret.address_id;
@@ -167,7 +171,8 @@ const tradegecko_create_company = async (customer, company_type) => {
 };
 
 /*
- * This function creates an accompanying 'consumer' company for new sales orders
+ * This function creates & returns an accompanying 'consumer' company for new sales orders. If one
+ * already exists it returns that instead.
  */
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
   let company;
@@ -187,6 +192,9 @@ const tradegecko_create_sales_order_contact = async (subscription, customer) => 
   return {ok:true, company:company};
 };
 
+/*
+ * Bare bones TG company creation helper method. Will export if needed.
+ */
 async function _tradegecko_create_company (company_type, email, name, phone_number){
   let res;
   try {
@@ -214,7 +222,7 @@ async function _tradegecko_create_company (company_type, email, name, phone_numb
 }
 
 /*
- * This function takes an address object and company_id anmd creates an address
+ * Bare bones TG address creation function. Will export if ever neccessary.
  */
 async function _tradegecko_create_address (company_id, address){
   let res;
@@ -246,6 +254,10 @@ async function _tradegecko_create_address (company_id, address){
   return {ok:true, address:res.body.address};
 }
 
+/*
+ * Helper function: checks for any TG customers with a matching email and returns
+ * the result.
+ */
 async function _tradegecko_check_for_existing_company (email, page=1){
   let res;
 
@@ -287,6 +299,10 @@ async function _tradegecko_check_for_existing_company (email, page=1){
   return {ok:true, exists:exists, company:company};
 };
 
+/*
+ * Helper function: chrcks for matching addresses for a given TG customer. Returns
+ * the result.
+ */
 async function _tradegecko_check_for_existing_address (address, company_id){
   let res;
 
@@ -312,17 +328,14 @@ async function _tradegecko_check_for_existing_address (address, company_id){
   const addresses = res.body.addresses;
 
   for (let a of addresses){
-    logger.info(`TG address: ${JSON.stringify(a, null, 2)}`);
-    logger.info(`CB address: ${JSON.stringify(address, null, 2)}`);
     if (a.address1 == address.address1 && a.suburb == address.suburb && a.city == address.city && a.zip_code == address.zip_code && a.country == address.country){
-      logger.info('A MATCH!!');
       address_id = a.id;
       exists = true;
       break;
     }
   }
 
-  return {ok:true, exists:exists, address_id: address_id};
+  return {ok:true, exists:exists, address_id:address_id};
 }
 
 exports.tradegecko_create_sales_order = tradegecko_create_sales_order;
