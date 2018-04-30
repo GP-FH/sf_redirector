@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 router.route('/').get( async (req,res) => {
-  res.status(200).send("hq_home");
+  res.render('hq_home');
 });
 
 // error handling for the sub route
