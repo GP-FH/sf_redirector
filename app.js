@@ -15,6 +15,7 @@ const express = require("express");
 const https = require("https");
 const fs = require("fs");
 const logger = require("./libs/lib_logger");
+const path = require( 'path' );
 
 /*
  * Initialize routes
@@ -31,6 +32,10 @@ const request_logger = require("./middleware/mw_request_logger").request_logger;
 
 const app = express();
 
+app.set( 'views', path.join( __dirname, 'views' ) );
+app.set( 'view engine', 'hbs' );
+
+app.use( '/static', express.static( 'public' ) );
 app.use( bodyparser.json() );
 app.use( bodyparser.urlencoded( {
     extended: true
@@ -73,5 +78,6 @@ if (process.env.ENVIRONMENT == 'dev'){
 }else{
   app.listen(80, () => {
     logger.info(`${os.hostname()} started and listening`);
+    console.log(`${os.hostname()} started and listening`);
   });
 }

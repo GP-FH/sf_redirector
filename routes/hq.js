@@ -2,20 +2,17 @@ const express = require("express");
 const router = express.Router();
 
 const shipped_product_search = require('../hq/shipped_product_search');
+const login = require('../hq/login');
+const hq_home = require('../hq/hq_home');
+const stylist_home = require('../hq/stylist_home');
 
 /* * * * * * * * * * * * * *
  * Put your HQ routes here
  * * * * * * * * * * * * * */
 router.use('/shipped_product_search', shipped_product_search);
-
-router.get( '/', async ( req, res, next) => {
-  //render hq home
-  res.status(200).send("hq_home");
-} );
-
-router.get( '/login', async ( req, res, next) => {
-  // render hq_login
-} );
+router.use('/login', login);
+router.use('/hq_home', hq_home);
+router.use('/stylist_home', stylist_home);
 
 /*
  * handle 404
