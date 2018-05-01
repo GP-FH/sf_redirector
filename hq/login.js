@@ -1,8 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const logger = require("../libs/lib_logger");
 
 router.route('/').get( async (req,res) => {
   res.render('login');
+});
+
+router.route('/').post( async (req,res) => {
+  logger.info(JSON.stringify(req.body, null, 2));
 });
 
 // error handling for the sub route

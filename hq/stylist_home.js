@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const logger = require("../libs/lib_logger");
 
 router.route('/').get( async (req,res) => {
   res.status(200).send("stylist_home");
