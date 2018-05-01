@@ -36,7 +36,7 @@ app.set( 'views', '/home/dev/redirect_node/current/views');
 app.set( 'view engine', 'hbs' );
 
 app.use( '/static', express.static( 'public' ) );
-app.use( bodyparser.json() );
+app.use( bodyparser.json());
 app.use( bodyparser.urlencoded( {
     extended: true
 } ) );
