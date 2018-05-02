@@ -1,10 +1,24 @@
 const express = require("express");
 const router = express.Router();
+const passport = require('passport');
+const Strategy = require('passport-local').Strategy;
+const db = require("../libs/lib_db");
+
+passport.use(new Strategy((username, password, cb) => {
+  db.find_user_by_name(username, (err, user) => {
+    if (err) { return cb(err); }
+    if (!user) { return cb(null, false); }
+    if (user.password != password) { return cb(null, false); }
+    return cb(null, user);
+  });
+}));
 
 const shipped_product_search = require('../hq/shipped_product_search');
 const login = require('../hq/login');
 const hq_home = require('../hq/hq_home');
 const stylist_home = require('../hq/stylist_home');
+
+
 
 /* * * * * * * * * * * * * *
  * Put your HQ routes here

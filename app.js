@@ -16,6 +16,7 @@ const https = require("https");
 const fs = require("fs");
 const logger = require("./libs/lib_logger");
 const path = require( 'path' );
+const express_session = require('express-session');
 
 /*
  * Initialize routes
@@ -41,6 +42,13 @@ app.use( bodyparser.urlencoded( {
     extended: true
 } ) );
 app.use(request_logger);
+app.use(express_session({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+
+// Initialize Passport and restore authentication state, if any, from the
+// session.
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 /*
  *  map endpoints to route files
