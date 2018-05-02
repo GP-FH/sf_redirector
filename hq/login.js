@@ -8,7 +8,7 @@ router.route('/').get( async (req,res) => {
 });
 
 router.route('/').post( async (req,res) => {
-  logger.info(JSON.stringify(req.body, null, 2));
+  logger.info(`This is what is being received: ${JSON.stringify(req.body, null, 2)}`);
 });
 
 // error handling for the sub route
