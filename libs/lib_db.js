@@ -14,11 +14,11 @@ const find_user_by_name = async (username) => {
   logger.info(`got connection`);
   let [rows, fields] = await connection.query(`select username, pw from hq_users where username = '${username}'`);
   logger.info(`executed a query`);
-  logger.info(`returned from DB: ${rows}`);
   connection.release();
 
   if (rows.length == 0) return {ok:true, user:false};
 
+  logger.info(`returned from DB: ${rows.toString()}`);
 
   const user = {username:username, password: rows[0].pw};
 
