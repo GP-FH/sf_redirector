@@ -11,7 +11,7 @@ passport.use(new Strategy((username, password, cb) => {
     .then((ret) => {
       if (!ret.user) { return cb(null, false); }
       if (ret.user.password != password) { return cb(null, false); }
-      logger.info("we found a user!");
+      logger.info(`we found a user: ${JSON.stringify(ret.user)}`);
       return cb(null, ret.user);
     })
     .catch((err) => {
