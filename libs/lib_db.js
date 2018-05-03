@@ -20,3 +20,5 @@ const find_user_by_name = async (username) => {
 
   return {ok:true, user:user};
 };
+
+exports.find_user_by_name = find_user_by_name;
