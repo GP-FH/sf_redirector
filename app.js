@@ -17,6 +17,7 @@ const fs = require("fs");
 const logger = require("./libs/lib_logger");
 const path = require( 'path' );
 const express_session = require('express-session');
+const passport = require('passport');
 
 /*
  * Initialize routes
