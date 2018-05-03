@@ -5,19 +5,19 @@ const pool = mysql.createPool( {
     host: "10.130.12.240",
     user: "sf-hq-user",
     password: "Kc3/H}96g{>fc",
-    database: "hq_dev",
-    multipleStatements: 'true'
+    database: "hq_dev"
 } );
 
 const find_user_by_name = async (username) => {
   logger.info(`Got to the db function`);
-  //const connection = await pool.getConnection();
-  let [rows, fields] = await pool.query(`select username, pw from hq_users where username = '${username}'`);
+  const connection = await pool.getConnection();
+  let [rows, fields] = await connection.query(`select username, pw from hq_users where username = '${username}'`);
   logger.info(`executed a query`);
-  pool.end();
+  logger.info(`returned from DB: ${rows}`);
+  connection.release();
 
   if (rows.length == 0) return {ok:true, user:false};
-  logger.info(`returned from DB: ${rows}`);
+
 
   const user = {username:username, password: rows[0].pw};
 
