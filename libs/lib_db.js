@@ -2,7 +2,7 @@ const logger = require('../libs/lib_logger');
 const mysql = require('mysql2/promise');
 const pool = mysql.createPool( {
     connectionLimit: 500,
-    host: "10.130.12.240",
+    host: "128.199.88.172",
     user: "sf-hq-user",
     password: "Kc3/H}96g{>fc",
     database: "hq_dev"
