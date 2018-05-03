@@ -17,5 +17,7 @@ const find_user_by_name = async (username) => {
 
   if (row.length == 0) return {ok:true, user:false};
 
-  return {ok:true, user:row[0].username, password:row[0].password};
+  const user = {username:username, password: row[0].pw};
+
+  return {ok:true, user:user};
 };

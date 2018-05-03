@@ -8,8 +8,9 @@ router.route('/').get( async (req,res) => {
   res.render('login');
 });
 
-router.route('/').post( async (req,res) => {
+router.route('/').post( passport.authenticate('local', { failureRedirect: '/' }), async (req,res) => {
   logger.info(`This is what is being received: ${JSON.stringify(req.body, null, 2)}`);
+  res.redirect('/hq/hq_home');
 });
 
 // error handling for the sub route

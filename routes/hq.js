@@ -5,11 +5,11 @@ const Strategy = require('passport-local').Strategy;
 const db = require("../libs/lib_db");
 
 passport.use(new Strategy((username, password, cb) => {
-  db.find_user_by_name(username, (err, user) => {
+  db.find_user_by_name(username, (err, ret) => {
     if (err) { return cb(err); }
-    if (!user) { return cb(null, false); }
-    if (user.password != password) { return cb(null, false); }
-    return cb(null, user);
+    if (!ret.user) { return cb(null, false); }
+    if (ret.user.password != password) { return cb(null, false); }
+    return cb(null, ret.user);
   });
 }));
 
