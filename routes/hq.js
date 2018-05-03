@@ -6,13 +6,15 @@ const db = require("../libs/lib_db");
 const logger = require("../libs/lib_logger");
 
 passport.use(new Strategy((username, password, cb) => {
-  logger.info("we getting to the passport method!");
-  db.find_user_by_name(username, (err, ret) => {
-    if (err) { return cb(err); }
-    if (!ret.user) { return cb(null, false); }
-    if (ret.user.password != password) { return cb(null, false); }
-    return cb(null, ret.user);
-  });
+  db.find_user_by_name(username)
+    .then((ret) => {
+      if (!ret.user) { return cb(null, false); }
+      if (ret.user.password != password) { return cb(null, false); }
+      return cb(null, ret.user);
+    })
+    .catch((err) => {
+      return cb(err)
+    });
 }));
 
 const shipped_product_search = require('../hq/shipped_product_search');
