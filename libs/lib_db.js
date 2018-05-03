@@ -11,11 +11,10 @@ const pool = mysql.createPool( {
 
 const find_user_by_name = async (username) => {
   logger.info(`Got to the db function`);
-  const connection = await pool.getConnection();
-  logger.info(`got a connection from the pool`);
-  let [rows, fields] = await connection.execute(`select username, pw from hq_users where username = '${username}'`);
+  //const connection = await pool.getConnection();
+  let [rows, fields] = await pool.query(`select username, pw from hq_users where username = '${username}'`);
   logger.info(`executed a query`);
-  connection.release();
+  pool.end();
 
   if (rows.length == 0) return {ok:true, user:false};
   logger.info(`returned from DB: ${rows}`);
