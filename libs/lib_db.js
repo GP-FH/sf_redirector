@@ -1,5 +1,6 @@
 const logger = require('../libs/lib_logger');
 const mysql = require('mysql2/promise');
+const VError = require('verror');
 const pool = mysql.createPool( {
     connectionLimit: 500,
     host: "128.199.88.172",
@@ -9,17 +10,16 @@ const pool = mysql.createPool( {
 } );
 
 const find_user_by_name = async (username) => {
-  logger.info(`Got to the db function`);
-  const connection = await pool.getConnection();
-  logger.info(`got connection`);
-  let [rows, fields] = await connection.query(`select username, pw from hq_users where username = '${username}'`);
-  logger.info(`executed a query`);
-  connection.release();
+  try{
+    const connection = await pool.getConnection();
+    let [rows, fields] = await connection.query(`select username, pw from hq_users where username = '${username}'`);
+    connection.release();
+  }catch(err){
+    throw new VError(err, "Error find_user_by_name query");
+  }
 
   if (rows.length == 0) return {ok:true, user:false};
-
   logger.info(`returned from DB: ${JSON.stringify(rows)}`);
-
   const user = {username:username, password: rows[0].pw};
 
   return {ok:true, user:user};
