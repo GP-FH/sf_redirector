@@ -6,6 +6,7 @@ const db = require("../libs/lib_db");
 const logger = require("../libs/lib_logger");
 
 passport.use(new Strategy((username, password, cb) => {
+  logger.info(`received by pp strategy: ${username} + ${passport}`);
   db.find_user_by_name(username)
     .then((ret) => {
       if (!ret.user) { return cb(null, false); }
@@ -13,6 +14,7 @@ passport.use(new Strategy((username, password, cb) => {
       return cb(null, ret.user);
     })
     .catch((err) => {
+      logger.info("hitting an error!");
       return cb(err)
     });
 }));
