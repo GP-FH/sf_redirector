@@ -1,1 +1,36 @@
-<h1>shipped_product_search</h1>
+<h1>Shipped Product Search</h1>
+
+<div class="card">
+  <div class="card-header">
+    Search By Email
+  </div>
+  <div class="card-body">
+    <p class="card-text">See all the products sent to a customer.</p>
+    <form action="/hq/login" method="post">
+      <div class="form-group">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search for sent items by customer email" name=searchInput>
+      </div>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    Search By Email & SKU
+  </div>
+  <div class="card-body">
+    <p class="card-text">Check whether a specific item has been sent to a customer before.</p>
+    <form action="/hq/login" method="post">
+      <div class="form-group">
+        <label for="emailSearchInput">Email</label>
+        <input type="text" class="form-control" id="emailSearchInput" placeholder="Search for sent items by customer email" name=emailSearchInput>
+      </div>
+      <div class="form-group">
+        <label for="skuSearchInput">Product SKU</label>
+        <input type="text" class="form-control" id="skuSearchInput" placeholder="Search for sent items by customer email" name=skuSearchInput>
+      </div>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </div>
+</div>
