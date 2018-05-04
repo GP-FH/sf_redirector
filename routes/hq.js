@@ -21,6 +21,20 @@ passport.use(new Strategy((username, password, cb) => {
     });
 }));
 
+passport.serializeUser(function(user, cb) {
+  cb(null, user.id);
+});
+
+passport.deserializeUser(function(id, cb) {
+  db.users.findById(id)
+    .then((ret) => {
+      cb(null, ret.user);
+    })
+    .catch((err) =>{
+      return cb(err);
+    });   
+});
+
 const shipped_product_search = require('../hq/shipped_product_search');
 const login = require('../hq/login');
 const hq_home = require('../hq/hq_home');
