@@ -10,6 +10,7 @@ const pool = mysql.createPool( {
 } );
 
 const find_user_by_name = async (username) => {
+  logger.info("making it to the DB!");
   try{
     const connection = await pool.getConnection();
     let [rows, fields] = await connection.query(`select username, password from hq_users where username = '${username}'`);
