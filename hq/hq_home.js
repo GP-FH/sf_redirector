@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const logger = require("../libs/lib_logger");
+const connect = require('connect-ensure-login');
 
-router.route('/').get( async (req,res) => {
+router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req,res) => {
   res.status(200).send("hq_home");
 });
 

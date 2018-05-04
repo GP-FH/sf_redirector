@@ -8,6 +8,7 @@
     "chai": "^4.1.0",
     "chargebee": "^2.2.0",
     "command-line-args": "^5.0.2",
+    "connect-ensure-login": "^0.1.1",
     "csvtojson": "^1.1.9",
     "dotenv": "^4.0.0",
     "express": "^4.15.2",
