@@ -11,18 +11,19 @@ const pool = mysql.createPool( {
 
 const find_user_by_name = async (username) => {
   logger.info("making it to the DB!");
-//  try{
+  try{
     const connection = await pool.getConnection();
     let [rows, fields] = await connection.query(`select username, password from hq_users where username = '${username}'`);
     connection.release();
-  //}catch(err){
-    //throw new VError(err, "Error find_user_by_name query");
-  //}
-  logger.info(`returned from DB: ${JSON.stringify(rows)}`);
-  if (rows.length == 0) return {ok:true, user:false};
+
+    logger.info(`returned from DB: ${JSON.stringify(rows)}`);
+    if (rows.length == 0) return {ok:true, user:false};
 
 
-  return {ok:true, user:rows[0]};
+    return {ok:true, user:rows[0]};
+  }catch(err){
+    throw new VError(err, "Error find_user_by_name query");
+  }
 };
 
 exports.find_user_by_name = find_user_by_name;
