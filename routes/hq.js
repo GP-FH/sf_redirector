@@ -9,6 +9,7 @@ passport.use(new Strategy((username, password, cb) => {
   logger.info(`received by pp strategy: ${username} + ${password}`);
   db.find_user_by_name(username)
     .then((ret) => {
+      logger.info(`returned from db function: ${JSON.stringify(ret)}`);
       if (!ret.user) { return cb(null, false); }
       if (ret.user.password != password) { return cb(null, false); }
       logger.info(`we found a user: ${JSON.stringify(ret.user)}`);

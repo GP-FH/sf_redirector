@@ -17,9 +17,9 @@ const find_user_by_name = async (username) => {
   }catch(err){
     throw new VError(err, "Error find_user_by_name query");
   }
-
-  if (rows.length == 0) return {ok:true, user:false};
   logger.info(`returned from DB: ${JSON.stringify(rows)}`);
+  if (rows.length == 0) return {ok:true, user:false};
+
 
   return {ok:true, user:rows[0]};
 };
