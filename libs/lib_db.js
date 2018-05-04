@@ -20,9 +20,8 @@ const find_user_by_name = async (username) => {
 
   if (rows.length == 0) return {ok:true, user:false};
   logger.info(`returned from DB: ${JSON.stringify(rows)}`);
-  const user = {username:username, password: rows[0].pw};
 
-  return {ok:true, user:user};
+  return {ok:true, user:row[0]};
 };
 
 exports.find_user_by_name = find_user_by_name;
