@@ -26,13 +26,13 @@ passport.serializeUser(function(user, cb) {
 });
 
 passport.deserializeUser(function(id, cb) {
-  db.users.findById(id)
+  db.find_user_by_id(id)
     .then((ret) => {
       cb(null, ret.user);
     })
     .catch((err) =>{
       return cb(err);
-    });   
+    });
 });
 
 const shipped_product_search = require('../hq/shipped_product_search');

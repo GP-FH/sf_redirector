@@ -44,3 +44,4 @@ const find_user_by_id = async (id) => {
 };
 
 exports.find_user_by_name = find_user_by_name;
+exports.find_user_by_id = find_user_by_id;
