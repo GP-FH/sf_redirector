@@ -1,5 +1,3 @@
-console.log(process.env.VERIFICATION_TOKEN);
-
 function sps_check(){
   document.getElementById("email_sku_check_form").submit();
 }
