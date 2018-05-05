@@ -35,10 +35,10 @@ const request_logger = require("./middleware/mw_request_logger").request_logger;
 
 const app = express();
 
+app.use( '/static', express.static( 'public' ) );
 app.set( 'views', '/home/dev/redirect_node/current/views');
 app.set( 'view engine', 'hbs' );
 
-app.use( '/static', express.static( 'public' ) );
 app.use( bodyparser.json());
 app.use( bodyparser.urlencoded( {
     extended: true
