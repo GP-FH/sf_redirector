@@ -3,7 +3,9 @@ const router = express.Router();
 const logger = require("../libs/lib_logger");
 
 router.route('/').post(async (req,res) => {
-  // do something
+  logger.info(`Received by /sbs_get: ${JSON.stringify(req.body)}`);
+  ret = sps.sps_get(req.body.email);
+  res.send(ret);
 });
 
 // error handling for the sub route

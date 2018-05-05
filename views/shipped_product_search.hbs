@@ -8,11 +8,11 @@
   </div>
   <div class="card-body">
     <p class="card-text">See all the products sent to a customer.</p>
-    <form action="/hq/login" method="post">
+    <form id-"email_get_form" action="/api/sps_get" method="post">
       <div class="form-group">
         <input type="text" class="form-control" id="searchInput" placeholder="Search for sent items by customer email" name=searchInput>
       </div>
-      <button type="submit" class="btn btn-primary">Search</button>
+      <button type="submit" class="btn btn-primary" onclick="sbs_get()">Search</button>
     </form>
   </div>
 </div>
@@ -23,7 +23,7 @@
   </div>
   <div class="card-body">
     <p class="card-text">Check whether a specific item has been sent to a customer before.</p>
-    <form action="/hq/login" method="post">
+    <form id="email_sku_check_form" action="/api/sps_check" method="post">
       <div class="form-group">
         <label for="emailSearchInput">Email</label>
         <input type="text" class="form-control" id="emailSearchInput" placeholder="Search for sent items by customer email" name=emailSearchInput>
@@ -32,7 +32,7 @@
         <label for="skuSearchInput">Product SKU</label>
         <input type="text" class="form-control" id="skuSearchInput" placeholder="Search for sent items by customer email" name=skuSearchInput>
       </div>
-      <button type="submit" class="btn btn-primary">Search</button>
+      <button type="submit" class="btn btn-primary" onclick="sbs_check()">Search</button>
     </form>
   </div>
 </div>

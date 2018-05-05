@@ -5,11 +5,11 @@ const logger = require("../libs/lib_logger");
 /*
  * Add new API methods here!
  */
-const sps_check_by_email_sku = require('../api/sps_check_by_email_sku');
-const sps_get_by_email = require('../api/sps_get_by_email');
+const sps_check = require('../api/sps_check');
+const sps_get = require('../api/sps_get');
 
-router.use('/sps_check_by_email_sku', sps_check_by_email_sku);
-router.use('/sps_get_by_email', sps_get_by_email);
+router.use('/sps_check', sps_check);
+router.use('/sps_get', sps_get);
 
 /*
  * handle 404

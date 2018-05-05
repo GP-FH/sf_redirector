@@ -1,9 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const logger = require("../libs/lib_logger");
+const sps = require("../libs/lib_shipped_product_search");
 
 router.route('/').post(async (req,res) => {
-  // do something
+  logger.info(`Received by /sbs_check: ${JSON.stringify(req.body)}`);
+  ret = sps.sps_check(req.body.email, req.body.sku);
+  res.send(ret);
 });
 
 // error handling for the sub route
