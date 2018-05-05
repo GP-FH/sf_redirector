@@ -5,7 +5,7 @@ const sps = require("../libs/lib_shipped_product_search");
 
 router.route('/').post(async (req,res) => {
   logger.info(`Received by /sbs_check: ${JSON.stringify(req.body)}`);
-  ret = sps.sps_check(req.body.email, req.body.sku);
+  ret = await sps.sps_check(req.body.email, req.body.sku);
   res.send(ret);
 });
 
