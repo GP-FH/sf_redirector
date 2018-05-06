@@ -3,7 +3,7 @@ const router = express.Router();
 const logger = require("../libs/lib_logger");
 const sps = require("../libs/lib_shipped_product_search");
 
-router.route('/').post(async (req,res) => {
+router.route('/').get(async (req,res) => {
   logger.info(`Received by /sbs_check: ${JSON.stringify(req.body)}`);
   ret = await sps.sps_check(req.body.email, req.body.sku);
   res.send(ret);

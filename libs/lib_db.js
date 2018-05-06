@@ -43,5 +43,37 @@ const find_user_by_id = async (id) => {
   }
 };
 
+const db_legacy_check_for_product_order = async (email, sku) => {
+  try{
+    const connection = await pool.getConnection();
+    let [rows, fields] = await connection.query(`select * from legacy_shipped_products where email = '${email}' and product_code = '${sku}'`);
+    connection.release();
+
+    logger.info(`returned from DB: ${JSON.stringify(rows)}`);
+    if (rows.length == 0) return {ok:true, products:false};
+
+    return {ok:true, products:rows};
+  }catch(err){
+    throw new VError(err, "Error db_legacy_check_for_product_order query");
+  }
+};
+
+const db_legacy_get_orders_by_email = async (email) => {
+  try{
+    const connection = await pool.getConnection();
+    let [rows, fields] = await connection.query(`select * from legacy_shipped_products where email = '${email}'`);
+    connection.release();
+
+    logger.info(`returned from DB: ${JSON.stringify(rows)}`);
+    if (rows.length == 0) return {ok:true, products:false};
+
+    return {ok:true, products:rows};
+  }catch(err){
+    throw new VError(err, "db_legacy_get_orders_by_email");
+  }
+};
+
 exports.find_user_by_name = find_user_by_name;
 exports.find_user_by_id = find_user_by_id;
+exports.db_legacy_get_orders_by_email = db_legacy_get_orders_by_email;
+exports.db_legacy_check_for_product_order = db_legacy_check_for_product_order;
