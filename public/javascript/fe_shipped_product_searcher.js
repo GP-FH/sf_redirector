@@ -9,9 +9,11 @@ $(document).ready(() => {
   });
 
   $("#email_sku_check_form").submit((event) => {
-    console.log(JSON.stringify(event));
-    /*$.get('/api/sps_check', document.getElementById("email_get_form"), (data, status) => {
-      console.log(JSON.stringify(data));
-    });*/
+    event.preventDefault();
+    const data = $("#email_get_form :input");
+
+    $.get('/api/sps_check', {"email":data[0].value, "sku":data[1].value}, (ret, status) => {
+      console.log(JSON.stringify(ret));
+    });
   });
 });

@@ -7,6 +7,7 @@ const sps_get = async (email) => {
 
 const sps_check = async (email, sku) => {
   const ret = await db.db_legacy_check_for_product_order(email, sku);
+  return ret;
 };
 
 exports.sps_get = sps_get;
