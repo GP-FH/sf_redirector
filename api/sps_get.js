@@ -3,8 +3,8 @@ const router = express.Router();
 const logger = require("../libs/lib_logger");
 
 router.route('/').get(async (req,res) => {
-  logger.info(`Received by /sbs_get: ${JSON.stringify(req.body)}`);
-  ret = sps.sps_get(req.body.email);
+  logger.info(`Received by /sbs_get: ${req.query.email}`);
+  ret = sps.sps_get(req.query.email);
   res.send(ret);
 });
 
