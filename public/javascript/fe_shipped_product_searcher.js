@@ -1,8 +1,8 @@
 $(document).ready(() => {
   $("#email_get_form").submit((event) => {
     event.preventDefault();
-    const data = $("#email_get_form :input").serializeArray();
-    console.log(data);
+    const data = $("#email_get_form :input");//.serializeArray();
+    console.log(data[0].value;
     /*$.get('/api/sps_check', document.getElementById("email_sku_check_form"), (data, status) => {
       console.log(JSON.stringify(data));
     });*/
