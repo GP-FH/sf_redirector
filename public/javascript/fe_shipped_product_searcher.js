@@ -1,5 +1,6 @@
 $(document).ready(() => {
   $("#email_get_form").submit((event) => {
+    event.preventDefault();
     console.log(JSON.stringify(event));
     /*$.get('/api/sps_check', document.getElementById("email_sku_check_form"), (data, status) => {
       console.log(JSON.stringify(data));
