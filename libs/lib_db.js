@@ -16,9 +16,7 @@ const find_user_by_name = async (username) => {
     let [rows, fields] = await connection.query(`select * from hq_users where username = '${username}'`);
     connection.release();
 
-    logger.info(`returned from DB: ${JSON.stringify(rows)}`);
     if (rows.length == 0) return {ok:true, user:false};
-
 
     return {ok:true, user:rows[0]};
   }catch(err){
@@ -33,9 +31,7 @@ const find_user_by_id = async (id) => {
     let [rows, fields] = await connection.query(`select * from hq_users where id = '${id}'`);
     connection.release();
 
-    logger.info(`returned from DB: ${JSON.stringify(rows)}`);
     if (rows.length == 0) return {ok:true, user:false};
-
 
     return {ok:true, user:rows[0]};
   }catch(err){
@@ -46,10 +42,9 @@ const find_user_by_id = async (id) => {
 const db_legacy_check_for_product_order = async (email, sku) => {
   try{
     const connection = await pool.getConnection();
-    let [rows, fields] = await connection.query(`select * from legacy_shipped_products where email = '${email}' and product_code = '${sku}'`);
+    let [rows, fields] = await connection.query(`select product_code, product_name, product_option1, quantity from legacy_shipped_products where email = '${email}' and product_code = '${sku}'`);
     connection.release();
 
-    logger.info(`returned from DB: ${JSON.stringify(rows)}`);
     if (rows.length == 0) return {ok:true, products:false};
 
     return {ok:true, products:rows};
@@ -64,7 +59,6 @@ const db_legacy_get_orders_by_email = async (email) => {
     let [rows, fields] = await connection.query(`select product_code, product_name, product_option1, quantity from legacy_shipped_products where email = '${email}'`);
     connection.release();
 
-    logger.info(`returned from DB: ${JSON.stringify(rows)}`);
     if (rows.length == 0) return {ok:true, products:false};
 
     return {ok:true, products:rows};
