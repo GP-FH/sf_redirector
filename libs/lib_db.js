@@ -61,7 +61,7 @@ const db_legacy_check_for_product_order = async (email, sku) => {
 const db_legacy_get_orders_by_email = async (email) => {
   try{
     const connection = await pool.getConnection();
-    let [rows, fields] = await connection.query(`select * from legacy_shipped_products where email = '${email}'`);
+    let [rows, fields] = await connection.query(`select product_code, product_name, product_option1, quantity from legacy_shipped_products where email = '${email}'`);
     connection.release();
 
     logger.info(`returned from DB: ${JSON.stringify(rows)}`);
