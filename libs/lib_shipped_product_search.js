@@ -2,6 +2,7 @@ const db = require("../libs/lib_db");
 
 const sps_get = async (email) => {
   const ret = await db.db_legacy_get_orders_by_email(email);
+  return ret;
 };
 
 const sps_check = async (email, sku) => {

@@ -3,8 +3,8 @@ $(document).ready(() => {
     event.preventDefault();
     const data = $("#email_get_form :input");
 
-    $.get('/api/sps_get', {"email":data[0].value}, (data, status) => {
-      console.log(JSON.stringify(data));
+    $.get('/api/sps_get', {"email":data[0].value}, (ret, status) => {
+      console.log(JSON.stringify(ret));
     });
   });
 
