@@ -8,7 +8,7 @@ $(document).ready(() => {
 
       for (let i = 0; i < ret.products.length; i++ ){
         const product = ret.products[i];
-        $("#email_get_results_list").append(`<li class="list-group-item"><b>${product.product_name}</b> SKU: ${product.product_code} Colour: ${product.product_option1} Quantity: ${product.quantity} </li>`);
+        $("#email_get_results_list").append(`<li class="list-group-item"><b>Product Name:</b> ${product.product_name} <b>SKU:</b> ${product.product_code} <b>Colour:</b> ${product.product_option1}</li>`);
       }
     });
   });
@@ -19,6 +19,14 @@ $(document).ready(() => {
 
     $.get('/api/sps_check', {"email":data[0].value, "sku":data[1].value}, (ret, status) => {
       console.log(JSON.stringify(ret));
+
+      if (!ret.products){
+        $("#email_sku_check_no_result_alert").text("DOES THIS WORK?");
+        $("#email_sku_check_no_result_alert").removeClass("invisible");
+      }else{
+        $("#email_sku_check_result_alert").text("DOES THIS WORK?");
+        $("#email_sku_check_result_alert").removeClass("invisible");
+      }
     });
   });
 });
