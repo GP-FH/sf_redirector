@@ -53,13 +53,18 @@ app.use(passport.session());
 
 
 /*
- *  map endpoints to route files
+ *  map endpoints to route files based on role
  */
-app.use("/sub_hook", sub_hook);
-app.use("/profile_hook", profile_hook);
 app.use("/health_check", health_check);
-app.use("/hq", hq);
-app.use("/api", api);
+if (process.env.ROLE == 'redirect'){
+  app.use("/sub_hook", sub_hook);
+  app.use("/profile_hook", profile_hook);
+}
+
+if (process.env.ROLE == 'hq'){
+  app.use("/hq", hq);
+  app.use("/api", api);
+}
 
 /*
  * App level error handlers
