@@ -6,9 +6,9 @@ const db = require("../libs/lib_db");
 const logger = require("../libs/lib_logger");
 const bcrypt = require("bcrypt");
 
-passport.use(new Strategy(async (username, password, cb) => {
+passport.use(new Strategy((username, password, cb) => {
   db.find_user_by_name(username)
-    .then((ret) => {
+    .then(async (ret) => {
       if (!ret.user) { return cb(null, false); }
       const match = await bcrypt.compare(password, ret.user.password);
       if (!match) { return cb(null, false); }
