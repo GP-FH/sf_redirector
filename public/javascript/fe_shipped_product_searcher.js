@@ -8,7 +8,7 @@ $(document).ready(() => {
 
       for (let i = 0; i < ret.products.length; i++ ){
         const product = ret.products[i];
-        $("email_get_results_list").append(`<li class="list-group-item"><b>${product.product_name}</b> SKU: ${product.product_code} Colour: ${product.product_option1} Quantity: ${product.quantity} </li>`);
+        $("#email_get_results_list").append(`<li class="list-group-item"><b>${product.product_name}</b> SKU: ${product.product_code} Colour: ${product.product_option1} Quantity: ${product.quantity} </li>`);
       }
     });
   });
