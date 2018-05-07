@@ -62,11 +62,6 @@ if (process.env.ROLE == 'redirect'){
 }else if (process.env.ROLE == 'hq'){
   app.use("/hq", hq);
   app.use("/api", api);
-}else if (process.env.ENVIRONMENT == 'dev'){
-  app.use("/sub_hook", sub_hook);
-  app.use("/profile_hook", profile_hook);
-  app.use("/hq", hq);
-  app.use("/api", api);
 }
 
 /*
