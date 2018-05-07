@@ -91,7 +91,7 @@ router.get( '/', async function ( req, res, next) {
 } );
 
 // error handling for the sub route
-router.use( function ( err, req, res, next ) {
+router.use( ( err, req, res, next ) => {
   res.end();
   logger.error( JSON.stringify( err ) );
 } );
