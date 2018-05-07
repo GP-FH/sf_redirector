@@ -9,6 +9,7 @@ $(document).ready(() => {
 
       if (!ret.products){
         $("#email_get_no_result_alert").text("No results for this email");
+        $("#email_get_no_result_alert").removeClass("invisible");
       }
 
       for (let i = 0; i < ret.products.length; i++ ){
