@@ -5,6 +5,12 @@ $(document).ready(() => {
 
     $.get('/api/sps_get', {"email":data[0].value}, (ret, status) => {
       $("#email_get_results_list").empty();
+      $("#email_get_no_result_alert").addClass("invisible");
+
+      if (!ret.products){
+        $("#email_get_no_result_alert").text("No results for this email");
+      }
+
       for (let i = 0; i < ret.products.length; i++ ){
         const product = ret.products[i];
         $("#email_get_results_list").append(`<li class="list-group-item"><b>Product Name:</b> ${product.product_name} <b>SKU:</b> ${product.product_code} <b>Colour:</b> ${product.product_option1}</li>`);
@@ -21,7 +27,7 @@ $(document).ready(() => {
       $("#email_sku_check_result_alert").addClass("invisible");
 
       if (!ret.products){
-        $("#email_sku_check_no_result_alert").text("No results for ths product");
+        $("#email_sku_check_no_result_alert").text("No results for this product");
         $("#email_sku_check_no_result_alert").removeClass("invisible");
       }else{
         $("#email_sku_check_result_alert").text("This product has been sent to the customer with this email before");
