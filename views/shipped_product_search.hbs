@@ -1,0 +1,41 @@
+<h1 class="ml-5 mt-3 mr-5">Shipped Product Search</h1>
+
+<div class="card ml-5 mt-3 mr-5">
+  <div class="card-header">
+    Search By Email
+  </div>
+  <div class="card-body">
+    <p class="card-text">See all the products sent to a customer.</p>
+    <form id="email_get_form">
+      <div class="form-group">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search for sent items by customer email" name=searchInput>
+      </div>
+      <button id="email_get_button" type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <div id="email_get_no_result_alert" class="alert alert-info invisible mt-3" role="alert"></div>
+    <ul id="email_get_results_list" class="list-group border mt-3"></ul>
+  </div>
+</div>
+
+<div class="card ml-5 mt-3 mr-5">
+  <div class="card-header">
+    Search By Email & SKU
+  </div>
+  <div class="card-body">
+    <p class="card-text">Check whether a specific item has been sent to a customer before.</p>
+    <form id="email_sku_check_form">
+      <div class="form-group">
+        <label for="emailSearchInput">Email</label>
+        <input type="text" class="form-control" id="emailSearchInput" placeholder="Search for sent items by customer email" name=emailSearchInput>
+      </div>
+      <div class="form-group">
+        <label for="skuSearchInput">Product SKU</label>
+        <input type="text" class="form-control" id="skuSearchInput" placeholder="Search for sent items by customer email" name=skuSearchInput>
+      </div>
+      <button id="email_sku_check_button" type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <div id="email_sku_check_no_result_alert" class="alert alert-success invisible mt-3" role="alert"></div>
+    <div id="email_sku_check_result_alert" class="alert alert-danger invisible mt-3" role="alert"></div>
+</div>
+
+<script src="/static/javascript/fe_shipped_product_searcher.js" type="text/javascript"></script>

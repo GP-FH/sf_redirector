@@ -15,6 +15,9 @@ const express = require("express");
 const https = require("https");
 const fs = require("fs");
 const logger = require("./libs/lib_logger");
+const path = require( 'path' );
+const express_session = require('express-session');
+const passport = require('passport');
 
 /*
  * Initialize routes
@@ -22,6 +25,8 @@ const logger = require("./libs/lib_logger");
 const sub_hook = require("./routes/sub_hook");
 const profile_hook = require("./routes/profile_hook");
 const health_check = require("./routes/health_check");
+const hq = require("./routes/hq");
+const api = require("./routes/api");
 
 /*
  * Initialize Application level middleware
@@ -30,18 +35,34 @@ const request_logger = require("./middleware/mw_request_logger").request_logger;
 
 const app = express();
 
-app.use( bodyparser.json() );
+app.use( '/static', express.static( '/home/dev/redirect_node/current/public' ) );
+app.set( 'views', '/home/dev/redirect_node/current/views');
+app.set( 'view engine', 'hbs' );
+
+app.use( bodyparser.json());
 app.use( bodyparser.urlencoded( {
     extended: true
 } ) );
 app.use(request_logger);
+app.use(express_session({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+
+// Initialize Passport and restore authentication state, if any, from the
+// session.
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 /*
- *  map endpoints to route files
+ *  map endpoints to route files based on role
  */
-app.use("/sub_hook", sub_hook);
-app.use("/profile_hook", profile_hook);
 app.use("/health_check", health_check);
+if (process.env.ROLE == 'redirect'){
+  app.use("/sub_hook", sub_hook);
+  app.use("/profile_hook", profile_hook);
+}else if (process.env.ROLE == 'hq'){
+  app.use("/hq", hq);
+  app.use("/api", api);
+}
 
 /*
  * App level error handlers
@@ -71,5 +92,6 @@ if (process.env.ENVIRONMENT == 'dev'){
 }else{
   app.listen(80, () => {
     logger.info(`${os.hostname()} started and listening`);
+    console.log(`${os.hostname()} started and listening`);
   });
 }

@@ -9,7 +9,7 @@ const express = require("express");
 const os = require("os");
 const router = express.Router();
 
-router.get( '/', function (req, res, next) {
+router.get( '/', (req, res, next) => {
   res.status( 200 ).end();
 });
 
