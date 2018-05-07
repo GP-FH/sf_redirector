@@ -4,7 +4,6 @@ $(document).ready(() => {
     const data = $("#email_get_form :input");
 
     $.get('/api/sps_get', {"email":data[0].value}, (ret, status) => {
-      console.log(JSON.stringify(ret));
       $("#email_get_results_list").empty();
       for (let i = 0; i < ret.products.length; i++ ){
         const product = ret.products[i];
@@ -18,16 +17,14 @@ $(document).ready(() => {
     const data = $("#email_sku_check_form :input");
 
     $.get('/api/sps_check', {"email":data[0].value, "sku":data[1].value}, (ret, status) => {
-      console.log(JSON.stringify(ret));
-
       $("#email_sku_check_no_result_alert").addClass("invisible");
       $("#email_sku_check_result_alert").addClass("invisible");
 
       if (!ret.products){
-        $("#email_sku_check_no_result_alert").text("DOES THIS WORK?");
+        $("#email_sku_check_no_result_alert").text("No results for ths product");
         $("#email_sku_check_no_result_alert").removeClass("invisible");
       }else{
-        $("#email_sku_check_result_alert").text("DOES THIS WORK?");
+        $("#email_sku_check_result_alert").text("This product has been sent to the customer with this email before");
         $("#email_sku_check_result_alert").removeClass("invisible");
       }
     });
