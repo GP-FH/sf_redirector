@@ -20,6 +20,9 @@ $(document).ready(() => {
     $.get('/api/sps_check', {"email":data[0].value, "sku":data[1].value}, (ret, status) => {
       console.log(JSON.stringify(ret));
 
+      $("#email_sku_check_no_result_alert").addClass("invisible");
+      $("#email_sku_check_result_alert").addClass("invisible");
+
       if (!ret.products){
         $("#email_sku_check_no_result_alert").text("DOES THIS WORK?");
         $("#email_sku_check_no_result_alert").removeClass("invisible");
