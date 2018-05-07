@@ -4,7 +4,7 @@ const logger = require("../libs/lib_logger");
 const connect = require('connect-ensure-login');
 
 router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req,res) => {
-  res.status(200).send("stylist_home");
+  res.render("stylist_home");
 });
 
 // error handling for the sub route
