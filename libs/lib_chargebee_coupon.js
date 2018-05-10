@@ -38,18 +38,18 @@ const chargebee_coupon_create_new = async ( coupon_id, set_name, customer_id ) =
  * it adds adds promotional credits to the referrers account in Chargebee. It can do this as the
  * referral code is actually just the customer ID of the referring customer.
  */
-const chargebee_coupon_check_and_apply_referral = async ( entity_id ) => {
-  if ( entity_id === undefined ) {
+const chargebee_coupon_check_and_apply_referral = async (coupon) => {
+  if (coupon.entity_id === undefined) {
       throw new VError ( "entity_id undefined" );
   }
 
-  if ( entity_id == process.env.FRIEND_REFERRAL_CODE_ID ) {
-    var coupon_owner = coupons[ 0 ].description.split( ' ' )[ 0 ];
+  if (coupon.entity_id == process.env.FRIEND_REFERRAL_CODE_ID){
+    var coupon_owner = coupon.description.split( ' ' )[ 0 ];
 
-    return await chargebee.customer.add_promotional_credits( coupon_owner, {
+    return await chargebee.customer.add_promotional_credits(coupon_owner, {
         amount: 1000,
         description: "refer_a_friend credits"
-    } ).request( ( err, ret ) => {
+    } ).request( (err, ret) => {
         if ( err ) {
           throw new VError ( err, "Error adding promotional credits to customer in Chargebee");
         }

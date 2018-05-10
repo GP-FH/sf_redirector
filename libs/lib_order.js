@@ -22,7 +22,7 @@ const logger = require("./lib_logger");
 const order_create_new_subscription = async ( subscription, customer, coupons ) => {
   try {
     if ( coupons ) {
-      await chargebee_coupon.chargebee_coupon_check_and_apply_referral( coupons[ 0 ].entity_id );
+      await chargebee_coupon.chargebee_coupon_check_and_apply_referral(coupons[ 0 ]);
     }
 
     await chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
