@@ -8,6 +8,9 @@ const logger = require("../libs/lib_logger");
 const sps_check = require('../api/sps_check');
 const sps_get = require('../api/sps_get');
 
+// router level middleware
+const token_check = require("../middleware/mw_verification_token_check").internal_callback_api_check;
+router.use(token_check);
 router.use('/sps_check', sps_check);
 router.use('/sps_get', sps_get);
 
