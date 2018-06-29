@@ -3,7 +3,7 @@ $(document).ready(() => {
     event.preventDefault();
     const data = $("#email_get_form :input");
 
-    $.get('/api/sps_get', {"email":data[0].value, "token": process.env.VERIFICATION_TOKEN}, (ret, status) => {
+    $.get('/api/sps_get', {"email":data[0].value, "token":"8oMUcp4iSkrHQ5563omj"}, (ret, status) => {
       $("#email_get_results_list").empty();
       $("#email_get_no_result_alert").addClass("invisible");
 
@@ -23,7 +23,7 @@ $(document).ready(() => {
     event.preventDefault();
     const data = $("#email_sku_check_form :input");
 
-    $.get('/api/sps_check', {"email":data[0].value, "sku":data[1].value, "token": process.env.VERIFICATION_TOKEN}, (ret, status) => {
+    $.get('/api/sps_check', {"email":data[0].value, "sku":data[1].value, "token":"8oMUcp4iSkrHQ5563omj"}, (ret, status) => {
       $("#email_sku_check_no_result_alert").addClass("invisible");
       $("#email_sku_check_result_alert").addClass("invisible");
 
