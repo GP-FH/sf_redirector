@@ -35,6 +35,7 @@ passport.deserializeUser(function(id, cb) {
 });
 
 const shipped_product_search = require('../hq/shipped_product_search');
+const product_search = require('../hq/product_search');
 const login = require('../hq/login');
 const hq_home = require('../hq/hq_home');
 const stylist_home = require('../hq/stylist_home');
