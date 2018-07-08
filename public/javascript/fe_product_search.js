@@ -4,7 +4,12 @@ $(document).ready(() => {
     const data = $("#sub_search_input :input");
 
     for (let i = 0; i < 50; i++ ){
-      $("#results").append(`<div class="col-lg-3 col-md-4 col-xs-6"><a href="#" class="d-block mb-4 h-100"><img class="img-fluid img-thumbnail" src="https://d1yx6mil86g02p.cloudfront.net/uploads/variant_image/image/16709483/medium_RYU-SFX-Sae.jpg" alt=""></a><span>[SKU]: [BRAND] [PRODUCT_NAME] [COLOUR] [SIZE]</span></div>`);
+      $("#results").append(`<div class="col-lg-3 col-md-4 col-xs-6"><a href="#" class="d-block mb-4 h-100"><figure class="figure"><img class="figure-img img-fluid img-thumbnail" src="https://d1yx6mil86g02p.cloudfront.net/uploads/variant_image/image/16709483/medium_RYU-SFX-Sae.jpg" alt=""><figcaption class="figure-caption">[SKU]: [BRAND] [PRODUCT_NAME] [COLOUR] [SIZE]</figcaption></figure></a></div>`);
     }
   });
 });
+
+<figure class="figure">
+  <img src="..." class="figure-img img-fluid rounded" alt="A generic square placeholder image with rounded corners in a figure.">
+  <figcaption class="figure-caption">A caption for the above image.</figcaption>
+</figure>
