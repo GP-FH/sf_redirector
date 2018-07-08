@@ -46,6 +46,7 @@ const stylist_home = require('../hq/stylist_home');
  * Put your HQ routes here
  * * * * * * * * * * * * * */
 router.use('/shipped_product_search', shipped_product_search);
+router.use('/product_search', product_search);
 router.use('/login', login);
 router.use('/hq_home', hq_home);
 router.use('/stylist_home', stylist_home);
