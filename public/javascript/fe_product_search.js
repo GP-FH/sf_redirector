@@ -1,5 +1,5 @@
 $(document).ready(() => {
-  $( "#target" ).click(function() {
+  $( "#test_button" ).click(function() {
     alert( "Handler for .click() called." );
   });
 
