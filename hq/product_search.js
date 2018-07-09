@@ -7,7 +7,7 @@ router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req,res) => {
   res.render('product_search');
 });
 
-router.route('/')/post(async (req, res) => {
+router.route('/').post(async (req, res) => {
   logger.info(`We received something!!! ${JSON.stringify(req.body, null, 4)}`);
 });
 
