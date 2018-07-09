@@ -4,12 +4,24 @@ const logger = require("../libs/lib_logger");
 const connect = require('connect-ensure-login');
 
 router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req,res) => {
-  res.render('product_search', { csrfToken: req.csrfToken() });
+  res.render('product_search', {csrfToken: req.csrfToken()});
 });
 
 router.route('/').post(async (req, res) => {
-  logger.info(`We received something!!! ${JSON.stringify(req.body, null, 4)}`);
-  res.redirect('/hq/stylist_home');
+  const test_obj = [
+    {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
+    {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
+    {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
+    {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
+    {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
+    {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
+    {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
+    {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
+    {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
+    {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'}
+  ];
+  // make lib calls the redirect back to page with payload
+  res.redirect('/hq/stylist_home', {results:test_obj});
 });
 
 // error handling for the sub route
