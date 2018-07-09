@@ -9,6 +9,7 @@ router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req,res) => {
 
 router.route('/').post(async (req, res) => {
   logger.info(`We received something!!! ${JSON.stringify(req.body, null, 4)}`);
+  res.redirect('/hq/stylist_home');
 });
 
 // error handling for the sub route
