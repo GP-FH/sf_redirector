@@ -5,7 +5,7 @@ const Strategy = require('passport-local').Strategy;
 const db = require("../libs/lib_db");
 const logger = require("../libs/lib_logger");
 const bcrypt = require("bcrypt");
-const csrf = require('csurf')
+const csrf = require('csurf');
 
 passport.use(new Strategy((username, password, cb) => {
   db.find_user_by_name(username)
