@@ -4,7 +4,7 @@ const logger = require("../libs/lib_logger");
 const connect = require('connect-ensure-login');
 
 router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req,res) => {
-  res.render('shipped_product_search');
+  res.render('shipped_product_search', { csrfToken: req.csrfToken() });
 });
 
 // error handling for the sub route

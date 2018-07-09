@@ -6,7 +6,8 @@
     </div>
     <div class="card-body">
       <p class="card-text">See all products that match a sub's style profile</p>
-      <form id="sub_search_input">
+      <form action="/hq/product_search" method="post" id="sub_search_input">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="form-group">
           <input type="text" class="form-control" id="searchInput" placeholder="Enter Chargebee subscription ID" name=searchInput>
         </div>
@@ -46,10 +47,8 @@
         <button type="reg_search_button" class="btn btn-primary mb-2">Search</button>
       </form>
     </div>
-    <div class="row text-center text-lg-left" id="results">
+    <div class="row text-center text-lg-left" id="reg_results">
     </div>
-  </div>
-  <div class="row text-center text-lg-left" id="reg_results">
   </div>
 </div>
 
