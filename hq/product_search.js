@@ -8,7 +8,7 @@ router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req,res) => {
 });
 
 router.route('/').post(async (req, res) => {
-  const test_obj = [
+  const test_obj = `[
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
@@ -19,9 +19,9 @@ router.route('/').post(async (req, res) => {
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'}
-  ];
+  ]`;
   // make lib calls the redirect back to page with payload
-  res.redirect('/hq/stylist_home', {results:test_obj});
+  res.redirect('/hq/product_search', {results:test_obj});
 });
 
 // error handling for the sub route
