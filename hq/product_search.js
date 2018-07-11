@@ -8,6 +8,7 @@ router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req,res) => {
 });
 
 router.route('/').post(async (req, res) => {
+  // store query in DB with some metadata and random generated pKey. pass pKey in q param of redirect. Query DB and pass results on through.
   const test_obj = [
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
