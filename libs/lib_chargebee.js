@@ -5,7 +5,7 @@
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-const chargebee =require("chargebee");
+const chargebee = require("chargebee");
 const VError = require("verror");
 const logger = require("./lib_logger");
 
@@ -50,7 +50,7 @@ const chargebee_get_subscription_info = async ( subscription_id ) => {
  * This function requests a hosted checkout page URL from Chargebee
  */
 const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution, keen, palette) => {
-  if (qs === undefined || redirect_url === undefined || stylist_attribution === undefined || keen === undefined || palette === undefined) {
+  if (qs === undefined || redirect_url === undefined || stylist_attribution === undefined || keen === undefined || palette === undefined    ) {
       throw new VError ("Received parameter not defined");
   }
 
@@ -72,13 +72,13 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
           cf_else: qs.else,
           cf_notes: qs.notes
       },
-      customer: {
+      /*customer: {
           email: qs.email,
           first_name: qs.fname,
           last_name: qs.lname,
           phone: qs.phone,
           cf_stylist_attr: stylist_attribution
-      },
+      },*/
       billing_address: {
           first_name: qs.fname,
           last_name: qs.lname,
@@ -94,6 +94,8 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
       }
   } );
 }
+
+// TODO add sub update functiomn that returns updated sub object
 
 exports.chargebee_get_customer_info = chargebee_get_customer_info;
 exports.chargebee_get_subscription_info = chargebee_get_subscription_info;

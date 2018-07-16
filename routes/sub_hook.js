@@ -35,6 +35,9 @@ router.post( '/', async ( req, res, next ) => {
     const coupons = req.body.content.invoice.discounts || false;
     const subscription = req.body.content.subscription;
 
+    // TODO add check here sub missing style profile data. If missing update profile from DB and replace
+    // subscription object with update one.
+
     let ret = await product_plan.product_plan_is_one_off( subscription.plan_id );
 
     try {
