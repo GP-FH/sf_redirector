@@ -74,6 +74,7 @@ const db_legacy_get_orders_by_email = async (email) => {
 };
 
 const db_aux_store_style_profile = async (profile) => {
+  logger.info(`profile info received: ${JSON.stringify(profile, null, 4)}`);
   try{
     const connection = await redirect_pool.getConnection();
     let [rows, fields] = await connection.query(`insert into pre_subs (ts, email, archetype, gender, childname, childage, topsize, bottomsize, jam, doit, palette, fave, keen,
