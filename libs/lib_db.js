@@ -77,8 +77,7 @@ const db_aux_store_style_profile = async (profile) => {
   logger.info(`profile info received: ${JSON.stringify(profile, null, 4)}`);
   try{
     const connection = await redirect_pool.getConnection();
-    let [rows, fields] = await connection.query(`insert into pre_subs values(NULL, ${profile.ts}, ${profile.email}, ${profile.archetype}, ${profile.gender}, ${profile.childname}, ${profile.childage}, ${profile.topsize},
-        ${profile.bottomsize}, ${profile.jam}, ${profile.doit}, ${profile.palette}, ${profile.fave}, ${profile.keen}, ${profile.else}, ${profile.notes}, ${profile.internal_notes}) `);
+    let [rows, fields] = await connection.query(`insert into pre_subs values (NULL, '${profile.ts}', '${profile.email}', '${profile.archetype}', '${profile.gender}', '${profile.childname}', '${profile.childage}', '${profile.topsize}', '${profile.bottomsize}', '${profile.jam}', '${profile.doit}', '${profile.palette}', '${profile.fave}', '${profile.keen}', '${profile.else}', '${profile.notes}', '${profile.internal_notes}')`);
     connection.release();
 
     return {ok:true};
