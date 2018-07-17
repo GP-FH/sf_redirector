@@ -75,7 +75,7 @@ router.get( '/', async function (req, res, next) {
 
     try{
       // we store existing customer profile data for pickup post sub creation
-      if (req.query.store_profile){
+      if (req.query.store_profile == 'true'){
         const profile = await _transform_request_for_storage(req.query, keen, palette);
         await db.db_aux_store_style_profile(profile);
         res.redirect(`https://${process.env.CHARGEBEE_SITE}.chargebee.com/hosted_pages/plans/${req.query.boxtype}`);
