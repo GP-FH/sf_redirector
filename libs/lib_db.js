@@ -77,7 +77,7 @@ const db_aux_store_style_profile = async (profile) => {
   try{
     const connection = await redirect_pool.getConnection();
     let [rows, fields] = await connection.query(`insert into pre_subs ts, email, archetype, gender, childname, childage, topsize, bottomsize, jam, doit, palette, fave, keen,
-      something_else, notes, internal_notes values(${profile.ts}, ${profile.email}, ${profile.archetype}, ${profile.genfer}, ${profile.childname}, ${profile.childage}, ${profile.topsize},
+      something_else, notes, internal_notes values(${profile.ts}, ${profile.email}, ${profile.archetype}, ${profile.gender}, ${profile.childname}, ${profile.childage}, ${profile.topsize},
         ${profile.bottomsize}, ${profile.jam}, ${profile.doit}, ${profile.palette}, ${profile.fave}, ${profile.keen}, ${profile.else}, ${profile.notes}, ${profile.internal_notes}) `);
     connection.release();
 

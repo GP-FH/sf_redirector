@@ -72,13 +72,13 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
           cf_else: qs.else,
           cf_notes: qs.notes
       },
-      /*customer: {
+      customer: {
           email: qs.email,
           first_name: qs.fname,
           last_name: qs.lname,
           phone: qs.phone,
           cf_stylist_attr: stylist_attribution
-      },*/ 
+      },
       billing_address: {
           first_name: qs.fname,
           last_name: qs.lname,
