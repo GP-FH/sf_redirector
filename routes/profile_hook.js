@@ -76,7 +76,7 @@ router.get( '/', async function (req, res, next) {
     try{
       // we store existing customer profile data for pickup post sub creation
       if (req.query.store_profile){
-        const profile = await _transform_request_for_storage(req.query);
+        const profile = await _transform_request_for_storage(req.query, keen, palette);
         await db.db_aux_store_style_profile(profile);
         res.redirect(`https://${process.env.CHARGEBEE_SITE}.chargebee.com/hosted_pages/plans/${req.query.boxtype}`);
       } else{
@@ -89,10 +89,6 @@ router.get( '/', async function (req, res, next) {
       res.redirect( process.env.BASE_URL + '/error' );
     }
   }
-  else {
-    logger.error( 'Request to profile hook with incorrect verification token made.' );
-    res.status( 401 ).send();
-  }
 } );
 
 // error handling for the sub route
@@ -103,8 +99,25 @@ router.use( ( err, req, res, next ) => {
 
 /************************Private function **************************/
 
-async function _transform_request_for_storage (qs){
-
+async function _transform_request_for_storage (qs, keen, palette){
+  return {
+    ts:new Date().getTime(),
+    email: qs.email,
+    archetype: 'not_yet_defined',
+    gender: qs.gender,
+    childname: qs.hername || qs.hisname,,
+    childage: qs.sheage || qs.heage,
+    topsize: qs.shetopsize || qs.hetopsize,
+    bottomsize: qs.shebottomsize || qs.hebottomsize,
+    jam: qs.jam1 || qs.jam2 || qs.jam3 || qs.jam4 || qs.jam5 || qs.jam6,
+    doit: qs.doit1 || qs.doit2 || qs.doit3 || qs.doit4 || qs.doit5 || qs.doit6,
+    palette: palette,
+    fave: qs.fav1 || qs.fav2,
+    keen: keen,
+    something_else: qs.else,
+    notes: qs.notes,
+    internal_notes: 'n/a'
+  };
 }
 
 module.exports = router;
