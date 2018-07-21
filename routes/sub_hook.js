@@ -40,6 +40,8 @@ router.post( '/', async ( req, res, next ) => {
 
     let ret = await product_plan.product_plan_is_one_off( subscription.plan_id );
 
+    logger.info(`Here us the sub: ${subscription}`);
+
     try {
       if ( ret.one_off ) {
         await autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_E427B712-F86E-4864-80F5-C8C5AC335E17', customer.email );
