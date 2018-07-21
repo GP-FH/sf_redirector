@@ -40,7 +40,7 @@ router.post( '/', async ( req, res, next ) => {
 
     let ret = await product_plan.product_plan_is_one_off( subscription.plan_id );
 
-    logger.info(`Here us the sub: ${subscription}`);
+    logger.info(`Here us the sub: ${JSON.stringify(subscription, null, 4)}`);
 
     try {
       if ( ret.one_off ) {
