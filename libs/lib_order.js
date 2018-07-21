@@ -125,8 +125,8 @@ const order_validate_if_for_new_customer = async (subscription) => {
       logger.info(`This is a new customer`);
       new_customer = true;
     }
-
-    if (i = keys.length-1){
+    logger.info(`i = ${i} and array length = ${keys.length-1}`);
+    if (i == keys.length-1){
       logger.info(`Let's get outta here~! new_customer = ${new_customer}`);
       return new_customer;
     }
