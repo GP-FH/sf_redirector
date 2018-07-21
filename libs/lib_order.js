@@ -117,6 +117,8 @@ const order_validate_if_for_new_customer = async (subscription) => {
   const keys = Object.keys(subscription);
   let new_customer = false;
 
+  logger.info(`Number of keys: ${keys}`);
+
   for (let i = 0; i < keys.length; i++){
     logger.info(`The key: ${keys[i]}`);
     if (keys[i].startsWith('cf_')){
