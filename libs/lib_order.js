@@ -118,11 +118,14 @@ const order_validate_if_for_new_customer = async (subscription) => {
   let new_customer = false;
 
   for (let i = 0; i < keys.length; i++){
+    logger.info(`The key: ${keys[i]}`);
     if (keys[i].startsWith('cf_')){
+      logger.info(`This is a new customer`);
       new_customer = true;
     }
 
     if (i = keys.length-1){
+      logger.info(`Let's get outta here~! new_customer = ${new_customer}`);
       return new_customer;
     }
   }
