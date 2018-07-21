@@ -31,12 +31,17 @@ router.post( '/', async ( req, res, next ) => {
      * On subscription creation, a new customer and a new sales order is
      * created in TradeGecko
      */
+
     const customer = req.body.content.customer;
     const coupons = req.body.content.invoice.discounts || false;
     const subscription = req.body.content.subscription;
 
-    // TODO add check here sub missing style profile data. If missing update profile from DB and replace
-    // subscription object with update one.
+    /*
+     * Check if  ustomer is new or existing. If existing then we need to retrieve the
+     * the customer's style profile information from aux db
+     */
+
+    const new_customer = order.order_validate_if_for_new_customer(subscription);
 
     let ret = await product_plan.product_plan_is_one_off( subscription.plan_id );
 

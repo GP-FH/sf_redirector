@@ -107,6 +107,27 @@ const order_process_renewal = async ( subscription, customer ) => {
   return { ok:true, new_order:new_order };
 }
 
+/*
+ * Used to check whether a received sub object has custom fields or not. If not, this indicates
+ * that this subscription was created for an existing customer as existing customers require that
+ * their style profiles be applied post subscribing.
+ */
+
+const order_validate_if_for_new_customer = async (subscription) => {
+  const keys = Object.keys(subscription);
+  const new_customer = false;
+
+  for (key in keys){
+    if (key.startsWith('cf_')){
+      new_customer = true;
+      logger.info('before');
+    }
+  }
+  logger.info('after');
+  return new_customer;
+};
+
 exports.order_create_new_subscription = order_create_new_subscription;
 exports.order_create_new_purchase = order_create_new_purchase;
 exports.order_process_renewal = order_process_renewal;
+exports.order_validate_if_for_new_customer = order_validate_if_for_new_customer;
