@@ -37,7 +37,7 @@ router.post( '/', async ( req, res, next ) => {
     const subscription = req.body.content.subscription;
 
     /*
-     * Check if  ustomer is new or existing. If existing then we need to retrieve the
+     * Check if customer is new or existing. If existing then we need to retrieve the
      * the customer's style profile information from aux db
      */
 

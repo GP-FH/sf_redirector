@@ -115,16 +115,17 @@ const order_process_renewal = async ( subscription, customer ) => {
 
 const order_validate_if_for_new_customer = async (subscription) => {
   const keys = Object.keys(subscription);
-  const new_customer = false;
+  let new_customer = false;
 
-  for (key in keys){
-    if (key.startsWith('cf_')){
+  for (let i = 0; i < keys.length; i++){
+    if (keys[i].startsWith('cf_')){
       new_customer = true;
-      logger.info('before');
+    }
+
+    if (i = keys.length-1){
+      return new_customer;
     }
   }
-  logger.info('after');
-  return new_customer;
 };
 
 exports.order_create_new_subscription = order_create_new_subscription;
