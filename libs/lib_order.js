@@ -117,7 +117,7 @@ const order_validate_if_for_new_customer = async (subscription) => {
   const keys = Object.keys(subscription);
   let new_customer = false;
 
-  logger.info(`Number of keys: ${keys}`);
+  logger.info(`Number of keys: ${keys.length}`);
 
   for (let i = 0; i < keys.length; i++){
     logger.info(`The key: ${keys[i]}`);
