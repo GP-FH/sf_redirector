@@ -68,7 +68,7 @@ router.post( '/', async ( req, res, next ) => {
       }
       else {
         await autopilot.autopilot_move_contact_to_new_list( 'contactlist_AAB1C098-225D-48B7-9FBA-0C4A68779072', 'contactlist_1C4F1411-4376-4FEC-8B63-3ADA5FF4EBBD', customer.email );
-        ret = await order.order_create_new_subscription( subscription, customer, coupons );
+        ret = await order.order_create_new_subscription( subscription, customer, coupons, new_customer );
       }
     }
     catch ( err ) {

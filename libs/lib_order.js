@@ -19,13 +19,20 @@ const logger = require("./lib_logger");
  * creating/checking referral codes, creating a draft sales order in TradeGecko, setting the renewal count.
  */
 
-const order_create_new_subscription = async ( subscription, customer, coupons ) => {
+const order_create_new_subscription = async ( subscription, customer, coupons, new_customer ) => {
   try {
-    if ( coupons ) {
+    if ( coupons ){
       await chargebee_coupon.chargebee_coupon_check_and_apply_referral(coupons[ 0 ]);
     }
 
-    await chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
+    /*
+     * We don't want to create a coupon for an existing customer as we use the customer ID for the coupon code.
+     * Dupes don't go well
+     */
+    if (new_customer){
+      await chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
+    }
+
     const ret = await tradegecko.tradegecko_create_sales_order_contact(subscription, customer);
     const company = ret.company;
 
