@@ -46,6 +46,7 @@ router.post( '/', async ( req, res, next ) => {
     const new_customer = await order.order_validate_if_for_new_customer(subscription);
 
     if (!new_customer){
+      logger.info(`This is not a new customer - about to make aux DB call for profile`);
       const profile = await db.db_aux_retrieve_most_recent_style_profile(customer.email);
 
       if (!profile.subscription){
@@ -55,9 +56,12 @@ router.post( '/', async ( req, res, next ) => {
         );
       }else {
         //TODO update the sub
+        logger.info(`profile found`);
 
       }
     }
+
+    logger.info('This customer is new. Progress as usual');
 
     let ret = await product_plan.product_plan_is_one_off( subscription.plan_id );
 
