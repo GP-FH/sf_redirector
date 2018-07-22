@@ -15,6 +15,8 @@ const autopilot = require( "../libs/lib_autopilot");
 const order = require( "../libs/lib_order");
 const product_plan = require( "../libs/lib_product_plan");
 const logger = require("../libs/lib_logger");
+const chargebee = require("../libs/lib_chargebee");
+const db = require("../libs/lib_db");
 
 // router level middleware
 const token_check = require("../middleware/mw_verification_token_check").verification_token_check;
@@ -41,11 +43,22 @@ router.post( '/', async ( req, res, next ) => {
      * the customer's style profile information from aux db
      */
 
-    const new_customer = order.order_validate_if_for_new_customer(subscription);
+    const new_customer = await order.order_validate_if_for_new_customer(subscription);
+
+    if (new_customer){
+      const profile = await db.db_aux_retrieve_most_recent_style_profile(customer.email);
+
+      if (!profile.subscription){
+        logger.error(
+          `Style profile information not found in aux db for subscription with id: ${subscription.id}. This means we likely need to head into typeform
+           and track it down and add it to the sub in chargebee. Because it is missing.`
+        );
+      }else {
+        //TODO update the sub
+      }
+    }
 
     let ret = await product_plan.product_plan_is_one_off( subscription.plan_id );
-
-    logger.info(`Here us the sub: ${JSON.stringify(subscription, null, 4)}`);
 
     try {
       if ( ret.one_off ) {
