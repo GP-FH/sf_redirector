@@ -36,7 +36,7 @@ router.post( '/', async ( req, res, next ) => {
 
     const customer = req.body.content.customer;
     const coupons = req.body.content.invoice.discounts || false;
-    const subscription = req.body.content.subscription;
+    let subscription = req.body.content.subscription;
 
     /*
      * Check if customer is new or existing. If existing then we need to retrieve the
@@ -47,7 +47,6 @@ router.post( '/', async ( req, res, next ) => {
 
     if (!new_customer){
       const profile = await db.db_aux_retrieve_most_recent_style_profile(customer.email);
-      logger.info(`This is the profile being received from the DB: ${JSON.stringify(profile, null, 4)}`);
 
       if (!profile.subscription){
         logger.error(
@@ -55,15 +54,8 @@ router.post( '/', async ( req, res, next ) => {
            and track it down and add it to the sub in chargebee. Because it is missing.`
         );
       }else {
-        try{
-          logger.info(`About to make call to update CB subscription`);
-          const updated_sub = await chargebee.chargebee_update_subscription(subscription, profile.subscription);
-          logger.info(`Updated sub from CB: ${JSON.stringify(updated_sub, null, 4)}`);
-          subscription = updated_sub.subscription;
-        }
-        catch ( err ) {
-          next(err);
-        }
+        const updated_sub = await chargebee.chargebee_update_subscription(subscription, profile.subscription);
+        subscription = updated_sub.subscription;
       }
     }
 

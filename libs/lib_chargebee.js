@@ -96,6 +96,14 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
 }
 
 const chargebee_update_subscription = async (subscription, new_fields) => {
+  if (typeof subscription === 'undefined' || subscription === null) {
+    throw new VError ("chargebee_update_subscription() called with undefined subscription parameter");
+  }
+
+  if (typeof new_fields === 'undefined' || new_fields === null) {
+    throw new VError ("chargebee_update_subscription() called with undefined new_fields parameter");
+  }
+
   const updates = {
     cf_archetype: new_fields.fave,
     cf_gender: new_fields.gender,
@@ -113,7 +121,7 @@ const chargebee_update_subscription = async (subscription, new_fields) => {
     cf_internal_notes: new_fields.internal_notes
   };
 
-  return await chargebee.subscription.update(subscription.id, updates).request((err, ret) => {
+  return await chargebee.subscription.update(subscription.id, updates).request( (err, ret) => {
     if ( err ) {
       throw new VError (err, "Error updating subscription Chargebee");
     }
