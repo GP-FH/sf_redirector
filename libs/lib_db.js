@@ -94,7 +94,7 @@ const db_aux_retrieve_most_recent_style_profile = async (email) => {
     connection.release();
 
     if (rows.length == 0) return {ok:true, subscription:false};
-    logger.info(`DEBUG: db_aux_retrieve_most_recent_style_profile returns - ${JSON.stringify(rows[0], null, 4)}`);
+    console.log(`DEBUG: db_aux_retrieve_most_recent_style_profile returns - ${JSON.stringify(rows[0], null, 4)}`);
 
     return {ok:true, subscription:rows[0]};
   }catch(err){
