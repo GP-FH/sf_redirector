@@ -91,7 +91,7 @@ const db_aux_retrieve_most_recent_style_profile = async (email) => {
   logger.info(`Call to db_aux_retrieve_most_recent_style_profile() made with email ${email}`);
   try{
     const connection = await redirect_pool.getConnection();
-    let [rows, fields] = await connection.query(`select * from pre_subs where email = ${email} order by ts desc`);
+    let [rows, fields] = await connection.query(`select * from pre_subs where email = '${email}' order by ts desc`);
     connection.release();
 
     if (rows.length == 0) return {ok:true, subscription:false};
