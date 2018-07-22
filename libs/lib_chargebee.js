@@ -95,7 +95,6 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
   });
 }
 
-// TODO add sub update functiomn that returns updated sub object
 const chargebee_update_subscription = async (subscription, new_fields) => {
   const updates = {
     cf_archetype: new_fields.fave,
@@ -124,3 +123,4 @@ const chargebee_update_subscription = async (subscription, new_fields) => {
 exports.chargebee_get_customer_info = chargebee_get_customer_info;
 exports.chargebee_get_subscription_info = chargebee_get_subscription_info;
 exports.chargebee_request_checkout = chargebee_request_checkout;
+exports.chargebee_update_subscription = chargebee_update_subscription;
