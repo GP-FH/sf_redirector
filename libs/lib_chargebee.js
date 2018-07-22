@@ -114,7 +114,7 @@ const chargebee_update_subscription = async (subscription, new_fields) => {
     cf_internal_notes: new_fields.internal_notes
   };
 
-  return chargebee.subscription.update(subscription.id, updates).request((err, ret) => {
+  return await chargebee.subscription.update(subscription.id, updates).request((err, ret) => {
     if ( err ) {
       throw new VError (err, "Error updating subscription Chargebee");
     }
