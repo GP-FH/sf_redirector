@@ -55,6 +55,7 @@ router.post( '/', async ( req, res, next ) => {
         );
       }else {
         const updated_sub = await chargebee.chargebee_update_subscription(subscription, profile.subscription);
+        logger.info(`Updated sub from CB: ${JSON.stringify(updated_sub, null, 4)}`);
         subscription = updated_sub.subscription;
       }
     }
