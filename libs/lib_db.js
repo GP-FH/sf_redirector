@@ -78,7 +78,7 @@ const db_aux_store_style_profile = async (profile) => {
     const connection = await redirect_pool.getConnection();
     let [rows, fields] = await connection.query(`insert into pre_subs values (NULL, '${profile.ts}', '${profile.email}', '${profile.archetype}', '${profile.gender}',
     '${profile.childname}', '${profile.childage}', '${profile.topsize}', '${profile.bottomsize}', '${profile.jam}', '${profile.doit}', '${profile.palette}', '${profile.fave}',
-    '${profile.keen}', '${profile.else}', '${profile.notes}', '${profile.internal_notes}')`);
+    '${profile.keen}', '${profile.something_else}', '${profile.notes}', '${profile.internal_notes}')`);
     connection.release();
 
     return {ok:true};
@@ -88,14 +88,12 @@ const db_aux_store_style_profile = async (profile) => {
 };
 
 const db_aux_retrieve_most_recent_style_profile = async (email) => {
-  logger.info(`Call to db_aux_retrieve_most_recent_style_profile() made with email ${email}`);
   try{
     const connection = await redirect_pool.getConnection();
     let [rows, fields] = await connection.query(`select * from pre_subs where email = '${email}' order by ts desc`);
     connection.release();
 
     if (rows.length == 0) return {ok:true, subscription:false};
-    logger.info(`DEBUG: db_aux_retrieve_most_recent_style_profile returns - ${JSON.stringify(rows[0], null, 4)}`);
 
     return {ok:true, subscription:rows[0]};
   }catch(err){
