@@ -45,7 +45,7 @@ router.post( '/', async ( req, res, next ) => {
 
     const new_customer = await order.order_validate_if_for_new_customer(subscription);
 
-    if (new_customer){
+    if (!new_customer){
       const profile = await db.db_aux_retrieve_most_recent_style_profile(customer.email);
 
       if (!profile.subscription){
@@ -55,6 +55,7 @@ router.post( '/', async ( req, res, next ) => {
         );
       }else {
         //TODO update the sub
+
       }
     }
 
