@@ -103,7 +103,7 @@ async function _transform_request_for_storage (qs, keen, palette){
   return {
     ts:new Date().getTime(),
     email: qs.email,
-    archetype: 'not_yet_defined',
+    archetype: qs.fav1 || qs.fav2,
     gender: qs.gender,
     childname: qs.hername || qs.hisname,
     childage: qs.sheage || qs.heage,
