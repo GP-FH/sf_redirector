@@ -102,6 +102,7 @@ router.use( ( err, req, res, next ) => {
 /************************ Private function **************************/
 
 async function _transform_request_for_storage (qs, keen, palette){
+  logger.info(`style profile IN TRANSFORM: ${JSON.stringify(qs, null, 4)}`);
   return {
     ts:new Date().getTime(),
     email: qs.email,
