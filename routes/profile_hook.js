@@ -120,8 +120,9 @@ async function _transform_request_for_storage (qs, keen, palette){
   };
 }
 
-async function _escape_user_input (string){
+function _escape_user_input (string){
   const escaped_string = string.replace(/'/g, "\'");
+  logger.info(`The escaped string: ${escaped_string}`);
   return escaped_string;
 }
 
