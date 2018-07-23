@@ -76,7 +76,9 @@ router.get( '/', async function (req, res, next) {
     try{
       // we store existing customer profile data for pickup post sub creation
       if (req.query.store_profile == 'true'){
+        logger.info(`style profile PRE TRANSFORM: ${JSON.stringify(req.query, null, 4)}`);
         const profile = await _transform_request_for_storage(req.query, keen, palette);
+        logger.info(`style profile POST TRANSFORM: ${JSON.stringify(profile, null, 4)}`);
         await db.db_aux_store_style_profile(profile);
         res.redirect(`https://${process.env.CHARGEBEE_SITE}.chargebee.com/hosted_pages/plans/${req.query.boxtype}`);
       } else{
@@ -122,7 +124,6 @@ async function _transform_request_for_storage (qs, keen, palette){
 
 function _escape_user_input (string){
   const escaped_string = string.replace(/'/g, "\\'");
-  logger.info(`The escaped string: ${escaped_string}`);
   return escaped_string;
 }
 
