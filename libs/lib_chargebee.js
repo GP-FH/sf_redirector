@@ -104,8 +104,6 @@ const chargebee_update_subscription = async (subscription, new_fields) => {
     throw new VError ("chargebee_update_subscription() called with undefined new_fields parameter");
   }
 
-  logger.info(`style profile PRE CB UPDATE: ${JSON.stringify(new_fields, null, 4)}`);
-
   const updates = {
     cf_archetype: new_fields.fave,
     cf_gender: new_fields.gender,

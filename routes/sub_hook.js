@@ -47,7 +47,6 @@ router.post( '/', async ( req, res, next ) => {
 
     if (!new_customer){
       const profile = await db.db_aux_retrieve_most_recent_style_profile(customer.email);
-      logger.info(`style profile POST retrieval: ${JSON.stringify(profile, null, 4)}`);
 
       if (!profile.subscription){
         logger.error(
