@@ -116,7 +116,7 @@ const chargebee_update_subscription = async (subscription, new_fields) => {
     cf_palette: new_fields.palette,
     cf_fave: new_fields.fave,
     cf_keen: new_fields.keen,
-    cf_else: new_fields.someting_else,
+    cf_else: new_fields.something_else,
     cf_notes: new_fields.notes,
     cf_internal_notes: new_fields.internal_notes
   };

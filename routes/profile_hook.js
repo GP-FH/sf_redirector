@@ -114,7 +114,7 @@ async function _transform_request_for_storage (qs, keen, palette){
     palette: palette,
     fave: qs.fav1 || qs.fav2,
     keen: keen,
-    something_else: qs.else || 'not_yet_defined',
+    something_else: !qs.else ? 'not_yet_defined' : _escape_user_input(qs.else),
     notes: !qs.notes ? 'not_yet_defined' : _escape_user_input(qs.notes),
     internal_notes: 'n/a'
   };
