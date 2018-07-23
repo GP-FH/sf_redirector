@@ -41,7 +41,7 @@ router.get( '/', async function (req, res, next) {
    *  is a temp fix
    */
   let palette = req.query.palette;
-  let keen = req.query.keen1 || req.query.keen2 || req.query.keen3;
+  let keen = _get_answered_questions([req.query.keen1, req.query.keen2, req.query.keen3]);
 
   //  if either of these fields is undefined - alert error. A bit heavy handed but need to enforce field mapping
   if (!keen || !palette){
@@ -104,18 +104,18 @@ router.use( ( err, req, res, next ) => {
 async function _transform_request_for_storage (qs, keen, palette){
   logger.info(`style profile IN TRANSFORM: ${JSON.stringify(qs, null, 4)}`);
   return {
-    ts:new Date().getTime(),
+    ts: new Date().getTime(),
     email: qs.email,
-    archetype: qs.fav1 || qs.fav2,
+    archetype: _get_answered_questions([qs.fav1, qs.fav2]),
     gender: qs.gender,
-    childname: qs.hername || qs.hisname,
-    childage: qs.sheage || qs.heage,
-    topsize: qs.shetopsize || qs.hetopsize,
-    bottomsize: qs.shebottomsize || qs.hebottomsize,
-    jam: qs.jam1 || qs.jam2 || qs.jam3 || qs.jam4 || qs.jam5 || qs.jam6,
-    doit: qs.doit1 || qs.doit2 || qs.doit3 || qs.doit4 || qs.doit5 || qs.doit6,
+    childname: _get_answered_questions([qs.hername, qs.hisname]),
+    childage: _get_answered_questions([qs.sheage, qs.heage]),
+    topsize: _get_answered_questions([qs.shetopsize, qs.hetopsize]),
+    bottomsize: _get_answered_questions([qs.shebottomsize, qs.hebottomsize]),
+    jam: _get_answered_questions([qs.jam1, qs.jam2, qs.jam3, qs.jam4, qs.jam5, qs.jam6]),
+    doit: _get_answered_questions([qs.doit1, qs.doit2, qs.doit3, qs.doit4, qs.doit5, qs.doit6]),
     palette: palette,
-    fave: qs.fav1 || qs.fav2,
+    fave: _get_answered_questions([qs.fav1, qs.fav2]),
     keen: keen,
     something_else: !qs.else ? 'not_yet_defined' : _escape_user_input(qs.else),
     notes: !qs.notes ? 'not_yet_defined' : _escape_user_input(qs.notes),
@@ -126,6 +126,22 @@ async function _transform_request_for_storage (qs, keen, palette){
 function _escape_user_input (string){
   const escaped_string = string.replace(/'/g, "\\'");
   return escaped_string;
+}
+
+/*
+ * Some q params will be '______' because that is how typeform expresses empty variables.
+ * This function finds the valid input and returns it
+ */
+function _get_answered_questions (questions){
+  let val = '';
+
+  for (let i = 0; i < questions.length; i++){
+    if (questions[i].test(/^[a-zA-Z]/)){
+      val = questions[i]
+    };
+  }
+
+  return val;
 }
 
 module.exports = router;
