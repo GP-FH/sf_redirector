@@ -134,7 +134,7 @@ function _escape_user_input (string){
  */
 function _get_answered_questions (questions){
   let val = '';
-  const reg_exp = /^[a-zA-Z]/;
+  const reg_exp = /^[a-zA-Z0-9]/;
 
   for (let i = 0; i < questions.length; i++){
     if (reg_exp.test(questions[i])){
