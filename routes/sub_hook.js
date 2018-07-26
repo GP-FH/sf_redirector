@@ -63,10 +63,13 @@ router.post( '/', async ( req, res, next ) => {
      */
     const subscription = req.body.content.subscription;
     const customer = req.body.content.customer;
+    const invoice = req.body.content.invoice;
 
     let ret;
     try{
-      ret = await order.order_process_renewal( subscription, customer );
+      if (invoice.status != 'not_paid'){
+        ret = await order.order_process_renewal( subscription, customer );
+      }
     }
     catch (err){
       next(err);
