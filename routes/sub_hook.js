@@ -99,9 +99,9 @@ router.post( '/', async ( req, res, next ) => {
 
     if (invoice.status == 'not_paid'){
       try{
-        const ret = await chargebee.pause_subscription(subscription.id);
+        await chargebee.chargebee_pause_subscription(subscription.id);
 
-        if (process.env.ENVIRONMENT == 'prod' && ret.ok){
+        if (process.env.ENVIRONMENT == 'prod'){
           slack.slack_send( 'subscription_cancelled', customer, subscription );
         }
       }

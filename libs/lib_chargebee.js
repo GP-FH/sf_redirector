@@ -95,6 +95,19 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
   } );
 }
 
+const chargebee_pause_subscription = async (subscription_id) => {
+  if (typeof subscription_id === 'undefined' || subscription_id === null) {
+    throw new VError ("chargebee_pause_subscription() called with undefined subscription_id parameter");
+  }
+
+  return await chargebee.subscription.pause(subscription_id).request((err, ret) => {
+    if ( err ) {
+      throw new VError (err, "Error pausing subscription in Chargebee");
+    }
+  })
+};
+
+exports.chargebee_pause_subscription = chargebee_pause_subscription;
 exports.chargebee_get_customer_info = chargebee_get_customer_info;
 exports.chargebee_get_subscription_info = chargebee_get_subscription_info;
 exports.chargebee_request_checkout = chargebee_request_checkout;
