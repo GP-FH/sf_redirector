@@ -55,7 +55,7 @@ router.post( '/', async ( req, res, next ) => {
       slack.slack_send( 'subscription_created', customer, subscription );
     }
   }
-  else if ( event_type == 'subscription_renewed' ) {
+  else if (event_type == 'subscription_renewed') {
     /*
      * On subscription renewal check whether it's delivery time. If so,
      * create a sales order in TradewGecko. If not a delivery time, increment
@@ -65,10 +65,10 @@ router.post( '/', async ( req, res, next ) => {
     const customer = req.body.content.customer;
 
     let ret;
-    try {
+    try{
       ret = await order.order_process_renewal( subscription, customer );
     }
-    catch ( err ) {
+    catch (err){
       next(err);
     }
 
@@ -76,7 +76,7 @@ router.post( '/', async ( req, res, next ) => {
       slack.slack_send( 'subscription_renewed_new_order', customer, subscription );
     }
   }
-  else if ( event_type == 'subscription_cancelled' ) {
+  else if (event_type == 'subscription_cancelled') {
     /*
      * For notifying in Slack when a subscription has been cancelled
      */
@@ -84,8 +84,31 @@ router.post( '/', async ( req, res, next ) => {
     const subscription = req.body.content.subscription;
 
     if ( process.env.ENVIRONMENT == 'prod' ) {
-      //  notify Slack
       slack.slack_send( 'subscription_cancelled', customer, subscription );
+    }
+  }
+  else if (event_type == 'payment_failed'){
+    const invoice = req.body.content.invoice;
+    const subscription = req.body.content.subscription;
+
+    /*
+     * If the status is not_paid it indicates that they have been through dunning and
+     * still not paid. Time has come to pause their subscription and send an alert to
+     * Slack
+     */
+
+    if (invoice.status == 'not_paid'){
+      try{
+        const ret = await chargebee.pause_subscription(subscription.id);
+
+        if (process.env.ENVIRONMENT == 'prod' && ret.ok){
+          slack.slack_send( 'subscription_cancelled', customer, subscription );
+        }
+      }
+      catch (err){
+        next(err);
+      }
+
     }
   }
 } );
