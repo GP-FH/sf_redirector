@@ -15,6 +15,7 @@ const autopilot = require( "../libs/lib_autopilot");
 const order = require( "../libs/lib_order");
 const product_plan = require( "../libs/lib_product_plan");
 const logger = require("../libs/lib_logger");
+const chargebee = require("../libs/lib_chargebee");
 
 // router level middleware
 const token_check = require("../middleware/mw_verification_token_check").verification_token_check;
