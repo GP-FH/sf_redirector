@@ -6,20 +6,24 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const request = require("request");
+const logger = require("../libs/lib_logger");
 
 /*
  * Exposes ability to send messages into Slack based on the 'reason'
  */
-const slack_send  = ( reason, customer, subscription ) => {
-  switch ( reason ) {
+const slack_send  = (reason, customer, subscription) => {
+  switch (reason){
     case 'subscription_created':
-      local_send_new_subscriber( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, subscription.plan_id, subscription.id );
+      local_send_new_subscriber(customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, subscription.plan_id, subscription.id);
       break;
     case 'subscription_cancelled':
-      local_send_cancelled_subscription( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, subscription.plan_id );
+      local_send_cancelled_subscription(customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, subscription.plan_id);
       break;
     case 'subscription_renewed_new_order':
-      local_send_renewed_subscriber_new_sales_order( customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, subscription.plan_id, subscription.id );
+      local_send_renewed_subscriber_new_sales_order(customer.first_name, customer.last_name, customer.email, subscription.shipping_address.city, subscription.plan_id, subscription.id);
+      break;
+    case 'subscription_paused':
+      local_send_unpaid_subscription(subscription, customer);
       break;
     default:
         return;
@@ -77,7 +81,7 @@ function local_send_new_subscriber( first_name, last_name, email, city, sub_plan
 }
 
 /*
- * Send message to Slack indicating that a subscription has been cancelled 
+ * Send message to Slack indicating that a subscription has been cancelled
  */
 function local_send_cancelled_subscription( first_name, last_name, email, city, sub_plan ) {
   const options = {
@@ -166,6 +170,48 @@ function local_send_renewed_subscriber_new_sales_order( first_name, last_name, e
   request( options, function ( error, response, body ) {
     if ( error ) {
       logger.error( 'Failed to send new subscriber alert to Slack: ' + JSON.stringify( body ) );
+    }
+  } );
+}
+
+function local_send_unpaid_subscription (subscription, customer){
+  const options = {
+    method: 'POST',
+    url: process.env.SLACK_WEBHOOK,
+    body: {
+      channel: '#unpaid-subs',
+      username: 'Dunbar Dunbot III',
+      icon_emoji: ':money_with_wings:',
+      attachments: [ {
+        text: 'This subscription has been through dunning and is still not paid. The subscription has been paused and we likely need to get in touch with them. Here are the details:',
+        fallback: 'This subscription has been through dunning and is still not paid. The subscription has been paused and we likely need to get in touch with them. Here are the details:',
+        title: 'This subscription is unhealthy :pill:',
+        color: '#ff0000 ',
+        fields: [ {
+          title: 'Subscription ID',
+          value: subscription.id,
+          short: true
+        }, {
+          title: 'Pricing Plan',
+          value: subscription.plan_id,
+          short: true
+        }, {
+          title: 'Name',
+          value: `${customer.first_name} ${customer.last_name}`,
+          short: true
+        }, {
+          title: 'Email',
+          value: customer.email,
+          short: true
+        } ]
+      } ]
+    },
+    json: true
+  };
+
+  request( options, function ( error, response, body ) {
+    if ( error ) {
+      logger.error( 'Failed to send unpaid subscription alert to Slack: ' + JSON.stringify( body ) );
     }
   } );
 }
