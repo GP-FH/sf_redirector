@@ -94,6 +94,8 @@ router.post( '/', async ( req, res, next ) => {
     const invoice = req.body.content.invoice;
     const subscription = req.body.content.subscription;
 
+    logger.info(`Payment failed event received and it looks like this! ${JSON.stringify(req.body.content, null, 4)}`);
+
     /*
      * If the status is not_paid it indicates that they have been through dunning and
      * still not paid. Time has come to pause their subscription and send an alert to
