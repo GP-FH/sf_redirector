@@ -95,6 +95,39 @@ const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution,
   });
 }
 
+const chargebee_update_subscription = async (subscription, new_fields) => {
+  if (typeof subscription === 'undefined' || subscription === null) {
+    throw new VError ("chargebee_update_subscription() called with undefined subscription parameter");
+  }
+
+  if (typeof new_fields === 'undefined' || new_fields === null) {
+    throw new VError ("chargebee_update_subscription() called with undefined new_fields parameter");
+  }
+
+  const updates = {
+    cf_archetype: new_fields.fave,
+    cf_gender: new_fields.gender,
+    cf_childname: new_fields.childname,
+    cf_childage: new_fields.childage,
+    cf_topsize: new_fields.topsize,
+    cf_bottomsize: new_fields.bottomsize,
+    cf_jam: new_fields.jam,
+    cf_doit: new_fields.doit,
+    cf_palette: new_fields.palette,
+    cf_fave: new_fields.fave,
+    cf_keen: new_fields.keen,
+    cf_else: new_fields.something_else,
+    cf_notes: new_fields.notes,
+    cf_internal_notes: new_fields.internal_notes
+  };
+
+  return await chargebee.subscription.update(subscription.id, updates).request( (err, ret) => {
+    if ( err ) {
+      throw new VError (err, "Error updating subscription Chargebee");
+    }
+  });
+};
+
 const chargebee_pause_subscription = async (subscription_id) => {
   if (typeof subscription_id === 'undefined' || subscription_id === null) {
     throw new VError ("chargebee_pause_subscription() called with undefined subscription_id parameter");
