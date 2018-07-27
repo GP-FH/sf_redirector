@@ -94,6 +94,7 @@ router.post( '/', async ( req, res, next ) => {
   else if (event_type == 'payment_failed'){
     const invoice = req.body.content.invoice;
     const subscription = req.body.content.subscription;
+    const customer = req.body.content.customer;
 
     /*
      * If the status is not_paid it indicates that they have been through dunning and
