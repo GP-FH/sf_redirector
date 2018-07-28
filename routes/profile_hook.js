@@ -91,7 +91,7 @@ router.get( '/', async function (req, res, next) {
     try{
       /*
        * For existing customers we store profile data when people initially submit as we aren't
-       * able to pass it through the checkout flow. Storing this data allow us to pull it out
+       * able to pass it through the checkout flow. Storing this data allows us to pull it out
        * and update the newly created subscription (when we CB hits our hook with a subscription_created)
        * event.
        */
@@ -122,7 +122,7 @@ router.use( ( err, req, res, next ) => {
   logger.error( JSON.stringify( err ) );
 } );
 
-/************************ Private function **************************/
+/************************ Private functionz **************************/
 
 /*
  * Transforms received profile information to be a little more palatable
