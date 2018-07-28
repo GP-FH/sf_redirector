@@ -5,6 +5,7 @@
  *  - subscription_created
  *  - subscription_renewed
  *  - subscription_cancelled
+ *  - payment_failed
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -85,12 +86,20 @@ router.post( '/', async ( req, res, next ) => {
      * create a sales order in TradewGecko. If not a delivery time, increment
      * the subscription count.
      */
+
     const subscription = req.body.content.subscription;
     const customer = req.body.content.customer;
     const invoice = req.body.content.invoice;
 
     let ret;
     try{
+      /*
+       * If the status of the incoice is not_paid it indicates that the sub has been
+       * through dunning and is still unpaid. As such we should generate an order as
+       * we are about to pause the subscription (handled below by the paumwent_failed)
+       * hook.
+       */
+
       if (invoice.status != 'not_paid'){
         ret = await order.order_process_renewal( subscription, customer );
       }
@@ -107,6 +116,7 @@ router.post( '/', async ( req, res, next ) => {
     /*
      * For notifying in Slack when a subscription has been cancelled
      */
+
     const customer = req.body.content.customer;
     const subscription = req.body.content.subscription;
 
