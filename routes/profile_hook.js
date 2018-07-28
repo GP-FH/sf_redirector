@@ -62,7 +62,7 @@ router.get( '/', async function (req, res, next) {
      * One off gift boxes point to a different thank-you page post purchase (more relevant copy).
      * Here we set the redirect_url to point to the appropriate page based on the boxtype.
      */
-     
+
     let redirect_url = '';
     const ret = await product_plan.product_plan_is_one_off ( req.query.boxtype );
 
@@ -76,11 +76,12 @@ router.get( '/', async function (req, res, next) {
     try{
       // we store existing customer profile data for pickup post sub creation
       if (req.query.store_profile == 'true'){
-        const profile = await _transform_request_for_storage(req.query, keen, palette);
+        const profile = await _transform_profile_for_storage(req.query, keen, palette);
         await db.db_aux_store_style_profile(profile);
         res.redirect(`https://${process.env.CHARGEBEE_SITE}.chargebee.com/hosted_pages/plans/${req.query.boxtype}`);
       } else{
-        let checkout = await chargebee.chargebee_request_checkout(req.query, redirect_url, stylist_attr, keen, palette);
+        const profile = await _transform_profile_for_storage(req.query, keen, palette);
+        let checkout = await chargebee.chargebee_request_checkout(profile, redirect_url, stylist_attr);
         res.redirect( checkout.hosted_page.url );
       }
     }
@@ -99,9 +100,10 @@ router.use( ( err, req, res, next ) => {
 
 /************************ Private function **************************/
 
-async function _transform_request_for_storage (qs, keen, palette){
+async function _transform_profile_for_storage (qs, keen, palette){
   return {
     ts: new Date().getTime(),
+    boxtype: qs.boxtype,
     email: qs.email,
     archetype: _get_answered_questions([qs.fav1, qs.fav2]),
     gender: qs.gender,
@@ -116,7 +118,13 @@ async function _transform_request_for_storage (qs, keen, palette){
     keen: keen,
     something_else: !qs.else ? 'not_yet_defined' : _escape_user_input(qs.else),
     notes: !qs.notes ? 'not_yet_defined' : _escape_user_input(qs.notes),
-    internal_notes: 'n/a'
+    internal_notes: 'n/a',
+    first_name: qs.fname,
+    last_name: qs.lname,
+    street_address: qs.streetaddress,
+    suburb: qs.suburb,
+    city: qs.city,
+    phone: qs.phone
   };
 }
 
