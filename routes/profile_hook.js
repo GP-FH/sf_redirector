@@ -62,7 +62,7 @@ router.get( '/', async function (req, res, next) {
      * One off gift boxes point to a different thank-you page post purchase (more relevant copy).
      * Here we set the redirect_url to point to the appropriate page based on the boxtype.
      */
-
+     
     let redirect_url = '';
     const ret = await product_plan.product_plan_is_one_off ( req.query.boxtype );
 
