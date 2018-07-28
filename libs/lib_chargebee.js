@@ -50,7 +50,7 @@ const chargebee_get_subscription_info = async ( subscription_id ) => {
  * This function requests a hosted checkout page URL from Chargebee
  */
 const chargebee_request_checkout = async (profile, redirect_url, stylist_attribution) => {
-  if (profile === undefined || redirect_url === undefined || stylist_attribution === undefined || keen === undefined || palette === undefined){
+  if (profile === undefined || redirect_url === undefined || stylist_attribution === undefined){
     throw new VError ("Received parameter not defined");
   }
 
