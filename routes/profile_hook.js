@@ -98,9 +98,14 @@ router.use( ( err, req, res, next ) => {
 
 /************************ Private function **************************/
 
-async function _transform_request_for_storage (qs, keen, palette){
+/*
+ * Transforms received profile information to be a little more palatable
+ */
+
+async function _transform_profile_for_storage (qs, keen, palette){
   return {
     ts: new Date().getTime(),
+    boxtype: qs.boxtype,
     email: qs.email,
     archetype: _get_answered_questions([qs.fav1, qs.fav2]),
     gender: qs.gender,
@@ -115,7 +120,13 @@ async function _transform_request_for_storage (qs, keen, palette){
     keen: keen,
     something_else: !qs.else ? 'not_yet_defined' : _escape_user_input(qs.else),
     notes: !qs.notes ? 'not_yet_defined' : _escape_user_input(qs.notes),
-    internal_notes: 'n/a'
+    internal_notes: 'n/a',
+    first_name: qs.fname,
+    last_name: qs.lname,
+    street_address: qs.streetaddress,
+    suburb: qs.suburb,
+    city: qs.city,
+    phone: qs.phone
   };
 }
 
