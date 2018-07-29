@@ -74,7 +74,8 @@ router.get( '/', async function ( req, res, next) {
       }
 
       try{
-        let checkout = await chargebee.chargebee_request_checkout(req.query, redirect_url, stylist_attr, keen, palette);
+        const profile = await _transform_profile_for_storage(req.query, keen, palette);
+        let checkout = await chargebee.chargebee_request_checkout(profile, redirect_url, stylist_attr);
         res.redirect( checkout.hosted_page.url );
       }
       catch (err) {
