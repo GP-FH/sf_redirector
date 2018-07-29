@@ -49,50 +49,50 @@ const chargebee_get_subscription_info = async ( subscription_id ) => {
 /*
  * This function requests a hosted checkout page URL from Chargebee
  */
-const chargebee_request_checkout = async (qs, redirect_url, stylist_attribution, keen, palette) => {
-  if ( qs === undefined || redirect_url === undefined || stylist_attribution === undefined || keen === undefined || palette === undefined ) {
-      throw new VError ("Received parameter not defined");
+const chargebee_request_checkout = async (profile, redirect_url, stylist_attribution) => {
+  if (profile === undefined || redirect_url === undefined || stylist_attribution === undefined){
+    throw new VError ("Received parameter not defined");
   }
 
-  return await chargebee.hosted_page.checkout_new( {
-      redirect_url: redirect_url,
-      embed: false,
-      subscription: {
-          plan_id: qs.boxtype,
-          cf_gender: qs.gender,
-          cf_childname: qs.hername || qs.hisname,
-          cf_childage: qs.sheage || qs.heage,
-          cf_topsize: qs.shetopsize || qs.hetopsize,
-          cf_bottomsize: qs.shebottomsize || qs.hebottomsize,
-          cf_jam: qs.jam1 || qs.jam2 || qs.jam3 || qs.jam4 || qs.jam5 || qs.jam6,
-          cf_doit: qs.doit1 || qs.doit2 || qs.doit3 || qs.doit4 || qs.doit5 || qs.doit6,
-          cf_palette: palette,
-          cf_fave: qs.fav1 || qs.fav2,
-          cf_keen: keen,
-          cf_else: qs.else,
-          cf_notes: qs.notes
-      },
-      customer: {
-          email: qs.email,
-          first_name: qs.fname,
-          last_name: qs.lname,
-          phone: qs.phone,
-          cf_stylist_attr: stylist_attribution
-      },
-      billing_address: {
-          first_name: qs.fname,
-          last_name: qs.lname,
-          line1: qs.streetaddress,
-          line2: qs.suburb,
-          city: qs.city,
-          country: "NZ",
-          phone: qs.phone
-      }
-  } ).request( ( err, ret ) => {
-      if ( err ) {
-        throw new VError (err, "Error requesting checkout page in Chargebee");
-      }
-  } );
+  return await chargebee.hosted_page.checkout_new({
+    redirect_url: redirect_url,
+    embed: false,
+    subscription: {
+      plan_id: profile.boxtype,
+      cf_gender: profile.gender,
+      cf_childname: profile.childname,
+      cf_childage: profile.childage,
+      cf_topsize: profile.topsize,
+      cf_bottomsize: profile.bottomsize,
+      cf_jam: profile.jam,
+      cf_doit: profile.doit,
+      cf_palette: profile.palette,
+      cf_fave: profile.fav,
+      cf_keen: profile.keen,
+      cf_else: profile.else,
+      cf_notes: profile.notes
+    },
+    customer: {
+      email: profile.email,
+      first_name: profile.first_name,
+      last_name: profile.last_name,
+      phone: profile.phone,
+      cf_stylist_attr: stylist_attribution
+    },
+    billing_address: {
+      first_name: profile.first_name,
+      last_name: profile.last_name,
+      line1: profile.street_address,
+      line2: profile.suburb,
+      city: profile.city,
+      country: "NZ",
+      phone: profile.phone
+    }
+  }).request( ( err, ret ) => {
+    if (err){
+      throw new VError (err, "Error requesting checkout page in Chargebee");
+    }
+  });
 }
 
 const chargebee_pause_subscription = async (subscription_id) => {
