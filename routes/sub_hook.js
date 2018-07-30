@@ -140,7 +140,7 @@ router.post( '/', async ( req, res, next ) => {
         await chargebee.chargebee_pause_subscription(subscription.id);
 
         if (process.env.ENVIRONMENT == 'prod'){
-          slack.slack_send( 'subscription_cancelled', customer, subscription );
+          slack.slack_send( 'subscription_paused', customer, subscription );
         }
       }
       catch (err){
