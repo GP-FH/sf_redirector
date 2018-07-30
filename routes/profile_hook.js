@@ -96,7 +96,6 @@ router.get( '/', async function (req, res, next) {
        * event.
        */
 
-      logger.info(`Should I store profile: ${req.query.store_profile}`); 
       if (req.query.store_profile == 'true'){
         const profile = await _transform_profile_for_storage(req.query, keen, palette);
         await db.db_aux_store_style_profile(profile);
