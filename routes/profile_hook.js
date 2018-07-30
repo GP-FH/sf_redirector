@@ -95,7 +95,7 @@ router.get( '/', async function (req, res, next) {
        * and update the newly created subscription (when we CB hits our hook with a subscription_created)
        * event.
        */
-
+       
       if (req.query.store_profile == 'true'){
         const profile = await _transform_profile_for_storage(req.query, keen, palette);
         await db.db_aux_store_style_profile(profile);
