@@ -68,9 +68,12 @@ router.post( '/', async ( req, res, next ) => {
 
     let ret;
     try{
-      if (invoice.status != 'not_paid'){
+      /*
+       * COMMENTED OUT WHILE WE FIGURE OUT HOW TO HANDLE THESE UNPAID SUBS PROPERLY
+       */
+      //if (invoice.status != 'not_paid'){
         ret = await order.order_process_renewal( subscription, customer );
-      }
+      //}
     }
     catch (err){
       next(err);
@@ -102,6 +105,8 @@ router.post( '/', async ( req, res, next ) => {
      * Slack
      */
 
+    /* COMMENTED OUT WHILE WE FIGURE OUT HOW TO HANDLE THESE UNPAID SUBS PROPERLY
+
     if (invoice.status == 'not_paid'){
       try{
         await chargebee.chargebee_pause_subscription(subscription.id);
@@ -114,7 +119,7 @@ router.post( '/', async ( req, res, next ) => {
         next(err);
       }
 
-    }
+    }*/
   }
 } );
 
