@@ -94,15 +94,11 @@ router.post( '/', async ( req, res, next ) => {
     let ret;
     try{
       /*
-       * If the status of the incoice is not_paid it indicates that the sub has been
-       * through dunning and is still unpaid. As such we should generate an order as
-       * we are about to pause the subscription (handled below by the paumwent_failed)
-       * hook.
+       * COMMENTED OUT WHILE WE FIGURE OUT HOW TO HANDLE THESE UNPAID SUBS PROPERLY
        */
-
-      if (invoice.status != 'not_paid'){
+      //if (invoice.status != 'not_paid'){
         ret = await order.order_process_renewal( subscription, customer );
-      }
+      //}
     }
     catch (err){
       next(err);
@@ -135,6 +131,8 @@ router.post( '/', async ( req, res, next ) => {
      * Slack
      */
 
+    /* COMMENTED OUT WHILE WE FIGURE OUT HOW TO HANDLE THESE UNPAID SUBS PROPERLY
+
     if (invoice.status == 'not_paid'){
       try{
         await chargebee.chargebee_pause_subscription(subscription.id);
@@ -147,7 +145,7 @@ router.post( '/', async ( req, res, next ) => {
         next(err);
       }
 
-    }
+    }*/
   }
 } );
 
