@@ -19,13 +19,20 @@ const logger = require("./lib_logger");
  * creating/checking referral codes, creating a draft sales order in TradeGecko, setting the renewal count.
  */
 
-const order_create_new_subscription = async ( subscription, customer, coupons ) => {
+const order_create_new_subscription = async ( subscription, customer, coupons, new_customer ) => {
   try {
-    if ( coupons ) {
+    if ( coupons ){
       await chargebee_coupon.chargebee_coupon_check_and_apply_referral(coupons[ 0 ]);
     }
 
-    await chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
+    /*
+     * We don't want to create a coupon for an existing customer as we use the customer ID for the coupon code.
+     * Dupes don't go well
+     */
+    if (new_customer){
+      await chargebee_coupon.chargebee_coupon_create_new( process.env.FRIEND_REFERRAL_CODE_ID, process.env.FRIEND_REFERRAL_SET_NAME, subscription.customer_id );
+    }
+
     const ret = await tradegecko.tradegecko_create_sales_order_contact(subscription, customer);
     const company = ret.company;
 
@@ -107,6 +114,28 @@ const order_process_renewal = async ( subscription, customer ) => {
   return { ok:true, new_order:new_order };
 }
 
+/*
+ * Used to check whether a received sub object has custom fields or not. If not, this indicates
+ * that this subscription was created for an existing customer as existing customers require that
+ * their style profiles be applied post subscribing.
+ */
+
+const order_validate_if_for_new_customer = async (subscription) => {
+  const keys = Object.keys(subscription);
+  let new_customer = false;
+
+  for (let i = 0; i < keys.length; i++){
+    if (keys[i].startsWith('cf_')){
+      new_customer = true;
+    }
+
+    if (i == keys.length-1){
+      return new_customer;
+    }
+  }
+};
+
 exports.order_create_new_subscription = order_create_new_subscription;
 exports.order_create_new_purchase = order_create_new_purchase;
 exports.order_process_renewal = order_process_renewal;
+exports.order_validate_if_for_new_customer = order_validate_if_for_new_customer;

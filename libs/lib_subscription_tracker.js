@@ -102,39 +102,42 @@ const increment_and_check_monthly = async ( customer_id, subscription_id, plan_i
     let increment;
     try {
       increment = await _validate_subscription_count( plan_id, customer_id, subscription_id, test);
+
+      if ( increment ){
+        /*
+         * Why the ping? - redis can sometimes get ahead of itself e.g in cases where we set a new count (switching cadence)
+         * it sometimes happens that the incenting below occurs before the new value has been properly set
+         */
+        client.ping((err, reply) => {
+          client.hincrby( customer_id, subscription_id, 1, (err, reply) => {
+            if (err) {
+              client.quit();
+              throw new VError( err );
+            }
+
+            let result;
+            if ( reply == 4 ) {
+              client.hset( customer_id, subscription_id, 1);
+              logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+              result = false;
+            }
+            else if ( reply == 2 ) {
+              logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
+              result = true
+            } else {
+              logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+              result = false;
+            }
+
+            client.quit();
+            resolve(result);
+          });
+        });
+      }
     }
     catch(err) {
       client.quit();
       throw new VError(err, `Error validating subscription count for ${subscription_id}`);
-    }
-
-    if ( increment ) {
-      /*
-       * Increment user count and decide whether to generate a draft Sales Order in TradeGecko
-       */
-      client.hincrby( customer_id, subscription_id, 1, (err, reply) => {
-        if (err) {
-          client.quit();
-          throw new VError( err );
-        }
-
-        let result;
-        if ( reply == 4 ) {
-          client.hset( customer_id, subscription_id, 1);
-          logger.info( 'Reset counter to 1 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-          result = false;
-        }
-        else if ( reply == 2 ) {
-          logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
-          result = true
-        } else {
-          logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-          result = false;
-        }
-
-        client.quit();
-        resolve(result);
-      });
     }
   });
 };
@@ -165,37 +168,45 @@ const increment_and_check_weekly = async ( customer_id, subscription_id, plan_id
     let increment;
     try {
       increment = await _validate_subscription_count( plan_id, customer_id, subscription_id, test);
+
+      if ( increment ){
+        /*
+         * Why the ping? - redis can sometimes get ahead of itself e.g in cases where we set a new count (switching cadence)
+         * it sometimes happens that the incenting below occurs before the new value has been properly set
+         */
+
+        client.ping((err, reply) => {
+          //  increment user count and decide whether to generate a draft Sales Order in TradeGecko
+          client.hincrby( customer_id, subscription_id, 1, ( err, reply ) => {
+            if ( err ) {
+              client.quit();
+              return reject(new VError(err, `Error incrementing subscription count for ${subscription_id}` ));
+            }
+
+            let result;
+            if ( reply == 18 ) {
+              client.hset( customer_id, subscription_id, 5 );
+              logger.info( 'Reset counter to 5 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+              result = false;
+            }
+            else if ( reply == 6 ) {
+              logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
+              result = true;
+            }else{
+              logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
+              result = false;
+            }
+
+            logger.close();
+            client.quit();
+            resolve(result);
+          } );
+        });
+      }
     }
     catch(err) {
       client.quit();
       return reject(new VError(err, `Error validating subscription count for ${subscription_id}` ));
-    }
-
-    if ( increment ) {
-      //  increment user count and decide whether to generate a draft Sales Order in TradeGecko
-      client.hincrby( customer_id, subscription_id, 1, ( err, reply ) => {
-        if ( err ) {
-          client.quit();
-          return reject(new VError(err, `Error incrementing subscription count for ${subscription_id}` ));
-        }
-
-        let result;
-        if ( reply == 18 ) {
-          client.hset( customer_id, subscription_id, 5 );
-          logger.info( 'Reset counter to 5 - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-          result = false;
-        }
-        else if ( reply == 6 ) {
-          logger.info( 'New sales order required for customer_id:' + customer_id + ' with subscription_id: ' + subscription_id );
-          result = true;
-        }else{
-          logger.info( 'Incremented count - no sales order required for customer_id: ' + customer_id + ' with subscription_id: ' + subscription_id );
-          result = false;
-        }
-
-        client.quit();
-        resolve(result);
-      } );
     }
   });
 };
@@ -253,7 +264,6 @@ async function _validate_subscription_count( plan_id, customer_id, subscription_
       }
 
       client.hset( customer_id, subscription_id, count_to_set );
-
       increment =  true;
 
     } // ... and vice versa
@@ -263,6 +273,7 @@ async function _validate_subscription_count( plan_id, customer_id, subscription_
        *  weekly renewals for the rest of the current month and scheduling plan change on a renewal date the same
        *  as the plan creation date - (ugh))
        */
+
       if ( reply > 5 && reply < 10 ) {
         count_to_set = 2;
       }
@@ -273,9 +284,8 @@ async function _validate_subscription_count( plan_id, customer_id, subscription_
         count_to_set = 1;
       }
 
-      client.hset( customer_id, subscription_id, count_to_set );
+      return client.hset(customer_id, subscription_id, count_to_set);
       increment = true;
-
     }
   } );
 

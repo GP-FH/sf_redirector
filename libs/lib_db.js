@@ -1,7 +1,7 @@
 const logger = require('../libs/lib_logger');
 const mysql = require('mysql2/promise');
 const VError = require('verror');
-const pool = mysql.createPool( {
+const hq_pool = mysql.createPool( {
     connectionLimit: 500,
     host: "128.199.88.172",
     user: "sf-hq-user",
@@ -9,9 +9,17 @@ const pool = mysql.createPool( {
     database: "hq_dev"
 } );
 
+const redirect_pool = mysql.createPool( {
+    connectionLimit: 500,
+    host: "178.128.87.107",
+    user: "sf-redirect-user",
+    password: "is[42QH)7(A>m",
+    database: "aux"
+} );
+
 const find_user_by_name = async (username) => {
   try{
-    const connection = await pool.getConnection();
+    const connection = await hq_pool.getConnection();
     let [rows, fields] = await connection.query(`select * from hq_users where username = '${username}'`);
     connection.release();
 
@@ -25,7 +33,7 @@ const find_user_by_name = async (username) => {
 
 const find_user_by_id = async (id) => {
   try{
-    const connection = await pool.getConnection();
+    const connection = await hq_pool.getConnection();
     let [rows, fields] = await connection.query(`select * from hq_users where id = '${id}'`);
     connection.release();
 
@@ -39,7 +47,7 @@ const find_user_by_id = async (id) => {
 
 const db_legacy_check_for_product_order = async (email, sku) => {
   try{
-    const connection = await pool.getConnection();
+    const connection = await hq_pool.getConnection();
     let [rows, fields] = await connection.query(`select product_code, product_name, product_option1, quantity from legacy_shipped_products where email = '${email}' and product_code = '${sku}'`);
     connection.release();
 
@@ -53,7 +61,7 @@ const db_legacy_check_for_product_order = async (email, sku) => {
 
 const db_legacy_get_orders_by_email = async (email) => {
   try{
-    const connection = await pool.getConnection();
+    const connection = await hq_pool.getConnection();
     let [rows, fields] = await connection.query(`select product_code, product_name, product_option1, quantity from legacy_shipped_products where email = '${email}'`);
     connection.release();
 
@@ -65,7 +73,37 @@ const db_legacy_get_orders_by_email = async (email) => {
   }
 };
 
+const db_aux_store_style_profile = async (profile) => {
+  try{
+    const connection = await redirect_pool.getConnection();
+    let [rows, fields] = await connection.query(`insert into pre_subs values (NULL, '${profile.ts}', '${profile.email}', '${profile.archetype}', '${profile.gender}',
+    '${profile.childname}', '${profile.childage}', '${profile.topsize}', '${profile.bottomsize}', '${profile.jam}', '${profile.doit}', '${profile.palette}', '${profile.fave}',
+    '${profile.keen}', '${profile.something_else}', '${profile.notes}', '${profile.internal_notes}')`);
+    connection.release();
+
+    return {ok:true};
+  }catch(err){
+    throw new VError(err, "db_aux_store_style_profile");
+  }
+};
+
+const db_aux_retrieve_most_recent_style_profile = async (email) => {
+  try{
+    const connection = await redirect_pool.getConnection();
+    let [rows, fields] = await connection.query(`select * from pre_subs where email = '${email}' order by ts desc`);
+    connection.release();
+
+    if (rows.length == 0) return {ok:true, subscription:false};
+
+    return {ok:true, subscription:rows[0]};
+  }catch(err){
+    throw new VError(err, "db_aux_retrieve_most_recent_style_profile");
+  }
+};
+
 exports.find_user_by_name = find_user_by_name;
 exports.find_user_by_id = find_user_by_id;
 exports.db_legacy_get_orders_by_email = db_legacy_get_orders_by_email;
 exports.db_legacy_check_for_product_order = db_legacy_check_for_product_order;
+exports.db_aux_store_style_profile = db_aux_store_style_profile;
+exports.db_aux_retrieve_most_recent_style_profile = db_aux_retrieve_most_recent_style_profile

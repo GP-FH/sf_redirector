@@ -37,9 +37,18 @@
     "winston": "^2.3.1",
     "winston-papertrail": "^1.0.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^23.4.2"
+  },
   "scripts": {
-    "test": "mocha -t 5000"
+    "test": "jest"
+  },
+  "jest": {
+    "verbose": true,
+    "testURL": "http://localhost/",
+    "collectCoverage": true,
+    "collectCoverageFrom": ["**/libs/*.js", "**/routes/*.js"],
+    "coverageDirectory": "coverage"
   },
   "author": "Marcelo Hudson",
   "license": "ISC"
