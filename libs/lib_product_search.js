@@ -14,20 +14,20 @@ const search_products = async (args) => {
 
 };
 
-async _get_customer_style_tags = (subcription_id) => {
+async function _get_customer_style_tags (subcription_id){
 
-};
+}
 
-async _list_products = (args) => {
+async function _list_products (args){
 
-};
+}
 
-async _list_variants = (args) => {
+async function _list_variants (args){
 
-};
+}
 
-async _list_images = (args) => {
+async function _list_images (args){
 
-};
+}
 
 exports.search_products = search_products;
