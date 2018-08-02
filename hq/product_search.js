@@ -2,13 +2,16 @@ const express = require("express");
 const router = express.Router();
 const logger = require("../libs/lib_logger");
 const connect = require('connect-ensure-login');
+const product_search = require("../libs/lib_product_search");
 
 router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req, res) => {
   res.render('product_search', {csrfToken: req.csrfToken()});
 });
 
 router.route('/').post(async (req, res) => {
-  // store query in DB with some metadata and random generated pKey. pass pKey in q param of redirect. Query DB and pass results on through.
+
+  logger.info(`HERE IS THE FORM? ${req.params}`);
+
   const test_obj = [
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
