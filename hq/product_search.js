@@ -9,7 +9,6 @@ router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req, res) => {
 });
 
 router.route('/').post(async (req, res) => {
-
   logger.info(`HERE IS THE FORM? ${JSON.stringify(req.body, null, 4)}`);
 
   const test_obj = [
@@ -25,8 +24,11 @@ router.route('/').post(async (req, res) => {
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'}
   ];
 
-  // make lib calls the redirect back to page with payload
-  res.render('product_search', {csrfToken: req.csrfToken(), results:test_obj});
+  if (req.body.sub_search){
+    res.render('product_search', {csrfToken: req.csrfToken(), sub_results:test_obj});
+  }else if (req.body.filter_search){
+    res.render('product_search', {csrfToken: req.csrfToken(), filter_results:test_obj});
+  }
 });
 
 // error handling for the sub route
