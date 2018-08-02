@@ -21,6 +21,7 @@ router.route('/').post(async (req, res) => {
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'}
   ];
+
   // make lib calls the redirect back to page with payload
   res.render('/', {results:test_obj});
 });
