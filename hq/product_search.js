@@ -10,7 +10,7 @@ router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req, res) => {
 
 router.route('/').post(async (req, res) => {
 
-  logger.info(`HERE IS THE FORM? ${req.params}`);
+  logger.info(`HERE IS THE FORM? ${JSON.stringify(req.params, null, 4)}`);
 
   const test_obj = [
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
