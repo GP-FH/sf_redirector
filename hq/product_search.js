@@ -3,7 +3,7 @@ const router = express.Router();
 const logger = require("../libs/lib_logger");
 const connect = require('connect-ensure-login');
 
-router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req,res) => {
+router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req, res) => {
   res.render('product_search', {csrfToken: req.csrfToken()});
 });
 
@@ -23,7 +23,7 @@ router.route('/').post(async (req, res) => {
   ];
 
   // make lib calls the redirect back to page with payload
-  res.render('/', {results:test_obj});
+  res.render('product_search', {csrfToken: req.csrfToken(), results:test_obj});
 });
 
 // error handling for the sub route
