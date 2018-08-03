@@ -48,7 +48,10 @@
     "verbose": true,
     "testURL": "http://localhost/",
     "collectCoverage": true,
-    "collectCoverageFrom": ["**/libs/*.js", "**/routes/*.js"],
+    "collectCoverageFrom": [
+      "**/libs/*.js",
+      "**/routes/*.js"
+    ],
     "coverageDirectory": "coverage"
   },
   "author": "Marcelo Hudson",
