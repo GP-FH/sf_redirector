@@ -133,7 +133,7 @@ function local_send_renewed_subscriber_new_sales_order( first_name, last_name, e
     method: 'POST',
     url: process.env.SLACK_WEBHOOK,
     body: {
-      channel: '#new-orders',
+      channel: '#renewed-orders',
       username: 'Good-News-Bot',
       icon_emoji: ':tada:',
       attachments: [ {
