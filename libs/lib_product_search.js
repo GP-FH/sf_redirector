@@ -11,7 +11,6 @@
  *  generic exposed search function.
  */
 const search_products = async (args) => {
-
 };
 
 async function _get_customer_style_tags (subcription_id){
