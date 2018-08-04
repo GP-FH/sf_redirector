@@ -28,8 +28,8 @@ router.route('/').post(async (req, res) => {
     const args = {
       sub_id: req.body.search_input
     };
-    
-    const ret = await product_search.search_products();
+
+    const ret = await product_search.search_products(args);
 
     res.render('product_search', {csrfToken: req.csrfToken(), sub_results:ret});
   }else if (req.body.filter_search){
