@@ -25,6 +25,7 @@ router.route('/').post(async (req, res) => {
   ];
 
   if (req.body.sub_search){
+    logger.info(`it's a sub search!`);
     const args = {
       sub_id: req.body.search_input
     };

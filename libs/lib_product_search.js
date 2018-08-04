@@ -12,6 +12,7 @@
  */
 const search_products = async (args) => {
   if (args.sub_id){
+    logger.info(`we're seaeching products with a sub!`);
     const sub_id = args.sub_id;
 
     const ret =  await _get_customer_style_tags (sub_id);
@@ -24,6 +25,7 @@ const search_products = async (args) => {
  * Returns tags from Chargebee subscription
  */
 async function _get_customer_style_tags (subcription_id){
+  logger.info(`we're getting customer tags!`);
   let ret = chargebee.chargebee_get_subscription_info(subscription_id);
 
   logger.info(`Returned from CB: ${ret}`);
