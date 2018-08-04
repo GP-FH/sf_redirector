@@ -13,6 +13,8 @@
 const search_products = async (args) => {
   if (args.sub_id){
     const sub_id = args.sub_id;
+
+    const ret =  await _get_customer_style_tags (sub_id);
   }
 
   return true;
