@@ -10,7 +10,7 @@
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <input type="hidden" name="sub_search" value="1">
         <div class="form-group">
-          <input type="text" class="form-control" id="searchInput" placeholder="Enter Chargebee subscription ID" name=searchInput>
+          <input type="text" class="form-control" id="search_input" placeholder="Enter Chargebee subscription ID" name=search_input>
         </div>
         <button id="sub_search_button" type="submit" class="btn btn-primary">Search</button>
       </form>
@@ -40,11 +40,11 @@
         <input type="hidden" name="filter_search" value="1">
         <div class="form-group">
           <label for="style_tags_input">Style Tags</label>
-          <input type="text" class="form-control" id="style_tags_input" placeholder="a,comma,separated,list" name="tagSelect" >
+          <input type="text" class="form-control" id="style_tags_input" placeholder="a,comma,separated,list" name="style_tags_input" >
         </div>
         <div class="form-group">
           <label for="size_select">Size</label>
-          <select multiple class="form-control" id="size_select_input" name="sizeSelect">
+          <select multiple class="form-control" id="size_select_input" name="size_select_input">
             <option>0m3</option>
             <option>3m6</option>
             <option>6m12</option>

@@ -26,11 +26,12 @@ router.route('/').post(async (req, res) => {
 
   if (req.body.sub_search){
     const args = {
-
+      sub_id: req.body.search_input
     };
+    
     const ret = await product_search.search_products();
 
-    res.render('product_search', {csrfToken: req.csrfToken(), sub_results:test_obj});
+    res.render('product_search', {csrfToken: req.csrfToken(), sub_results:ret});
   }else if (req.body.filter_search){
     res.render('product_search', {csrfToken: req.csrfToken(), filter_results:test_obj});
   }
