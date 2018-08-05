@@ -4,7 +4,7 @@ const logger = require("../libs/lib_logger");
 const connect = require('connect-ensure-login');
 const product_search = require("../libs/lib_product_search");
 
-router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req, res) => {
+router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req, res, next) => {
   res.render('product_search', {csrfToken: req.csrfToken()});
 });
 
