@@ -24,17 +24,21 @@ router.route('/').post(async (req, res) => {
     {sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'}
   ];
 
-  if (req.body.sub_search){
-    logger.info(`it's a sub search!`);
-    const args = {
-      sub_id: req.body.search_input
-    };
+  try{
+    if (req.body.sub_search){
+      logger.info(`it's a sub search!`);
+      const args = {
+        sub_id: req.body.search_input
+      };
 
-    const ret = await product_search.search_products(args);
+      const ret = await product_search.search_products(args);
 
-    res.render('product_search', {csrfToken: req.csrfToken(), sub_results:ret});
-  }else if (req.body.filter_search){
-    res.render('product_search', {csrfToken: req.csrfToken(), filter_results:test_obj});
+      res.render('product_search', {csrfToken: req.csrfToken(), sub_results:ret});
+    }else if (req.body.filter_search){
+      res.render('product_search', {csrfToken: req.csrfToken(), filter_results:test_obj});
+    }
+  }catch (err){
+    next(err);
   }
 });
 
