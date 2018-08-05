@@ -32,7 +32,7 @@ const chargebee_get_customer_info = async ( customer_id ) => {
 
 /*
  * This function exposes the subscription retrieval functions of the chargebee module.
- * Similar to the above function it returns a subscription object full of good stuff.
+ * Similar to the above function it returns a subscription object full of good stuff. 
  */
 const chargebee_get_subscription_info = async ( subscription_id ) => {
   if (subscription_id === undefined){
