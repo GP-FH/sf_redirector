@@ -6,11 +6,13 @@
 
  const tradegecko = require("../libs/lib_tradegecko");
  const chargebee = require("../libs/lib_chargebee");
+ const logger = require("../libs/lib_logger");
 
 /*
  *  generic exposed search function.
  */
 const search_products = async (args) => {
+  logger.info
   if (args.sub_id){
     logger.info(`we're seaeching products with a sub!`);
     const sub_id = args.sub_id;
