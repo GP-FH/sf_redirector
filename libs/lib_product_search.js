@@ -12,9 +12,8 @@
  *  generic exposed search function.
  */
 const search_products = async (args) => {
-  logger.info
   if (args.sub_id){
-    logger.info(` we're seaeching products with a sub!`);
+    logger.info(` we're searching products with a sub!`);
     const sub_id = args.sub_id;
 
     const ret =  await _get_customer_style_tags (sub_id);
