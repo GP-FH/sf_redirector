@@ -39,6 +39,8 @@ const chargebee_get_subscription_info = async ( subscription_id ) => {
     throw new VError ("subscription_id not defined");
   }
 
+  logger.info(`THIS IS WHAT THE CB LIB FUNC RECEIVES: ${subscription_id}`);
+
   return await chargebee.subscription.retrieve( subscription_id ).request( ( err, ret ) => {
     if (err){
       throw new VError (err, "Error retrieving subscription data from Chargebee");
