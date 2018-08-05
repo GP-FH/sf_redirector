@@ -23,7 +23,7 @@ passport.use(new Strategy((username, password, cb) => {
 
 passport.serializeUser(function(user, cb) {
   cb(null, user.id);
-}); 
+});
 
 passport.deserializeUser(function(id, cb) {
   db.find_user_by_id(id)
@@ -33,7 +33,7 @@ passport.deserializeUser(function(id, cb) {
     .catch((err) =>{
       return cb(err);
     });
-});
+}); 
 
 const shipped_product_search = require('../hq/shipped_product_search');
 const product_search = require('../hq/product_search');
