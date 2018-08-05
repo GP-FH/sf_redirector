@@ -23,7 +23,7 @@ passport.use(new Strategy((username, password, cb) => {
 
 passport.serializeUser(function(user, cb) {
   cb(null, user.id);
-});
+}); 
 
 passport.deserializeUser(function(id, cb) {
   db.find_user_by_id(id)
