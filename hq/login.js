@@ -9,7 +9,6 @@ router.route('/').get( async (req,res) => {
 });
 
 router.route('/').post(passport.authenticate('local', { failureRedirect: '/hq/login' }), (req,res) => {
-  logger.info(`hello`);
   res.redirect('/hq/hq_home');
 });
 
