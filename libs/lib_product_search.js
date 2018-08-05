@@ -63,7 +63,7 @@ async function _list_images (args){
  * in TradeGecko APi call
  */
 async function _transform_custom_fields_to_tags (subscription){
-  if ((Object.keys(obj).length === 0 && obj.constructor === Object) ||  typeof subscription === 'undefined' || subscription === null){
+  if ((Object.keys(subscription).length === 0 && subscription.constructor === Object) ||  typeof subscription === 'undefined' || subscription === null){
     throw new VError(`subscription parameter not usable`);
   }
 
