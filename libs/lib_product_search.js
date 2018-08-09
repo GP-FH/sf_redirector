@@ -79,6 +79,8 @@ async function _transform_custom_fields_to_tags (subscription){
     }
   }
 
+  logger.info(`TAGS: ${tags}`);
+
   tags = tags.str.slice(',', -1);
 
   return tags;
