@@ -28,7 +28,7 @@ const search_products = async (args) => {
     logger.info(` we're searching products with a sub! Here's the ID: ${args.sub_id}`);
     const sub_id = args.sub_id;
 
-    const ret =  await _get_customer_style_tags (sub_id);
+    const ret =  await _get_customer_style_info (sub_id);
     logger.info(`Here are the transformed tags! ${ret}`);
   }
 
