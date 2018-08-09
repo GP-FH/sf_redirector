@@ -86,7 +86,7 @@ async function _transform_custom_fields_to_tags_and_size (subscription){
     }
   }
 
-  tags = tags.str.slice(',', -1);
+  tags = tags.slice(',', -1);
   logger.info(`TAGS: ${tags} and SIZES: ${JSON.stringify(size, null, 4)}`);
   return tags;
 };
