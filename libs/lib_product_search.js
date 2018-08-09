@@ -62,10 +62,13 @@ async function _list_images (args){
  * Takes a Chargebee subscription object and returns tags string ready for use
  * in TradeGecko APi call
  */
+
 async function _transform_custom_fields_to_tags (subscription){
   if ((Object.keys(subscription).length === 0 && subscription.constructor === Object) ||  typeof subscription === 'undefined' || subscription === null){
     throw new VError(`subscription parameter not usable`);
   }
+
+  logger.info(`HERE IS WHAT IM GETTING TO TRANSFORM: ${JSON.stringify(subscription, null, 4)}`);
 
   const keys = Object.keys(subscription);
   let tags = " ";
