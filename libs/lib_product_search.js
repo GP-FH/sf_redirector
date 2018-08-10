@@ -59,9 +59,7 @@ async function _get_customer_style_info (subscription_id){
  */
 
 async function _list_products (tags){
-  if ((Object.keys(sizes).length === 0 && sizes.constructor === Object) ||  typeof sizes === 'undefined' || sizes === null){
-    throw new VError(`sizes parameter not usable`);
-  }else if (typeof tags === 'undefined' || tags === null){
+  if (typeof tags === 'undefined' || tags === null){
     throw new VError(`tags parameter not usable`);
   }
   logger.info(`OOOO JUST ABOUT TO MAKE THE CALL TO THE TG LIB`);
