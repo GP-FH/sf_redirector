@@ -6,8 +6,10 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const got = require("got");
+const qs = require("qs");
 const VError = require("verror");
 const logger = require("../libs/lib_logger");
+
 
 /*
  * This function exposes the ability to create a Sales Order containing all the information and Stylist
@@ -161,6 +163,11 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
   if (!get_all && page == 1){
     const keys = Object.keys(filters);
     for (let i = 0; i < keys.length; i++){
+      if (keys[i] == 'tags'){
+        query[keys[i]] = qs.stringify(filters[keys[i]], { encode: false });
+      }else{
+
+      }
       query[keys[i]] = filters[keys[i]];
     }
   }
