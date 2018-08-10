@@ -165,31 +165,31 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
   if (!get_all && page == 1){
     const keys = Object.keys(filters);
     for (let i = 0; i < keys.length; i++){
-      //if (keys[i] == 'tags'){
-        //query[keys[i]] = qs.stringify({'tags': filters[keys[i]]}, {arrayFormat: 'brackets', encode: false});
-      //}else{
-        query[keys[i]] = filters[keys[i]];
-      //}
+      query[keys[i]] = filters[keys[i]];
     }
   }
 
-  logger.info(`Here us the query object: ${JSON.stringify(query, null, 4)}`);
-  const test = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
+  /*
+   * Have to put the URL together with the Q params here instead of using Got's
+   * query arg as got does not seem to support the bracket array format e.g
+   * tag[]=tag1&tag[]=tag2.... which TG requires.
+   */
+
+  const qs = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
   url += `?${test}`;
-  logger.info(`HERE IS A PRETEND URL: ${url}`);
 
   try {
     res = await got.get(url, {
       headers:{
         Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
       },
-      //query: query,
       json: true
     });
   }
   catch (err) {
     throw new VError (err, `Error listing variants via TradeGecko API.` );
   }
+
   logger.info(`STRAIGHT FROM TG: ${JSON.stringify(res.body, null, 4)}`);
   concat_storage = storage.concat(res.body.products);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
