@@ -177,7 +177,7 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
     throw new VError (err, `Error listing variants via TradeGecko API.` );
   }
 
-  concat_storage = storage.concat(res.body.variants);
+  concat_storage = storage.concat(res.body.products);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
   if(!pagination_info.last_page){

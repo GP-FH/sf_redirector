@@ -64,7 +64,7 @@ async function _list_products (tags){
   }
   logger.info(`OOOO JUST ABOUT TO MAKE THE CALL TO THE TG LIB`);
   const ret = await tradegecko.tradegecko_get_products ({tags: tags});
-  logger.info(`HERE ARE THE PRODUCTS WE GOT BACK: ${ret}`);
+  logger.info(`HERE ARE THE PRODUCTS WE GOT BACK: ${JSON.stringify(ret, null, 4)}`);
 }
 
 async function _list_variants (args){
