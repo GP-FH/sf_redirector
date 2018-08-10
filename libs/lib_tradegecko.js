@@ -195,7 +195,7 @@ const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
   if(!pagination_info.last_page){
-    return tradegecko_get_product_variants(query, concat_storage, ++page);
+    return tradegecko_get_product_variants(query, concat_storage, ++page); 
   }
 
   return concat_storage;
