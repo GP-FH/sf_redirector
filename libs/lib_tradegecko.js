@@ -175,8 +175,8 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
    * tag[]=tag1&tag[]=tag2.... which TG requires.
    */
 
-  const qs = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
-  url += `?${test}`;
+  const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
+  url += `?${query_string}`;
 
   try {
     res = await got.get(url, {
