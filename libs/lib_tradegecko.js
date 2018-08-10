@@ -141,8 +141,7 @@ const tradegecko_get_product_variants = async (storage=[], page=1) => {
  * function and keeps making API calls until it has been through all pages
  */
 
-const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => {
-  logger.info(`THIS IS THE PAGE: ${page}`);
+const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
   let get_all = false;
   let url = 'https://api.tradegecko.com/products/';
 
@@ -191,7 +190,6 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
     throw new VError (err, `Error listing variants via TradeGecko API.` );
   }
 
-  //logger.info(`STRAIGHT FROM TG: ${JSON.stringify(res.body, null, 4)}`);
   concat_storage = storage.concat(res.body.products);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
