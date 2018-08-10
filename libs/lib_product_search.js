@@ -29,6 +29,7 @@ const search_products = async (args) => {
 
     try{
       const {tags, sizes} = await _get_customer_style_info (sub_id);
+      logger.info(`HERE ARE THE TAGS WE GOT: ${tags}`);
       logger.info('ABOUT TO LIST PRODUCTS');
       const products = await _list_products(tags);
     } catch (err){

@@ -148,7 +148,8 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
 
   let query = {
     limit: 250,
-    page: page
+    page: page,
+    status: "active"
   }
   let concat_storage = [];
   let res;
