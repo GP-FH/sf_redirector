@@ -28,7 +28,7 @@ const search_products = async (args) => {
     const sub_id = args.sub_id;
 
     try{
-      const {tags, sizes} = await _get_customer_style_info (sub_id);
+      let {tags, sizes} = await _get_customer_style_info (sub_id);
       logger.info(`HERE ARE THE TAGS WE GOT: ${tags}`);
       logger.info('ABOUT TO LIST PRODUCTS');
       tags = tags.split(',');
