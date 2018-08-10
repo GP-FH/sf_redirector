@@ -164,7 +164,7 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
     const keys = Object.keys(filters);
     for (let i = 0; i < keys.length; i++){
       if (keys[i] == 'tags'){
-        query[keys[i]] = qs.stringify(filters[keys[i]], { encode: false });
+        query[keys[i]] = qs.stringify({'tags': filters[keys[i]]}, {arrayFormat: 'brackets'});
       }else{
         query[keys[i]] = filters[keys[i]];
       }
