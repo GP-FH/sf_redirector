@@ -25,11 +25,9 @@
  */
 const search_products = async (args) => {
   if (args.sub_id){
-    logger.info(` we're searching products with a sub! Here's the ID: ${args.sub_id}`);
     const sub_id = args.sub_id;
-
-    const ret =  await _get_customer_style_info (sub_id);
-    logger.info(`Here are the transformed tags! ${ret}`);
+    const {tags, sizes} = await _get_customer_style_info (sub_id);
+    const products = await _list_products(tags);
   }
 
   return true;
@@ -38,18 +36,31 @@ const search_products = async (args) => {
 /*
  * Returns tags string and sizes from Chargebee subscription
  */
-async function _get_customer_style_info (subscription_id){
-  logger.info(`we're getting customer tags! with this ID: ${subscription_id}`);
-  let ret = await chargebee.chargebee_get_subscription_info(subscription_id);
 
+async function _get_customer_style_info (subscription_id){
+  if (typeof subscription_id === 'undefined' || subscription_id === null){
+    throw new VError(`subscription_id parameter not usable`);
+  }
+
+  const ret = await chargebee.chargebee_get_subscription_info(subscription_id);
   const tags = await _transform_custom_fields_to_tags_and_size(ret.subscription);
-  logger.info(`Returned from CB: ${JSON.stringify(ret, null, 4)}`);
 
   return tags;
 }
 
-async function _list_products (args){
+/*
+ *
+ */
 
+async function _list_products (tags){
+  if ((Object.keys(sizes).length === 0 && sizes.constructor === Object) ||  typeof sizes === 'undefined' || sizes === null){
+    throw new VError(`sizes parameter not usable`);
+  }else if (typeof tags === 'undefined' || tags === null){
+    throw new VError(`tags parameter not usable`);
+  }
+
+  const ret = await tradegecko.tradegecko_get_products ({tags: tags});
+  logger.info(`HERE ARE THE PRODUCTS WE GOT BACK: ${ret}`);
 }
 
 async function _list_variants (args){
@@ -70,25 +81,30 @@ async function _transform_custom_fields_to_tags_and_size (subscription){
     throw new VError(`subscription parameter not usable`);
   }
 
-  logger.info(`HERE IS WHAT IM GETTING TO TRANSFORM: ${JSON.stringify(subscription, null, 4)}`);
-
   const keys = Object.keys(subscription);
   let tags = " ";
-  let size = {};
+  let sizes = {};
+
+  /*
+   * loops through subscription object pulling out all relevant custom fields
+   */
 
   for (let i = 0; i < keys.length; i++){
     if (keys[i].startsWith('cf_') && !_non_tags.includes(keys[i])){
       tags += `${subscription[keys[i]]},`;
     }else if (keys[i] == 'cf_bottomsize'){
-      size['bottom'] = subscription[keys[i]];
+      sizes['bottom'] = subscription[keys[i]];
     }else if (keys[i] == 'cf_topsize'){
-      size['top'] = subscription[keys[i]];
+      sizes['top'] = subscription[keys[i]];
     }
   }
 
+  /*
+   * Remove trailing comma as it doesn't really need to be there for the API call
+   */
+
   tags = tags.slice(',', -1);
-  logger.info(`TAGS: ${tags} and SIZES: ${JSON.stringify(size, null, 4)}`);
-  return tags;
+  return {tags: tags, sizes: sizes};
 };
 
 exports.search_products = search_products;

@@ -13,6 +13,7 @@ const logger = require("../libs/lib_logger");
  * This function exposes the ability to create a Sales Order containing all the information and Stylist
  * needs to fill it
  */
+
 const tradegecko_create_sales_order = async ( subscription, customer, company_id = "21313869" ) => {
   let { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
   let order = {
@@ -27,6 +28,7 @@ const tradegecko_create_sales_order = async ( subscription, customer, company_id
    * Here we compare the address received from CB to the addresses attached to the customer in TG.
    * If any matches are found we send the address ID in the sales order to avoid creating dupe addresses
    */
+
   const ret = await _tradegecko_check_for_existing_address(shipping_address, company_id);
   if (ret.exists){
     order["shipping_address_id"] = ret.address_id;
@@ -58,6 +60,7 @@ const tradegecko_create_sales_order = async ( subscription, customer, company_id
  * This helper function takes customer and subscription info and preps it for being sent
  * into Tradegecko via a new Sales Order.
  */
+
 async function _prep_subscription_for_sending ( subscription, customer ) {
   return {
     "shipping_address": { // the customers address -> this will be automagically added to the Stylists relationship
@@ -98,6 +101,7 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
  * This function lists all product variants. It is a recursive function and keeps making
  * API calls until it has been through all pages
  */
+
 const tradegecko_get_product_variants = async (storage=[], page=1) => {
   let concat_storage = [];
   let res;
@@ -130,8 +134,63 @@ const tradegecko_get_product_variants = async (storage=[], page=1) => {
 };
 
 /*
+ * This function lists products. If no filters are passed it returns all products.
+ * Filters must be valid accoriing to TG API documentation. It is a recursive
+ * function and keeps making API calls until it has been through all pages
+ */
+
+const tradegecko_get_products = async (filters = {}, storage=[], page=1) => {
+  let get_all = false;
+
+  if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
+    get_all = true;
+  }
+
+  let query = {
+    limit: 250,
+    page: page
+  }
+  let concat_storage = [];
+  let res;
+
+  /*
+   * Append to the the query object and only do it the first function call
+   */
+
+  if (!get_all && page == 1){
+    const keys = Object.keys(filter);
+    for (let i = 0; i < keys.length; i++){
+      query[keys[i]] = filter[keys[i]];
+    }
+  }
+
+  try {
+    res = await got.get('https://api.tradegecko.com/products/', {
+      headers:{
+        Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
+      },
+      query: query,
+      json: true
+    });
+  }
+  catch (err) {
+    throw new VError (err, `Error listing variants via TradeGecko API.` );
+  }
+
+  concat_storage = storage.concat(res.body.variants);
+  const pagination_info = JSON.parse(res.headers["x-pagination"]);
+
+  if(!pagination_info.last_page){
+    return tradegecko_get_product_variants(query, concat_storage, ++page);
+  }
+
+  return concat_storage;
+};
+
+/*
  * This function uploads product images to Tradegecko.
  */
+
 const tradegecko_upload_product_images = async (product_id, variant_ids, image_url) => {
   let res;
 
@@ -162,6 +221,7 @@ const tradegecko_upload_product_images = async (product_id, variant_ids, image_u
  * This function creates a company in TradeGecko (a 'company' being a supplier, business, or consumer
  * contact).
  */
+
 const tradegecko_create_company = async (customer, company_type) => {
   try{
     return await _tradegecko_create_company(company_type, customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
@@ -174,6 +234,7 @@ const tradegecko_create_company = async (customer, company_type) => {
  * This function creates & returns an accompanying 'consumer' company for new sales orders. If one
  * already exists it returns that instead.
  */
+
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
   let company;
   try{
@@ -195,6 +256,7 @@ const tradegecko_create_sales_order_contact = async (subscription, customer) => 
 /*
  * Bare bones TG company creation helper method. Will export if needed.
  */
+
 async function _tradegecko_create_company (company_type, email, name, phone_number){
   let res;
   try {
@@ -224,6 +286,7 @@ async function _tradegecko_create_company (company_type, email, name, phone_numb
 /*
  * Bare bones TG address creation function. Will export if ever neccessary.
  */
+
 async function _tradegecko_create_address (company_id, address){
   let res;
 
@@ -258,6 +321,7 @@ async function _tradegecko_create_address (company_id, address){
  * Helper function: checks for any TG customers with a matching email and returns
  * the result.
  */
+
 async function _tradegecko_check_for_existing_company (email, page=1){
   let res;
 
@@ -303,6 +367,7 @@ async function _tradegecko_check_for_existing_company (email, page=1){
  * Helper function: chrcks for matching addresses for a given TG customer. Returns
  * the result.
  */
+
 async function _tradegecko_check_for_existing_address (address, company_id){
   let res;
 
@@ -343,3 +408,4 @@ exports.tradegecko_get_product_variants = tradegecko_get_product_variants;
 exports.tradegecko_upload_product_images = tradegecko_upload_product_images;
 exports.tradegecko_create_company = tradegecko_create_company;
 exports.tradegecko_create_sales_order_contact = tradegecko_create_sales_order_contact;
+exports.tradegecko_get_products = tradegecko_get_products;
