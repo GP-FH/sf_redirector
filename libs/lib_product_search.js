@@ -27,6 +27,7 @@ const search_products = async (args) => {
   if (args.sub_id){
     const sub_id = args.sub_id;
     const {tags, sizes} = await _get_customer_style_info (sub_id);
+    logger.info('ABOUT TO LIST PRODUCTS');
     const products = await _list_products(tags);
   }
 
@@ -49,7 +50,7 @@ async function _get_customer_style_info (subscription_id){
 }
 
 /*
- *
+ * Returns list of filtered products from TG
  */
 
 async function _list_products (tags){
@@ -58,7 +59,7 @@ async function _list_products (tags){
   }else if (typeof tags === 'undefined' || tags === null){
     throw new VError(`tags parameter not usable`);
   }
-
+  logger.info(`OOOO JUST ABOUT TO MAKE THE CALL TO THE TG LIB`);
   const ret = await tradegecko.tradegecko_get_products ({tags: tags});
   logger.info(`HERE ARE THE PRODUCTS WE GOT BACK: ${ret}`);
 }
