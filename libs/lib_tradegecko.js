@@ -166,9 +166,8 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
       if (keys[i] == 'tags'){
         query[keys[i]] = qs.stringify(filters[keys[i]], { encode: false });
       }else{
-
+        query[keys[i]] = filters[keys[i]];
       }
-      query[keys[i]] = filters[keys[i]];
     }
   }
 
