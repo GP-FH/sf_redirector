@@ -143,6 +143,7 @@ const tradegecko_get_product_variants = async (storage=[], page=1) => {
 
 const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => {
   let get_all = false;
+  let url = 'https://api.tradegecko.com/products/';
 
   if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
     get_all = true;
@@ -174,10 +175,11 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
 
   logger.info(`Here us the query object: ${JSON.stringify(query, null, 4)}`);
   const test = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
+  url += `?${test}`;
   logger.info(`HERE IS A PRETEND URL: https://api.tradegecko.com/products/?${test}`);
 
   try {
-    res = await got.get('https://api.tradegecko.com/products/', {
+    res = await got.get(url, {
       headers:{
         Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
       },
