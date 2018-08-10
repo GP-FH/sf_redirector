@@ -147,9 +147,9 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
   }
 
   let query = {
-    limit: 250,
-    page: page,
-    status: "active"
+    "limit": 250,
+    "page": page,
+    "status": "active"
   }
   let concat_storage = [];
   let res;
@@ -164,6 +164,8 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
       query[keys[i]] = filters[keys[i]];
     }
   }
+
+  logger.info(`Here us the query object: ${JSON.stringify(query, null, 4)}`);
 
   try {
     res = await got.get('https://api.tradegecko.com/products/', {
