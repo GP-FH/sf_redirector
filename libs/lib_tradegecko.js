@@ -135,11 +135,11 @@ const tradegecko_get_product_variants = async (storage=[], page=1) => {
 
 /*
  * This function lists products. If no filters are passed it returns all products.
- * Filters must be valid accoriing to TG API documentation. It is a recursive
+ * Filters must be valid according to TG API documentation. It is a recursive
  * function and keeps making API calls until it has been through all pages
  */
 
-const tradegecko_get_products = async (filters = {}, storage=[], page=1) => {
+const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => {
   let get_all = false;
 
   if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
@@ -158,9 +158,9 @@ const tradegecko_get_products = async (filters = {}, storage=[], page=1) => {
    */
 
   if (!get_all && page == 1){
-    const keys = Object.keys(filter);
+    const keys = Object.keys(filters);
     for (let i = 0; i < keys.length; i++){
-      query[keys[i]] = filter[keys[i]];
+      query[keys[i]] = filters[keys[i]];
     }
   }
 
