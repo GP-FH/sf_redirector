@@ -176,14 +176,14 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
   logger.info(`Here us the query object: ${JSON.stringify(query, null, 4)}`);
   const test = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
   url += `?${test}`;
-  logger.info(`HERE IS A PRETEND URL: https://api.tradegecko.com/products/?${test}`);
+  logger.info(`HERE IS A PRETEND URL: ${url}`);
 
   try {
     res = await got.get(url, {
       headers:{
         Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
       },
-      query: query,
+      //query: query,
       json: true
     });
   }
