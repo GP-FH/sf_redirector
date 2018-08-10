@@ -153,6 +153,8 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
     "page": page,
     "status": "active"
   }
+
+  const test = qs.stringify({'tags': filters[keys[i]]}, {arrayFormat: 'brackets', encode: false});
   let concat_storage = [];
   let res;
 
@@ -163,15 +165,17 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
   if (!get_all && page == 1){
     const keys = Object.keys(filters);
     for (let i = 0; i < keys.length; i++){
-      if (keys[i] == 'tags'){
-        query[keys[i]] = qs.stringify({'tags': filters[keys[i]]}, {arrayFormat: 'brackets', encode: false});
-      }else{
+      //if (keys[i] == 'tags'){
+        //query[keys[i]] = qs.stringify({'tags': filters[keys[i]]}, {arrayFormat: 'brackets', encode: false});
+      //}else{
         query[keys[i]] = filters[keys[i]];
-      }
+      //}
     }
   }
 
   logger.info(`Here us the query object: ${JSON.stringify(query, null, 4)}`);
+  const test = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
+  logger.info(`HERE IS A PRETEND URL: https://api.tradegecko.com/products/?${test}`);
 
   try {
     res = await got.get('https://api.tradegecko.com/products/', {
