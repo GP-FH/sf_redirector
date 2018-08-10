@@ -154,7 +154,6 @@ const tradegecko_get_products = async (filters = {}, storage = [], page = 1) => 
     "status": "active"
   }
 
-  const test = qs.stringify({'tags': filters[keys[i]]}, {arrayFormat: 'brackets', encode: false});
   let concat_storage = [];
   let res;
 
