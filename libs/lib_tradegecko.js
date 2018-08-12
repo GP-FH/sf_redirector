@@ -142,6 +142,7 @@ const tradegecko_get_product_variants = async (storage=[], page=1) => {
  */
 
 const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
+  logger.info(`PAGE: ${page}`);
   let var_storage = storage;
   let get_all = false;
   let url = 'https://api.tradegecko.com/products/';
