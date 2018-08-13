@@ -190,8 +190,6 @@ const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
     throw new VError (err, `Error listing products via TradeGecko API.` );
   }
 
-  logger.info(`CMON! ${JSON.stringify(res.body)}`);
-
   concat_storage = storage.concat(res.body.products);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 

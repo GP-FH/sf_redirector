@@ -66,6 +66,7 @@ async function _list_products (tags){
   }
 
   const ret = await tradegecko.tradegecko_get_products ({"tags": tags});
+  logger.info(`RETURNED PRODUCTS: ${JSON.stringify(ret, null, 4)}`);
 }
 
 async function _list_variants (args){
