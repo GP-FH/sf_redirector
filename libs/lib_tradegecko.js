@@ -191,18 +191,12 @@ const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
     throw new VError (err, `Error listing products via TradeGecko API.` );
   }
 
-  try{
-    concat_storage = storage.concat(res.body.products);
-    const pagination_info = JSON.parse(res.headers["x-pagination"]);
+  concat_storage = storage.concat(res.body.products);
+  const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
-    if(!pagination_info.last_page){
-      return tradegecko_get_product_variants(query, concat_storage, ++page);
-    }
-  } catch (err){
-    throw new VError (err, `Error storing` );
+  if(!pagination_info.last_page){
+    return tradegecko_get_products(query, concat_storage, ++page);
   }
-
-
 
   return concat_storage;
 };
