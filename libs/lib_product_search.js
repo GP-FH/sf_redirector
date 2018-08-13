@@ -32,7 +32,7 @@ const search_products = async (args) => {
       logger.info(`HERE ARE THE TAGS WE GOT: ${tags.toString()}`);
       logger.info('ABOUT TO LIST PRODUCTS');
       const products = await _list_products(tags);
-      logger.info(`PRODUCTS: ${JSON.stringify(products)}`);
+      logger.info(`PRODUCTS: ${JSON.stringify(products, null, 4)}`);
     } catch (err){
       throw new VError(err, 'error calling search functions');
     }
@@ -66,7 +66,7 @@ async function _list_products (tags){
   }
 
   const ret = await tradegecko.tradegecko_get_products ({"tags": tags});
-  logger.info(`RETURNED PRODUCTS: ${JSON.stringify(ret, null, 4)}`);
+  logger.info(`RETURNED PRODUCTS: ${JSON.stringify(ret, null, 4)}`);  return ret;
 }
 
 async function _list_variants (args){
