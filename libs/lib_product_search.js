@@ -65,7 +65,7 @@ async function _list_products (tags){
     throw new VError(`tags parameter not usable`);
   }
   logger.info(`OOOO JUST ABOUT TO MAKE THE CALL TO THE TG LIB`);
-  const ret = await tradegecko.tradegecko_get_products ({"tags": tags});
+  const ret = await tradegecko.tradegecko_get_products ({"tags": tags}, []);
   logger.info(`HERE ARE THE PRODUCTS WE GOT BACK: ${JSON.stringify(ret, null, 4)}`);
 }
 
