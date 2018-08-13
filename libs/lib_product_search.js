@@ -96,7 +96,7 @@ async function _transform_custom_fields_to_tags_and_size (subscription){
 
   for (let i = 0; i < keys.length; i++){
     if (keys[i].startsWith('cf_') && !_non_tags.includes(keys[i])){
-      tags.push(subscription[keys[i]]});
+      tags.push(subscription[keys[i]]);
     }else if (keys[i] == 'cf_bottomsize'){
       sizes['bottom'] = subscription[keys[i]];
     }else if (keys[i] == 'cf_topsize'){
