@@ -78,7 +78,7 @@ async function _list_variants (ids){
     throw new VError(`ids parameter not usable`);
   }
 
-  const ret = await tradegecko.tradegecko_get_product_variants({"ids": ids});
+  const ret = await tradegecko.tradegecko_get_product_variants({"product_id": ids});
   logger.info(`RETURNED VARIANTS: ${JSON.stringify(ret, null, 4)} VARIANTS`);
   return ret;
 }

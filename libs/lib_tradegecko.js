@@ -116,27 +116,48 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
   let query = {
     "limit": 250,
     "page": page,
-    "status": "active"
+    "sellable": true
   }
 
   let concat_storage = [];
   let res;
+  let batch_request = false;
+  let remainder = [];
+  let batch = [];
 
   /*
    * Append to the the query object and only do it the first function call
+   * + check for excessive number of filter values (specifically product_ids)
+   * and enable batched requests (more recursions) if necessary
    */
 
   if (!get_all && page == 1){
     const keys = Object.keys(filters);
     for (let i = 0; i < keys.length; i++){
-      query[keys[i]] = filters[keys[i]];
+      if (keys[i] == 'product_id' && filters[keys[i]].length > 50){
+        batch_request = true;
+      }else{
+        query[keys[i]] = filters[keys[i]];
+      }
     }
+  }
+
+  /*
+   * Calls helper function which splits the array of product_ids into 2 arrays:
+   * the 'batch' which will be used in the current API request, and the 'remainder'
+   * which will be used in future requests
+   */
+
+  if (batch_request){
+    {batch, remainder} = await _tradegecko_prepare_for_batch_request(filters.product_ids);
+    query['product_ids'] = batch;
+
   }
 
   /*
    * Have to put the URL together with the Q params here instead of using Got's
    * query arg as got does not seem to support the bracket array format e.g
-   * tag[]=tag1&tag[]=tag2.... which TG requires.
+   * product_id[]=id1&product_id[]=id2.... which TG requires.
    */
 
   const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
@@ -159,6 +180,17 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
   if(!pagination_info.last_page){
+    /*
+     * If it's a multi-page result for a batch request then we need to make a recursive
+     * function call with the current query object as it contains the 'batched' product_ids.
+     * Otherwise we should move on to a recursive call with the remainder of the product_ids.
+     */
+
+    if (batch_request){
+      return tradegecko_get_product_variants(query, concat_storage, ++page);
+    }
+
+    query['product_id'] = remainder;
     return tradegecko_get_product_variants(query, concat_storage, ++page);
   }
 
@@ -444,6 +476,27 @@ async function _tradegecko_check_for_existing_address (address, company_id){
   }
 
   return {ok:true, exists:exists, address_id:address_id};
+}
+
+/*
+ * Helper function to break array up into smaller batches when number of filters is
+ * too long for TG API e.g when using ids as filters. Returns object containing batch
+ * array + array containing remaining values
+ */
+
+async function _tradegecko_prepare_for_batch_request (values, batch_size=50){
+  if (values.length == 0 ||  typeof values === 'undefined' || values === null || !Array.isArray(values)){
+    throw new VError(`values parameter not usable`);
+  }
+
+  let batch = [];
+
+  for (let i = 0; i < batch_size; i++){
+    let v = values.pop();
+    batch.push(v);
+  }
+
+  return { batch: batch, remainder: values};
 }
 
 exports.tradegecko_create_sales_order = tradegecko_create_sales_order;
