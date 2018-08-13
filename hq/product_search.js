@@ -38,7 +38,8 @@ router.route('/').post(async (req, res, next) => {
       res.render('product_search', {csrfToken: req.csrfToken(), filter_results:test_obj});
     }
   }catch (err){
-    next(err);
+    logger.error(JSON.stringify( err ));
+    res.render('product_search', {csrfToken: req.csrfToken(), error: err.message});
   }
 });
 
