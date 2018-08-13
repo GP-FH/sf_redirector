@@ -24,6 +24,8 @@
  *  generic exposed search function.
  */
 const search_products = async (args) => {
+  let results = [];
+
   if (args.sub_id){
     const sub_id = args.sub_id;
 
@@ -32,7 +34,9 @@ const search_products = async (args) => {
       logger.info(`HERE ARE THE TAGS WE GOT: ${tags.toString()}`);
       logger.info('ABOUT TO LIST PRODUCTS');
       const products = await _list_products(tags);
-      logger.info(`PRODUCTS: ${JSON.stringify(products, null, 4)}`);
+      const ids = await _extract_product_ids(products);
+      const variants = await _list_variants(ids);
+
     } catch (err){
       throw new VError(err, 'error calling search functions');
     }
@@ -66,11 +70,17 @@ async function _list_products (tags){
   }
 
   const ret = await tradegecko.tradegecko_get_products ({"tags": tags});
-  logger.info(`RETURNED PRODUCTS: ${JSON.stringify(ret, null, 4)}`);  return ret;
+  return ret;
 }
 
-async function _list_variants (args){
+async function _list_variants (ids){
+  if (typeof ids === 'undefined' || ids === null){
+    throw new VError(`ids parameter not usable`);
+  }
 
+  const ret = await tradegecko.tradegecko_get_product_variants({"ids": ids});
+  logger.info(`RETURNED VARIANTS: ${JSON.stringify(ret, null, 4)} VARIANTS`);
+  return ret;
 }
 
 async function _list_images (args){
@@ -107,5 +117,24 @@ async function _transform_custom_fields_to_tags_and_size (subscription){
 
   return {tags: tags, sizes: sizes};
 };
+
+/*
+ * Takes a TG products array and extracts all the product IDs and returns them
+ * in an array
+ */
+
+async function _extract_product_ids (products){
+  if (products.length == 0 ||  typeof products === 'undefined' || products === null || !Array.isArray(products)){
+    throw new VError(`product parameter not usable`);
+  }
+
+  let ids = [];
+
+  for (let i = 0; i < products.length; i++){
+    ids.push(products[i].id);
+  }
+
+  return ids;
+}
 
 exports.search_products = search_products;

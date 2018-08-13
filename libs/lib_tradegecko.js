@@ -100,22 +100,52 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
 }
 
 /*
- * This function lists all product variants. It is a recursive function and keeps making
- * API calls until it has been through all pages
+ * This function lists product variants. If no filters are passed it returns all variants.
+ * Filters must be valid according to TG API documentation. It is a recursive
+ * function and keeps making API calls until it has been through all pages
  */
 
-const tradegecko_get_product_variants = async (storage=[], page=1) => {
+const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) => {
+  let get_all = false;
+  let url = 'https://api.tradegecko.com/variants/';
+
+  if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
+    get_all = true;
+  }
+
+  let query = {
+    "limit": 250,
+    "page": page,
+    "status": "active"
+  }
+
   let concat_storage = [];
   let res;
 
+  /*
+   * Append to the the query object and only do it the first function call
+   */
+
+  if (!get_all && page == 1){
+    const keys = Object.keys(filters);
+    for (let i = 0; i < keys.length; i++){
+      query[keys[i]] = filters[keys[i]];
+    }
+  }
+
+  /*
+   * Have to put the URL together with the Q params here instead of using Got's
+   * query arg as got does not seem to support the bracket array format e.g
+   * tag[]=tag1&tag[]=tag2.... which TG requires.
+   */
+
+  const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
+  url += `?${query_string}`;
+
   try {
-    res = await got.get('https://api.tradegecko.com/variants/', {
+    res = await got.get(url, {
       headers:{
         Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
-      },
-      query:{
-        limit:250,
-        page:page
       },
       json: true
     });
@@ -129,7 +159,7 @@ const tradegecko_get_product_variants = async (storage=[], page=1) => {
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
   if(!pagination_info.last_page){
-    return tradegecko_get_product_variants(concat_storage, ++page);
+    return tradegecko_get_product_variants(query, concat_storage, ++page);
   }
 
   return concat_storage;
