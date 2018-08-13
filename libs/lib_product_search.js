@@ -29,10 +29,10 @@ const search_products = async (args) => {
 
     try{
       let {tags, sizes} = await _get_customer_style_info (sub_id);
-      logger.info(`HERE ARE THE TAGS WE GOT: ${tags}`);
+      logger.info(`HERE ARE THE TAGS WE GOT: ${tags.toString()}`);
       logger.info('ABOUT TO LIST PRODUCTS');
-      tags = tags.split(',');
       const products = await _list_products(tags);
+      logger.info(`PRODUCTS: ${JSON.stringify(products)}`);
     } catch (err){
       throw new VError(err, 'error calling search functions');
     }
@@ -77,7 +77,7 @@ async function _list_images (args){
 }
 
 /*
- * Takes a Chargebee subscription object and returns tags string ready for use
+ * Takes a Chargebee subscription object and returns tags array ready for use
  * in TradeGecko APi call + size object containing top and bottom size
  */
 
@@ -87,7 +87,7 @@ async function _transform_custom_fields_to_tags_and_size (subscription){
   }
 
   const keys = Object.keys(subscription);
-  let tags = " ";
+  let tags = [];
   let sizes = {};
 
   /*
@@ -96,7 +96,7 @@ async function _transform_custom_fields_to_tags_and_size (subscription){
 
   for (let i = 0; i < keys.length; i++){
     if (keys[i].startsWith('cf_') && !_non_tags.includes(keys[i])){
-      tags += `${subscription[keys[i]]},`;
+      tags.push(subscription[keys[i]]});
     }else if (keys[i] == 'cf_bottomsize'){
       sizes['bottom'] = subscription[keys[i]];
     }else if (keys[i] == 'cf_topsize'){
@@ -104,11 +104,6 @@ async function _transform_custom_fields_to_tags_and_size (subscription){
     }
   }
 
-  /*
-   * Remove trailing comma as it doesn't really need to be there for the API call
-   */
-
-  tags = tags.slice(',', -1);
   return {tags: tags, sizes: sizes};
 };
 
