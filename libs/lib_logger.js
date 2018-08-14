@@ -21,8 +21,7 @@ const winstonPapertrail = new winston.transports.Papertrail( {
 
 const logger = new winston.Logger( {
   transports: [
-    winstonPapertrail,
-    new winston.transports.Console(),
+    winstonPapertrail
   ],
   exitOnError: false
 } );
