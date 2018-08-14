@@ -199,6 +199,104 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
 };
 
 /*
+ * This function lists image objects. If no filters are passed it returns all images.
+ * Filters must be valid according to TG API documentation. It is a recursive
+ * function and keeps making API calls until it has been through all pages
+ */
+
+const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
+  let get_all = false;
+  let url = 'https://api.tradegecko.com/images/';
+
+  if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
+    get_all = true;
+  }
+
+  let query = {
+    "limit": 250,
+    "page": page
+  }
+
+  let concat_storage = [];
+  let res;
+  let batch_request = false;
+  let remainder = [];
+  let batch = [];
+
+  /*
+   * Append to the the query object and only do it the first function call
+   * + check for excessive number of filter values (specifically image ids)
+   * and enable batched requests (more recursions) if necessary
+   */
+
+  if (!get_all && page == 1){
+    const keys = Object.keys(filters);
+    for (let i = 0; i < keys.length; i++){
+      if (keys[i] == 'ids' && filters[keys[i]].length > 50){
+        batch_request = true;
+      }else{
+        query[keys[i]] = filters[keys[i]];
+      }
+    }
+  }
+
+  /*
+   * Calls helper function which splits the array of ids into 2 arrays:
+   * the 'batch' which will be used in the current API request, and the 'remainder'
+   * which will be used in future requests
+   */
+
+  if (batch_request){
+    const ret = await _tradegecko_prepare_for_batch_request(filters.ids);
+    batch  = ret.batch;
+    remainder = ret.remainder
+    query['ids'] = batch;
+  }
+
+  /*
+   * Have to put the URL together with the Q params here instead of using Got's
+   * query arg as got does not seem to support the bracket array format e.g
+   * ids[]=id1&ids[]=id2.... which TG requires.
+   */
+
+  const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
+  url += `?${query_string}`;
+
+  try {
+    res = await got.get(url, {
+      headers:{
+        Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
+      },
+      json: true
+    });
+
+  }
+  catch (err) {
+    throw new VError (err, `Error listing images via TradeGecko API.` );
+  }
+
+  concat_storage = storage.concat(res.body.images);
+  const pagination_info = JSON.parse(res.headers["x-pagination"]);
+
+  if(!pagination_info.last_page){
+    /*
+     * If it's a multi-page result for a batch request then we need to make a recursive
+     * function call with the current query object as it contains the 'batched' ids.
+     * Otherwise we should move on to a recursive call with the remainder of the ids.
+     */
+
+    if (batch_request){
+      return tradegecko_get_images(query, concat_storage, ++page);
+    }
+
+    query['product_id'] = remainder;
+    return tradegecko_get_images(query, concat_storage, ++page);
+  }
+
+  return concat_storage;
+}
+
+/*
  * This function lists products. If no filters are passed it returns all products.
  * Filters must be valid according to TG API documentation. It is a recursive
  * function and keeps making API calls until it has been through all pages
@@ -506,3 +604,4 @@ exports.tradegecko_upload_product_images = tradegecko_upload_product_images;
 exports.tradegecko_create_company = tradegecko_create_company;
 exports.tradegecko_create_sales_order_contact = tradegecko_create_sales_order_contact;
 exports.tradegecko_get_products = tradegecko_get_products;
+exports.tradegecko_get_images = tradegecko_get_images;

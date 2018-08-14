@@ -23,6 +23,7 @@
 /*
  *  generic exposed search function.
  */
+
 const search_products = async (args) => {
   let results = [];
 
@@ -37,7 +38,10 @@ const search_products = async (args) => {
       const ids = await _extract_product_ids(products);
       const variants = await _list_variants(ids);
       const image_ids = await _extract_image_ids(variants);
-      logger.info(`IMAGE IDS: ${image_ids.toString()}`);
+      logger.info(`IMAGE IDS: ${image_ids.length}`);
+      const images = await _list_images(image_ids);
+      logger.info(`IMAGE OBJECTS: ${images.length}`);
+
 
     } catch (err){
       throw new VError(err, 'error calling search functions');
@@ -81,7 +85,7 @@ async function _list_variants (ids, only_soh=true){
   }
 
   let ret = await tradegecko.tradegecko_get_product_variants({"product_id": ids});
-  logger.info(`RETURNED VARIANTS: ${JSON.stringify(ret, null, 4)} VARIANTS`);
+  logger.info(`RETURNED VARIANTS: ${ret.length}`);
 
   const available = [];
 
@@ -103,8 +107,18 @@ async function _list_variants (ids, only_soh=true){
   return ret;
 }
 
-async function _list_images (args){
+/*
+ * Returned list of image objects from TG
+ */
 
+async function _list_images (image_ids){
+  if (typeof image_ids === 'undefined' || image_ids === null){
+    throw new VError(`image_ids parameter not usable`);
+  }
+
+  const ret = tradegecko.tradegecko_get_images({"ids": image_ids});
+
+  return ret;
 }
 
 /*
