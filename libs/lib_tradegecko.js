@@ -289,7 +289,7 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
       return tradegecko_get_images(query, concat_storage, ++page);
     }
 
-    query['product_id'] = remainder;
+    query['ids'] = remainder;
     return tradegecko_get_images(query, concat_storage, ++page);
   }
 
