@@ -33,10 +33,13 @@ const search_products = async (args) => {
     try{
       let {tags, sizes} = await _get_customer_style_info (sub_id);
       logger.info(`HERE ARE THE TAGS WE GOT: ${tags.toString()}`);
-      logger.info('ABOUT TO LIST PRODUCTS');
+      logger.info('ABOUT TO START LISTING');
       const products = await _list_products(tags);
+      logger.info(`PRODUCTS: ${products.length}`);
       const ids = await _extract_product_ids(products);
+      logger.info(`PRODUCT_IDS: ${ids.length}`);
       const variants = await _list_variants(ids);
+      logger.info(`VARIANTS: ${variants.length}`);
       const image_ids = await _extract_image_ids(variants);
       logger.info(`IMAGE IDS: ${image_ids.length}`);
       const images = await _list_images(image_ids);
@@ -85,7 +88,6 @@ async function _list_variants (ids, only_soh=true){
   }
 
   let ret = await tradegecko.tradegecko_get_product_variants({"product_id": ids});
-  logger.info(`RETURNED VARIANTS: ${ret.length}`);
 
   const available = [];
 
