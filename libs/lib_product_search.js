@@ -36,6 +36,8 @@ const search_products = async (args) => {
       const products = await _list_products(tags);
       const ids = await _extract_product_ids(products);
       const variants = await _list_variants(ids);
+      const image_ids = await _extract_image_ids(variants);
+      logger.info(`IMAGE IDS: ${image_ids.toString()}`);
 
     } catch (err){
       throw new VError(err, 'error calling search functions');
@@ -73,13 +75,31 @@ async function _list_products (tags){
   return ret;
 }
 
-async function _list_variants (ids){
+async function _list_variants (ids, only_soh=true){
   if (typeof ids === 'undefined' || ids === null){
     throw new VError(`ids parameter not usable`);
   }
 
-  const ret = await tradegecko.tradegecko_get_product_variants({"product_id": ids});
+  let ret = await tradegecko.tradegecko_get_product_variants({"product_id": ids});
   logger.info(`RETURNED VARIANTS: ${JSON.stringify(ret, null, 4)} VARIANTS`);
+
+  const available = [];
+
+  /*
+   * If only_soh is true then we only want to return stock on hand.
+   */
+
+  if (only_soh){
+    for (let i = 0; i < ret.length; i++){
+      if (ret[i].stock_on_hand != "0"){
+        available.push(ret[i]);
+      }
+    }
+
+    ret = available;
+  }
+
+
   return ret;
 }
 
@@ -132,6 +152,32 @@ async function _extract_product_ids (products){
 
   for (let i = 0; i < products.length; i++){
     ids.push(products[i].id);
+  }
+
+  return ids;
+}
+
+/*
+ * Takes a TG Variants array and extracts all of the image IDs and returns them
+ * in an array
+ */
+
+async function _extract_image_ids (variants){
+  if (variants.length == 0 ||  typeof variants === 'undefined' || variants === null || !Array.isArray(variants)){
+    throw new VError(`variants parameter not usable`);
+  }
+
+  let ids = [];
+
+  /*
+   * Defaults to plucking the first image. This is fine now but in a future where
+   * variants may have multiple images we'll need to do better
+   */
+
+  for (let i = 0; i < variants.length; i++){
+    if (variants[i].image_ids.length > 0){
+      ids.push(variants[i].image_ids[0]);
+    }
   }
 
   return ids;
