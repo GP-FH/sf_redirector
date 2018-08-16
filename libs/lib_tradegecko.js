@@ -152,7 +152,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
     const ret = await _tradegecko_prepare_for_batch_request(filters.product_id);
     batch  = ret.batch;
     remainder = ret.remainder
-    query['product_ids'] = batch;
+    query['product_id'] = batch;
   }
 
   /*
@@ -180,17 +180,21 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
   concat_storage = storage.concat(res.body.variants);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
-  if(!pagination_info.last_page){
-    /*
-     * If it's a multi-page result for a batch request then we need to make a recursive
-     * function call with the current query object as it contains the 'batched' product_ids.
-     * Otherwise we should move on to a recursive call with the remainder of the product_ids.
-     */
+  /*
+   * If it's a multi-page result make the recursive call to get the rest of the
+   * results
+   */
 
-    if (batch_request){
-      return tradegecko_get_product_variants(query, concat_storage, ++page);
-    }
+  if (!pagination_info.last_page){
+    return tradegecko_get_product_variants(query, concat_storage, ++page);
+  }
 
+  /*
+   * If it's a batched request then we want to make a recursive call with the
+   * remainder of the ids we have to start the process again
+   */
+
+  if (batch_request){
     query['product_id'] = remainder;
     return tradegecko_get_product_variants(query, concat_storage, ++page);
   }
@@ -282,16 +286,19 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
   concat_storage = storage.concat(res.body.images);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
-  if(!pagination_info.last_page){
-    logger.info(`NOT LAST PAGE`);
-    /*
-     * If it's a multi-page result for a batch request then we need to make a recursive
-     * function call with the current query object as it contains the 'batched' ids.
-     * Otherwise we should move on to a recursive call with the remainder of the ids.
-     */
-     
-    return tradegecko_get_products(query, concat_storage, ++page);
+  /*
+   * If it's a multi-page result make the recursive call to get the rest of the
+   * results
+   */
+
+  if (!pagination_info.last_page){
+    return tradegecko_get_images(query, concat_storage, ++page);
   }
+
+  /*
+   * If it's a batched request then we want to make a recursive call with the
+   * remainder of the ids we have to start the process again
+   */
 
   if (batch_request){
     query['ids'] = remainder;
