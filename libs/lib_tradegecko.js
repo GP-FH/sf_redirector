@@ -276,7 +276,7 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
     throw new VError (err, `Error listing images via TradeGecko API.` );
   }
 
-  logger.info(`RESPONSE TO IMAGE API CALL: ${JSON.stringify(res.body, null, 4)}`);
+  logger.info(`RESPONSE TO IMAGE API CALL LENGTH: ${res.body.images.length}`);
   concat_storage = storage.concat(res.body.images);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
