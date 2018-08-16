@@ -283,16 +283,17 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
   if(!pagination_info.last_page){
+    logger.info(`NOT LAST PAGE`);
     /*
      * If it's a multi-page result for a batch request then we need to make a recursive
      * function call with the current query object as it contains the 'batched' ids.
      * Otherwise we should move on to a recursive call with the remainder of the ids.
      */
+     
+    return tradegecko_get_products(query, concat_storage, ++page);
+  }
 
-    if (batch_request){
-      return tradegecko_get_images(query, concat_storage, ++page);
-    }
-
+  if (batch_request){
     query['ids'] = remainder;
     return tradegecko_get_images(query, concat_storage, ++page);
   }
