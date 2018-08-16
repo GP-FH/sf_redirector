@@ -595,7 +595,7 @@ async function _tradegecko_prepare_for_batch_request (values, batch_size=50){
     batch.push(v);
   }
 
-  return { batch: batch, remainder: values};
+  return {batch: batch, remainder: values};
 }
 
 exports.tradegecko_create_sales_order = tradegecko_create_sales_order;
