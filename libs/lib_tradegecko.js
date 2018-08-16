@@ -234,6 +234,7 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
     const keys = Object.keys(filters);
     for (let i = 0; i < keys.length; i++){
       if (keys[i] == 'ids' && filters[keys[i]].length > 50){
+        logger.info(`SETTING BATCH TO TRUE`);
         batch_request = true;
       }else{
         query[keys[i]] = filters[keys[i]];
@@ -251,6 +252,7 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
     const ret = await _tradegecko_prepare_for_batch_request(filters.ids);
     batch  = ret.batch;
     remainder = ret.remainder
+    logger.info(`BATCH LENGTH: ${batch.length}. REMAINDER LENGTH: ${remainder.length}`);
     query['ids'] = batch;
   }
 
