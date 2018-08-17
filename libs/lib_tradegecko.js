@@ -180,6 +180,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
 
   concat_storage = storage.concat(res.body.variants);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
+  logger.info(`TEST: WHAT ARE WE GETTING BACK FROM VARIANT CALLS: ${res.body.variants.length}`);
 
   /*
    * If it's a multi-page result make the recursive call to get the rest of the
