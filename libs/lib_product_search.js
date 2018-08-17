@@ -21,7 +21,7 @@
  ];
 
 /*
- *  generic exposed search function.
+ *  generic exposed search function. 
  */
 
 const search_products = async (args) => {
