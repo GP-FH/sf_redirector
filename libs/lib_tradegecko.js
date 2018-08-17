@@ -126,12 +126,12 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
   let batch = [];
 
   /*
-   * Append to the the query object and only do it the first function call
-   * + check for excessive number of filter values (specifically product_ids)
-   * and enable batched requests (more recursions) if necessary
+   * Append to the the query object + check for excessive number of filter values
+   * (specifically product_ids) and enable batched requests (more recursions)
+   * if necessary
    */
 
-  if (!get_all && page == 1){
+  if (!get_all){
     const keys = Object.keys(filters);
 
     for (let i = 0; i < keys.length; i++){
@@ -230,10 +230,9 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
   let batch = [];
 
   /*
-   * Append to the the query object and only do it the first function call
-   * + check for excessive number of filter values (specifically image ids)
-   * and enable batched requests (more recursions) if necessary
-   * TODO: only doing this the first call means that the batching only happens once. FIX THIS
+   * Append to the the query object + check for excessive number of filter values
+   * (specifically image ids) and enable batched requests (more recursions)
+   * if necessary
    */
 
   if (!get_all){
