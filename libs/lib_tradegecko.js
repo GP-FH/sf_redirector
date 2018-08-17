@@ -233,10 +233,12 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
    * Append to the the query object and only do it the first function call
    * + check for excessive number of filter values (specifically image ids)
    * and enable batched requests (more recursions) if necessary
+   * TODO: only doing this the first call means that the batching only happens once. FIX THIS
    */
 
-  if (!get_all && page == 1){
+  if (!get_all){
     const keys = Object.keys(filters);
+
     for (let i = 0; i < keys.length; i++){
       if (keys[i] == 'ids' && filters[keys[i]].length > 50){
         logger.info(`SETTING BATCH TO TRUE`);
