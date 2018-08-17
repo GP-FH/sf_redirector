@@ -210,7 +210,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
  */
 
 const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
-  //logger.info(`IDS LENGTH: ${filters.ids.length}`);
+  logger.info(`FILTER CONTENTS: ${JSON.stringify(filters)}`);
   let get_all = false;
   let url = 'https://api.tradegecko.com/images/';
 
@@ -285,7 +285,6 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
 
   concat_storage = storage.concat(res.body.images);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
-  logger.info(`RL LIMIT LEFT ${JSON.stringify(res.headers["X-Rate-Limit-Remaining"])}`);
 
   /*
    * If it's a multi-page result make the recursive call to get the rest of the
