@@ -210,7 +210,6 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
  */
 
 const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
-  logger.info(`FILTER CONTENTS: ${JSON.stringify(filters)}`);
   let get_all = false;
   let url = 'https://api.tradegecko.com/images/';
 
