@@ -133,6 +133,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
 
   if (!get_all && page == 1){
     const keys = Object.keys(filters);
+
     for (let i = 0; i < keys.length; i++){
       if (keys[i] == 'ids' && filters[keys[i]].length > 50){
         batch_request = true;
@@ -149,7 +150,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
    */
 
   if (batch_request){
-    const ret = await _tradegecko_prepare_for_batch_request(filters.product_id);
+    const ret = await _tradegecko_prepare_for_batch_request(filters.ids);
     batch  = ret.batch;
     remainder = ret.remainder
     query['ids'] = batch;
