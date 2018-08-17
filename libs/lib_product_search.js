@@ -167,7 +167,7 @@ async function _extract_product_ids (products){
   let ids = [];
 
   for (let i = 0; i < products.length; i++){
-    ids.push(products[i].id);
+    ids.concat(products[i].variant_ids);
   }
 
   return ids;
