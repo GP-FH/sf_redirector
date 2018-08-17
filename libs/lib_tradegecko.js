@@ -134,7 +134,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
   if (!get_all && page == 1){
     const keys = Object.keys(filters);
     for (let i = 0; i < keys.length; i++){
-      if (keys[i] == 'product_id' && filters[keys[i]].length > 50){
+      if (keys[i] == 'ids' && filters[keys[i]].length > 50){
         batch_request = true;
       }else{
         query[keys[i]] = filters[keys[i]];
@@ -152,7 +152,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
     const ret = await _tradegecko_prepare_for_batch_request(filters.product_id);
     batch  = ret.batch;
     remainder = ret.remainder
-    query['product_id'] = batch;
+    query['ids'] = batch;
   }
 
   /*
@@ -195,7 +195,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
    */
 
   if (batch_request){
-    query['product_id'] = remainder;
+    query['ids'] = remainder;
     return tradegecko_get_product_variants(query, concat_storage, ++page);
   }
 

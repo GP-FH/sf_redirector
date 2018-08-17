@@ -87,7 +87,7 @@ async function _list_variants (ids, only_soh=true){
     throw new VError(`ids parameter not usable`);
   }
 
-  let ret = await tradegecko.tradegecko_get_product_variants({"product_id": ids});
+  let ret = await tradegecko.tradegecko_get_product_variants({"ids": ids});
 
   const available = [];
 
