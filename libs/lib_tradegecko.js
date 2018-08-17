@@ -214,10 +214,9 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
   let get_all = false;
   let url = 'https://api.tradegecko.com/images/';
 
-  /*
   if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
     get_all = true;
-  }*/
+  }
 
   let query = {
     "limit": 250,
