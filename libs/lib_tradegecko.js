@@ -156,6 +156,8 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
     query['ids'] = batch;
   }
 
+  logger.info(`HERE IS THE QUERY OBJECT: ${JSON.stringify(query, null, 4)}`);
+
   /*
    * Have to put the URL together with the Q params here instead of using Got's
    * query arg as got does not seem to support the bracket array format e.g
