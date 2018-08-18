@@ -40,10 +40,13 @@ const search_products = async (args) => {
       logger.info(`VARIANT_IDS: ${ids.length}`);
       const variants = await _list_variants(ids);
       logger.info(`VARIANTS: ${variants.length}`);
+      logger.info(`Variant example: ${variants[0]}`);
       const image_ids = await _extract_image_ids(variants);
       logger.info(`IMAGE IDS: ${image_ids.length}`);
       const images = await _list_images(image_ids);
       logger.info(`IMAGE OBJECTS: ${images.length}`);
+
+      //results = await _create_results_array(products, variants, images);
 
 
     } catch (err){
@@ -199,6 +202,37 @@ async function _extract_image_ids (variants){
   }
 
   return ids;
+}
+
+/*
+ * Create and return results array for presenting to stylists. BOOM.
+ */
+
+async function _create_results_array (products, variants, images){
+  //{sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
+  if (products.length == 0 ||  typeof products === 'undefined' || products === null || !Array.isArray(products)){
+    throw new VError(`products parameter not usable`);
+  }
+  if (variants.length == 0 ||  typeof variants === 'undefined' || variants === null || !Array.isArray(variants)){
+    throw new VError(`variants parameter not usable`);
+  }
+  if (images.length == 0 ||  typeof images === 'undefined' || images === null || !Array.isArray(images)){
+    throw new VError(`images parameter not usable`);
+  }
+
+  let ret = [];
+
+  for (let i = 0; i < variants.length; i++){
+    let o = {};
+    o['sku'] = variants[i].sku;
+    o['name'] = variants[i].product_name;
+    o['stock_on_hand'] = variants.stock_on_hand;
+    o['price'] = variants.wholesale_price;
+    o['colour'] = variants.opt2;
+    o['size'] = variants.opt1;
+  }
+
+  return ret;
 }
 
 exports.search_products = search_products;
