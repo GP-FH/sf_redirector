@@ -153,10 +153,9 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
     const ret = await _tradegecko_prepare_for_batch_request(filters.ids);
     batch  = ret.batch;
     remainder = ret.remainder
+    logger.info(`VARIANTS BATCH LENGTH: ${batch.length}. REMAINDER LENGTH: ${remainder.length}`);
     query['ids'] = batch;
   }
-
-  logger.info(`HERE IS THE QUERY OBJECT: ${JSON.stringify(query, null, 4)}`);
 
   /*
    * Have to put the URL together with the Q params here instead of using Got's
@@ -182,7 +181,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
 
   concat_storage = storage.concat(res.body.variants);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
-  logger.info(`TEST: WHAT ARE WE GETTING BACK FROM VARIANT CALLS: ${res.body.variants.length}`);
+
 
   /*
    * If it's a multi-page result make the recursive call to get the rest of the
@@ -260,7 +259,7 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
     const ret = await _tradegecko_prepare_for_batch_request(filters.ids);
     batch  = ret.batch;
     remainder = ret.remainder
-    logger.info(`BATCH LENGTH: ${batch.length}. REMAINDER LENGTH: ${remainder.length}`);
+    logger.info(`IMAGES BATCH LENGTH: ${batch.length}. REMAINDER LENGTH: ${remainder.length}`);
     query['ids'] = batch;
   }
 
