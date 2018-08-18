@@ -86,7 +86,7 @@ async function _list_products (tags){
   return ret;
 }
 
-async function _list_variants (ids, only_soh=true){
+async function _list_variants (ids, sizes, only_soh=true){
   if (typeof ids === 'undefined' || ids === null){
     throw new VError(`ids parameter not usable`);
   }
