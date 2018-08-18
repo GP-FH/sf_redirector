@@ -232,15 +232,6 @@ async function _create_results_array (products, variants, images){
     o['colour'] = variants[i].opt1;
     o['size'] = variants[i].opt2;
 
-    for (let j = 0; j < images.length; j++){
-      logger.info(`INNER LOOP ENTRY`);
-      if (variants[i].id == images[j].variant_ids[0]){
-        logger.info(`INNER LOOP IF`);
-        o['image_url'] = images[j].base_path;
-        break;
-      }
-    }
-
     ret.push(o);
   }
 
