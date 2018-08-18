@@ -238,7 +238,7 @@ async function _create_results_array (products, variants, images){
 
   for (let i = 0; i < ret.length; i++){
     for (let j = 0; j < images.length; j++ ){
-      if (images[i].variant_ids[0] == ret[i].id){
+      if (images[i].variant_ids.includes(ret[i].id)){
         logger.info(`THERE IS A MATCH`);
       }
     }
