@@ -165,10 +165,10 @@ async function _extract_variant_ids (products){
   }
 
   let ids = [];
+  let ret = [];
 
   for (let i = 0; i < products.length; i++){
-    logger.info(`HERE ARE SOME VARIANT IDS AS WE EXTRACT THEM: ${products[i].variant_ids.toString()}`);
-    ids.concat(products[i].variant_ids);
+    ids = ids.concat(products[i].variant_ids);
   }
 
   logger.info(`NUMBER OF EXTRACTED VARIANT IDS: ${ids.length}`);
