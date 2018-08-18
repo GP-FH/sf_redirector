@@ -46,7 +46,7 @@ const search_products = async (args) => {
       const images = await _list_images(image_ids);
       logger.info(`IMAGE OBJECTS: ${images.length}`);
 
-      //results = await _create_results_array(products, variants, images);
+      results = await _create_results_array(products, variants, images);
 
 
     } catch (err){
