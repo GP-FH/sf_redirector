@@ -238,8 +238,8 @@ async function _create_results_array (products, variants, images){
 
   for (let i = 0; i < ret.length; i++){
     for (let j = 0; j < images.length; j++ ){
-      if (images[i].variant_ids.includes(ret[i].id)){
-        logger.info(`THERE IS A MATCH`);
+      if (images[j].variant_ids.includes(ret[i].id)){
+        ret[i]['image'] = images[j].base_path;
       }
     }
   }
