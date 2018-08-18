@@ -171,6 +171,7 @@ async function _extract_variant_ids (products){
     ids.concat(products[i].variant_ids);
   }
 
+  logger.info(`NUMBER OF EXTRACTED VARIANT IDS: ${ids.length}`);
   return ids;
 }
 
