@@ -55,7 +55,7 @@ const search_products = async (args) => {
     }
   }
 
-  return true;
+  return results;
 };
 
 /*
