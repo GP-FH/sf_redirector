@@ -239,7 +239,7 @@ async function _create_results_array (products, variants, images){
   for (let i = 0; i < ret.length; i++){
     for (let j = 0; j < images.length; j++ ){
       if (images[j].variant_ids.includes(ret[i].id)){
-        ret[i]['image'] = images[j].base_path;
+        ret[i]['image'] = `${images[j].base_path}/${images[j].file_name}`;
       }
     }
   }
