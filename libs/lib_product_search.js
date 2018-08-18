@@ -45,6 +45,7 @@ const search_products = async (args) => {
       logger.info(`IMAGE IDS: ${image_ids.length}`);
       const images = await _list_images(image_ids);
       logger.info(`IMAGE OBJECTS: ${images.length}`);
+      logger.info(`Images example: ${JSON.stringify(images[0], null, 4)}`);
 
       results = await _create_results_array(products, variants, images);
 
@@ -209,7 +210,6 @@ async function _extract_image_ids (variants){
  */
 
 async function _create_results_array (products, variants, images){
-  //{sku:'BAB-DDD-AAA', brand:'Nature baby', name:'T-Shirt', colour:'red', size:'0m3'},
   if (products.length == 0 ||  typeof products === 'undefined' || products === null || !Array.isArray(products)){
     throw new VError(`products parameter not usable`);
   }
@@ -225,14 +225,23 @@ async function _create_results_array (products, variants, images){
   // eeeeew
   for (let i = 0; i < variants.length; i++){
     let o = {};
+    o['id'] = variants[i].id;
     o['sku'] = variants[i].sku;
     o['name'] = variants[i].product_name;
     o['stock_on_hand'] = variants[i].stock_on_hand;
-    o['price'] = variants[i].wholesale_price;
+    o['price'] = `$${variants[i].wholesale_price}`;
     o['colour'] = variants[i].opt1;
     o['size'] = variants[i].opt2;
 
     ret.push(o);
+  }
+
+  for (let i = 0; i < ret.length; i++){
+    for (let j = 0; j < images.length; j++ ){
+      if (images[i].variant_ids[0] == ret[i].id){
+        logger.info(`THERE IS A MATCH`);
+      }
+    }
   }
 
   logger.info(`results array length: ${ret.length} and example result ${JSON.stringify(ret[0], null, 4)}`);
