@@ -36,8 +36,8 @@ const search_products = async (args) => {
       logger.info('ABOUT TO START LISTING');
       const products = await _list_products(tags);
       logger.info(`PRODUCTS: ${products.length}`);
-      const ids = await _extract_product_ids(products);
-      logger.info(`PRODUCT_IDS: ${ids.length}`);
+      const ids = await _extract_variant_ids(products);
+      logger.info(`VARIANT_IDS: ${ids.length}`);
       const variants = await _list_variants(ids);
       logger.info(`VARIANTS: ${variants.length}`);
       const image_ids = await _extract_image_ids(variants);
@@ -159,7 +159,7 @@ async function _transform_custom_fields_to_tags_and_size (subscription){
  * in an array
  */
 
-async function _extract_product_ids (products){
+async function _extract_variant_ids (products){
   if (products.length == 0 ||  typeof products === 'undefined' || products === null || !Array.isArray(products)){
     throw new VError(`product parameter not usable`);
   }
@@ -167,6 +167,7 @@ async function _extract_product_ids (products){
   let ids = [];
 
   for (let i = 0; i < products.length; i++){
+    logger.info(`HERE ARE SOME VARIANT IDS AS WE EXTRACT THEM: ${products[i].variant_ids.toString()}`);
     ids.concat(products[i].variant_ids);
   }
 
