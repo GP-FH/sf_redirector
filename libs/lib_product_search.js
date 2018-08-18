@@ -40,7 +40,7 @@ const search_products = async (args) => {
       logger.info(`VARIANT_IDS: ${ids.length}`);
       const variants = await _list_variants(ids);
       logger.info(`VARIANTS: ${variants.length}`);
-      logger.info(`Variant example: ${variants[0]}`);
+      logger.info(`Variant example: ${JSON.stringify(variants[0], null, 4)}`);
       const image_ids = await _extract_image_ids(variants);
       logger.info(`IMAGE IDS: ${image_ids.length}`);
       const images = await _list_images(image_ids);
