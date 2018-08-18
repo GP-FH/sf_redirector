@@ -222,16 +222,27 @@ async function _create_results_array (products, variants, images){
 
   let ret = [];
 
+  // eeeeew
   for (let i = 0; i < variants.length; i++){
     let o = {};
     o['sku'] = variants[i].sku;
     o['name'] = variants[i].product_name;
-    o['stock_on_hand'] = variants.stock_on_hand;
-    o['price'] = variants.wholesale_price;
-    o['colour'] = variants.opt2;
-    o['size'] = variants.opt1;
+    o['stock_on_hand'] = variants[i].stock_on_hand;
+    o['price'] = variants[i].wholesale_price;
+    o['colour'] = variants[i].opt1;
+    o['size'] = variants[i].opt2;
+
+    for (let j = 0; j < images.length; j++){
+      if (variants[i].id == images[j].variant_ids[0]){
+        o['image_url'] = images[j].base_path;
+        break;
+      }
+    }
+
+    ret.push(o);
   }
 
+  logger.info(`results array length: ${ret.length} and example result ${JSON.stringify(ret[0], null, 4)}`);
   return ret;
 }
 
