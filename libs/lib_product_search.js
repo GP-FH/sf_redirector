@@ -57,20 +57,11 @@ const search_products = async (args) => {
 
     try{
       let {tags, sizes} = await _get_customer_style_info (sub_id);
-      logger.info(`HERE ARE THE TAGS WE GOT: ${tags.toString()} AND THE SIZES ${JSON.stringify(sizes, null, 4)}`);
-      logger.info('ABOUT TO START LISTING');
       const products = await _list_products(tags);
-      logger.info(`PRODUCTS: ${products.length}`);
       const ids = await _extract_variant_ids(products);
-      logger.info(`VARIANT_IDS: ${ids.length}`);
       const variants = await _list_variants(ids, sizes);
-      logger.info(`VARIANTS: ${variants.length}`);
-      logger.info(`Variant example: ${JSON.stringify(variants[0], null, 4)}`);
       const image_ids = await _extract_image_ids(variants);
-      logger.info(`IMAGE IDS: ${image_ids.length}`);
       const images = await _list_images(image_ids);
-      logger.info(`IMAGE OBJECTS: ${images.length}`);
-      logger.info(`Images example: ${JSON.stringify(images[0], null, 4)}`);
 
       results = await _create_results_array(products, variants, images);
 
@@ -205,7 +196,6 @@ async function _extract_variant_ids (products){
     ids = ids.concat(products[i].variant_ids);
   }
 
-  logger.info(`NUMBER OF EXTRACTED VARIANT IDS: ${ids.length}`);
   return ids;
 }
 
@@ -283,7 +273,6 @@ async function _create_results_array (products, variants, images){
     }
   }
 
-  logger.info(`results array length: ${ret.length} and example result ${JSON.stringify(ret[0], null, 4)}`);
   return ret;
 }
 
@@ -292,7 +281,6 @@ async function _create_results_array (products, variants, images){
  */
 
 async function _filter_for_sizes (variants, sizes){
-  logger.info(`VARIANTS RECEIVED FOR FILTERING: ${variants.length}`);
   let ret = [];
 
   for (let i = 0; i < variants.length; i++){
@@ -306,8 +294,6 @@ async function _filter_for_sizes (variants, sizes){
       }
     }
   }
-
-  logger.info(`FILTERED VARIANT ARRAY LENGTH: ${ret.length}`);
 
   return ret;
 };

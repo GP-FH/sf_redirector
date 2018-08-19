@@ -153,7 +153,6 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
     const ret = await _tradegecko_prepare_for_batch_request(filters.ids);
     batch  = ret.batch;
     remainder = ret.remainder
-    logger.info(`VARIANTS BATCH LENGTH: ${batch.length}. REMAINDER LENGTH: ${remainder.length}`);
     query['ids'] = batch;
   }
 
@@ -241,7 +240,6 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
 
     for (let i = 0; i < keys.length; i++){
       if (keys[i] == 'ids' && filters[keys[i]].length > 200){
-        logger.info(`SETTING BATCH TO TRUE`);
         batch_request = true;
       }else{
         query[keys[i]] = filters[keys[i]];
@@ -259,7 +257,6 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
     const ret = await _tradegecko_prepare_for_batch_request(filters.ids);
     batch  = ret.batch;
     remainder = ret.remainder
-    logger.info(`IMAGES BATCH LENGTH: ${batch.length}. REMAINDER LENGTH: ${remainder.length}`);
     query['ids'] = batch;
   }
 
