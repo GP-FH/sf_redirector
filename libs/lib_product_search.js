@@ -20,6 +20,34 @@
   'cf_topsize'
  ];
 
+ // Tees, Onesies, Leggings, Shorts, Socks, Tops, Jumpsuits, Crossovers, Dresses, Singlets,
+ // Swimwear, Bloomers, Crews, Coats and jackets, Cardigans, Leotards, Playsuits, Trackies,
+ // Hoodies, Henleys
+const _product_type_tops = [
+  'Tees',
+  'Onesies',
+  'Tops',
+  'Jumpsuits',
+  'Crossovers',
+  'Dresses',
+  'Singlets',
+  'Crews',
+  'Coats and jackets',
+  'Cardigans',
+  'Leotards',
+  'Playsuits',
+  'Hoodies',
+  'Henleys'
+ ];
+
+const _product_type_bottoms = [
+  'Leggings',
+  'Shorts',
+  'Swimwear',
+  'Bloomers',
+  'Trackies'
+];
+
 /*
  *  generic exposed search function.
  */
@@ -86,7 +114,11 @@ async function _list_products (tags){
   return ret;
 }
 
-async function _list_variants (ids, sizes, only_soh=true){
+/*
+ * Returns a list of product variants based on ids, sizes and stock on hand.
+ */
+
+async function _list_variants (ids, sizes={}, only_soh=true){
   if (typeof ids === 'undefined' || ids === null){
     throw new VError(`ids parameter not usable`);
   }
@@ -109,6 +141,9 @@ async function _list_variants (ids, sizes, only_soh=true){
     ret = available;
   }
 
+  if (Object.keys(sizes).length === 0){
+    ret = await _filter_for_sizes(ret, sizes);
+  }
 
   return ret;
 }
@@ -247,5 +282,27 @@ async function _create_results_array (products, variants, images){
   logger.info(`results array length: ${ret.length} and example result ${JSON.stringify(ret[0], null, 4)}`);
   return ret;
 }
+
+/*
+ * Filter variants array for given sizes. Returns filtered array
+ */
+
+async function _filter_for_sizes (variants, sizes){
+  let ret = [];
+
+  for (let i = 0; i < variants.length; i++){
+    if (_product_type_tops.includes(variants[i].product_type)){
+      if (variants[i].opt2 == sizes.top){
+        ret.push(variants[i]);
+      }
+    }else if (_product_type_bottoms.includes(variants[i].product_type){
+      if (variants[i].opt2 == sizes.bottom){
+        ret.push(variants[i]);
+      }
+    }
+  }
+
+  return ret;
+};
 
 exports.search_products = search_products;
