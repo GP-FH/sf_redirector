@@ -20,9 +20,6 @@
   'cf_topsize'
  ];
 
- // Tees, Onesies, Leggings, Shorts, Socks, Tops, Jumpsuits, Crossovers, Dresses, Singlets,
- // Swimwear, Bloomers, Crews, Coats and jackets, Cardigans, Leotards, Playsuits, Trackies,
- // Hoodies, Henleys
 const _product_type_tops = [
   'Tees',
   'Onesies',
@@ -273,6 +270,15 @@ async function _create_results_array (products, variants, images){
     for (let j = 0; j < images.length; j++ ){
       if (images[j].variant_ids.includes(ret[i].id)){
         ret[i]['image'] = `${images[j].base_path}/${images[j].file_name}`;
+      }
+    }
+  }
+
+  for (let i = 0; i < ret.length; i++){
+    for (let j = 0; j < products.length; j++){
+      if (ret[i].id == products[j].product_id){
+        ret[i]['brand'] = products[j].brand;
+        ret[i]['tg_link'] = `https://go.tradegecko.com/inventory/${products[j].id}/variants/${ret[i].id}/edit`
       }
     }
   }
