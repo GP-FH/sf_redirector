@@ -141,10 +141,7 @@ async function _list_variants (ids, sizes={}, only_soh=true){
     ret = available;
   }
 
-  if (!Object.keys(sizes).length === 0){
-    logger.info(`GONNA FILTER!`);
-    ret = await _filter_for_sizes(ret, sizes);
-  }
+  ret = await _filter_for_sizes(ret, sizes);
 
   return ret;
 }
