@@ -276,7 +276,7 @@ async function _create_results_array (products, variants, images){
 
   for (let i = 0; i < ret.length; i++){
     for (let j = 0; j < products.length; j++){
-      if (ret[i].id == products[j].product_id){
+      if (products[j].variant_ids.includes(ret[i].id)){
         ret[i]['brand'] = products[j].brand;
         ret[i]['tg_link'] = `https://go.tradegecko.com/inventory/${products[j].id}/variants/${ret[i].id}/edit`
       }
