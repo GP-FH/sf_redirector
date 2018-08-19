@@ -66,7 +66,7 @@ const search_products = async (args) => {
       logger.info(`PRODUCTS: ${products.length}`);
       const ids = await _extract_variant_ids(products);
       logger.info(`VARIANT_IDS: ${ids.length}`);
-      const variants = await _list_variants(ids);
+      const variants = await _list_variants(ids, sizes);
       logger.info(`VARIANTS: ${variants.length}`);
       logger.info(`Variant example: ${JSON.stringify(variants[0], null, 4)}`);
       const image_ids = await _extract_image_ids(variants);
@@ -141,7 +141,7 @@ async function _list_variants (ids, sizes={}, only_soh=true){
     ret = available;
   }
 
-  if (Object.keys(sizes).length === 0){
+  if (!Object.keys(sizes).length === 0){
     ret = await _filter_for_sizes(ret, sizes);
   }
 
@@ -288,6 +288,7 @@ async function _create_results_array (products, variants, images){
  */
 
 async function _filter_for_sizes (variants, sizes){
+  logger.info(`VARIANTS RECEIVED FOR FILTERING: ${variants.length}`);
   let ret = [];
 
   for (let i = 0; i < variants.length; i++){
