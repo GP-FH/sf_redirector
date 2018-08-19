@@ -302,6 +302,8 @@ async function _filter_for_sizes (variants, sizes){
     }
   }
 
+  logger.info(`FILTERED VARIANT ARRAY LENGTH: ${ret.length}`);
+
   return ret;
 };
 
