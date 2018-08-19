@@ -1,0 +1,81 @@
+<div class="container">
+  <h1 class="my-4 text-center text-lg-left">Product Search</h1>
+  {{#if error}}
+    <div id="search_error" class="alert alert-danger mt-3" role="alert">
+      {{error}}
+    </div>
+  {{/if}}
+  <div class="card ml-5 mt-3 mr-5">
+    <div class="card-header">
+      Get products by Subscription ID (experimental)
+    </div>
+    <div class="card-body">
+      <p class="card-text">See all products that match a sub's style profile</p>
+      <form action="/hq/product_search" method="post" id="sub_search_input">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <input type="hidden" name="sub_search" value="1">
+        <div class="form-group">
+          <input type="text" class="form-control" id="search_input" placeholder="Enter Chargebee subscription ID" name=search_input>
+        </div>
+        <button id="sub_search_button" type="submit" class="btn btn-primary">Search</button>
+      </form>
+    </div>
+    <div class="row text-center text-lg-left" id="sub_results">
+      {{#each sub_results}}
+        <div class="col-lg-3 col-md-4 col-xs-6">
+          <a href="{{this.tg_link}}" class="d-block mb-4 h-100" target="_blank">
+            <figure class="figure">
+              <img class="figure-img img-fluid img-thumbnail" src="{{this.image}}" alt="">
+              <figcaption class="figure-caption"><b>SKU:</b>{{this.sku}}<br><b>Name:</b>{{this.name}}<br><b>Brand:</b>{{this.brand}}<br><b>Colour:</b>{{this.colour}}<br><b>Size:</b>{{this.size}}<br><b>Stock On Hand:</b>{{this.stock_on_hand}}<br><b>Value:</b>{{this.price}}</figcaption>
+            </figure>
+          </a>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <div class="card ml-5 mt-3 mr-5">
+    <div class="card-header">
+      Get products by regular things (NOT WORKING YET)
+    </div>
+    <div class="card-body">
+      <p class="card-text">See all products that match filters you select</p>
+      <form action="/hq/product_search" method="post" id="filter_search_input">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <input type="hidden" name="filter_search" value="1">
+        <div class="form-group">
+          <label for="style_tags_input">Style Tags</label>
+          <input type="text" class="form-control" id="style_tags_input" placeholder="a,comma,separated,list" name="style_tags_input" >
+        </div>
+        <div class="form-group">
+          <label for="size_select">Size</label>
+          <select multiple class="form-control" id="size_select_input" name="size_select_input">
+            <option>0m3</option>
+            <option>3m6</option>
+            <option>6m12</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+          </select>
+        </div>
+        <button id="reg_search_button" type="submit" class="btn btn-primary mb-2">Search</button>
+      </form>
+    </div>
+    <div class="row text-center text-lg-left" id="reg_results">
+      {{#each filter_results}}
+        <div class="col-lg-3 col-md-4 col-xs-6">
+          <a href="#" class="d-block mb-4 h-100">
+            <figure class="figure">
+              <img class="figure-img img-fluid img-thumbnail" src="https://d1yx6mil86g02p.cloudfront.net/uploads/variant_image/image/16709483/medium_RYU-SFX-Sae.jpg" alt="">
+              <figcaption class="figure-caption">{{this.sku}}: {{this.brand}} {{this.name}} {{this.colour}} {{this.size}}</figcaption>
+            </figure>
+          </a>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</div>

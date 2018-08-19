@@ -5,11 +5,10 @@ const logger = require("../libs/lib_logger");
 
 
 router.route('/').get( async (req,res) => {
-  res.render('login');
+  res.render('login', { csrfToken: req.csrfToken() });
 });
 
 router.route('/').post(passport.authenticate('local', { failureRedirect: '/hq/login' }), (req,res) => {
-  logger.info(`hello`);
   res.redirect('/hq/hq_home');
 });
 

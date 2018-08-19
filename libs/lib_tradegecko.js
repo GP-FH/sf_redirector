@@ -6,13 +6,16 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const got = require("got");
+const qs = require("qs");
 const VError = require("verror");
 const logger = require("../libs/lib_logger");
+
 
 /*
  * This function exposes the ability to create a Sales Order containing all the information and Stylist
  * needs to fill it
  */
+
 const tradegecko_create_sales_order = async ( subscription, customer, company_id = "21313869" ) => {
   let { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
   let order = {
@@ -27,6 +30,7 @@ const tradegecko_create_sales_order = async ( subscription, customer, company_id
    * Here we compare the address received from CB to the addresses attached to the customer in TG.
    * If any matches are found we send the address ID in the sales order to avoid creating dupe addresses
    */
+
   const ret = await _tradegecko_check_for_existing_address(shipping_address, company_id);
   if (ret.exists){
     order["shipping_address_id"] = ret.address_id;
@@ -58,6 +62,7 @@ const tradegecko_create_sales_order = async ( subscription, customer, company_id
  * This helper function takes customer and subscription info and preps it for being sent
  * into Tradegecko via a new Sales Order.
  */
+
 async function _prep_subscription_for_sending ( subscription, customer ) {
   return {
     "shipping_address": { // the customers address -> this will be automagically added to the Stylists relationship
@@ -95,21 +100,75 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
 }
 
 /*
- * This function lists all product variants. It is a recursive function and keeps making
- * API calls until it has been through all pages
+ * This function lists product variants. If no filters are passed it returns all variants.
+ * Filters must be valid according to TG API documentation. It is a recursive
+ * function and keeps making API calls until it has been through all pages
  */
-const tradegecko_get_product_variants = async (storage=[], page=1) => {
+
+const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) => {
+  let get_all = false;
+  let url = 'https://api.tradegecko.com/variants/';
+
+  if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
+    get_all = true;
+  }
+
+  let query = {
+    "limit": 250,
+    "page": page,
+    "sellable": true
+  }
+
   let concat_storage = [];
   let res;
+  let batch_request = false;
+  let remainder = [];
+  let batch = [];
+
+  /*
+   * Append to the the query object + check for excessive number of filter values
+   * (specifically product_ids) and enable batched requests (more recursions)
+   * if necessary
+   */
+
+  if (!get_all){
+    const keys = Object.keys(filters);
+
+    for (let i = 0; i < keys.length; i++){
+      if (keys[i] == 'ids' && filters[keys[i]].length > 200){
+        batch_request = true;
+      }else{
+        query[keys[i]] = filters[keys[i]];
+      }
+    }
+  }
+
+  /*
+   * Calls helper function which splits the array of product_ids into 2 arrays:
+   * the 'batch' which will be used in the current API request, and the 'remainder'
+   * which will be used in future requests
+   */
+
+  if (batch_request){
+    const ret = await _tradegecko_prepare_for_batch_request(filters.ids);
+    batch  = ret.batch;
+    remainder = ret.remainder
+    query['ids'] = batch;
+  }
+
+  /*
+   * Have to put the URL together with the Q params here instead of using Got's
+   * query arg as got does not seem to support the bracket array format e.g
+   * product_id[]=id1&product_id[]=id2.... which TG requires.
+   */
+
+  const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
+  url += `?${query_string}`;
 
   try {
-    res = await got.get('https://api.tradegecko.com/variants/', {
+    res = await got.get(url, {
       headers:{
         Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
-      },
-      query:{
-        limit:250,
-        page:page
       },
       json: true
     });
@@ -122,8 +181,192 @@ const tradegecko_get_product_variants = async (storage=[], page=1) => {
   concat_storage = storage.concat(res.body.variants);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
+
+  /*
+   * If it's a multi-page result make the recursive call to get the rest of the
+   * results
+   */
+
+  if (!pagination_info.last_page){
+    return tradegecko_get_product_variants(query, concat_storage, ++page);
+  }
+
+  /*
+   * If it's a batched request then we want to make a recursive call with the
+   * remainder of the ids we have to start the process again
+   */
+
+  if (batch_request){
+    query['ids'] = remainder;
+    return tradegecko_get_product_variants(query, concat_storage, ++page);
+  }
+
+  return concat_storage;
+};
+
+/*
+ * This function lists image objects. If no filters are passed it returns all images.
+ * Filters must be valid according to TG API documentation. It is a recursive
+ * function and keeps making API calls until it has been through all pages
+ */
+
+const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
+  let get_all = false;
+  let url = 'https://api.tradegecko.com/images/';
+
+  if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
+    get_all = true;
+  }
+
+  let query = {
+    "limit": 250,
+    "page": page
+  }
+
+  let concat_storage = [];
+  let res;
+  let batch_request = false;
+  let remainder = [];
+  let batch = [];
+
+  /*
+   * Append to the the query object + check for excessive number of filter values
+   * (specifically image ids) and enable batched requests (more recursions)
+   * if necessary
+   */
+
+  if (!get_all){
+    const keys = Object.keys(filters);
+
+    for (let i = 0; i < keys.length; i++){
+      if (keys[i] == 'ids' && filters[keys[i]].length > 200){
+        batch_request = true;
+      }else{
+        query[keys[i]] = filters[keys[i]];
+      }
+    }
+  }
+
+  /*
+   * Calls helper function which splits the array of ids into 2 arrays:
+   * the 'batch' which will be used in the current API request, and the 'remainder'
+   * which will be used in future requests
+   */
+
+  if (batch_request){
+    const ret = await _tradegecko_prepare_for_batch_request(filters.ids);
+    batch  = ret.batch;
+    remainder = ret.remainder
+    query['ids'] = batch;
+  }
+
+  /*
+   * Have to put the URL together with the Q params here instead of using Got's
+   * query arg as got does not seem to support the bracket array format e.g
+   * ids[]=id1&ids[]=id2.... which TG requires.
+   */
+
+  const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
+  url += `?${query_string}`;
+
+  try {
+    res = await got.get(url, {
+      headers:{
+        Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
+      },
+      json: true
+    });
+
+  }
+  catch (err) {
+    throw new VError (err, `Error listing images via TradeGecko API.` );
+  }
+
+  concat_storage = storage.concat(res.body.images);
+  const pagination_info = JSON.parse(res.headers["x-pagination"]);
+
+  /*
+   * If it's a multi-page result make the recursive call to get the rest of the
+   * results
+   */
+
+  if (!pagination_info.last_page){
+    return tradegecko_get_images(query, concat_storage, ++page);
+  }
+
+  /*
+   * If it's a batched request then we want to make a recursive call with the
+   * remainder of the ids we have to start the process again
+   */
+
+  if (batch_request){
+    query['ids'] = remainder;
+    return tradegecko_get_images(query, concat_storage, ++page);
+  }
+
+  return concat_storage;
+}
+
+/*
+ * This function lists products. If no filters are passed it returns all products.
+ * Filters must be valid according to TG API documentation. It is a recursive
+ * function and keeps making API calls until it has been through all pages
+ */
+
+const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
+  let get_all = false;
+  let url = 'https://api.tradegecko.com/products/';
+
+  if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
+    get_all = true;
+  }
+
+  let query = {
+    "limit": 250,
+    "page": page,
+    "status": "active"
+  }
+
+  let concat_storage = [];
+  let res;
+
+  /*
+   * Append to the the query object and only do it the first function call
+   */
+
+  if (!get_all && page == 1){
+    const keys = Object.keys(filters);
+    for (let i = 0; i < keys.length; i++){
+      query[keys[i]] = filters[keys[i]];
+    }
+  }
+
+  /*
+   * Have to put the URL together with the Q params here instead of using Got's
+   * query arg as got does not seem to support the bracket array format e.g
+   * tag[]=tag1&tag[]=tag2.... which TG requires.
+   */
+
+  const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
+  url += `?${query_string}`;
+
+  try {
+    res = await got.get(url, {
+      headers:{
+        Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
+      },
+      json: true
+    });
+  }
+  catch (err) {
+    throw new VError (err, `Error listing products via TradeGecko API.` );
+  }
+
+  concat_storage = storage.concat(res.body.products);
+  const pagination_info = JSON.parse(res.headers["x-pagination"]);
+
   if(!pagination_info.last_page){
-    return tradegecko_get_product_variants(concat_storage, ++page);
+    return tradegecko_get_products(query, concat_storage, ++page);
   }
 
   return concat_storage;
@@ -132,6 +375,7 @@ const tradegecko_get_product_variants = async (storage=[], page=1) => {
 /*
  * This function uploads product images to Tradegecko.
  */
+
 const tradegecko_upload_product_images = async (product_id, variant_ids, image_url) => {
   let res;
 
@@ -162,6 +406,7 @@ const tradegecko_upload_product_images = async (product_id, variant_ids, image_u
  * This function creates a company in TradeGecko (a 'company' being a supplier, business, or consumer
  * contact).
  */
+
 const tradegecko_create_company = async (customer, company_type) => {
   try{
     return await _tradegecko_create_company(company_type, customer.email, `${customer.first_name} ${customer.last_name}`, customer.phone);
@@ -174,6 +419,7 @@ const tradegecko_create_company = async (customer, company_type) => {
  * This function creates & returns an accompanying 'consumer' company for new sales orders. If one
  * already exists it returns that instead.
  */
+
 const tradegecko_create_sales_order_contact = async (subscription, customer) => {
   let company;
   try{
@@ -195,6 +441,7 @@ const tradegecko_create_sales_order_contact = async (subscription, customer) => 
 /*
  * Bare bones TG company creation helper method. Will export if needed.
  */
+
 async function _tradegecko_create_company (company_type, email, name, phone_number){
   let res;
   try {
@@ -224,6 +471,7 @@ async function _tradegecko_create_company (company_type, email, name, phone_numb
 /*
  * Bare bones TG address creation function. Will export if ever neccessary.
  */
+
 async function _tradegecko_create_address (company_id, address){
   let res;
 
@@ -258,6 +506,7 @@ async function _tradegecko_create_address (company_id, address){
  * Helper function: checks for any TG customers with a matching email and returns
  * the result.
  */
+
 async function _tradegecko_check_for_existing_company (email, page=1){
   let res;
 
@@ -303,6 +552,7 @@ async function _tradegecko_check_for_existing_company (email, page=1){
  * Helper function: chrcks for matching addresses for a given TG customer. Returns
  * the result.
  */
+
 async function _tradegecko_check_for_existing_address (address, company_id){
   let res;
 
@@ -338,8 +588,31 @@ async function _tradegecko_check_for_existing_address (address, company_id){
   return {ok:true, exists:exists, address_id:address_id};
 }
 
+/*
+ * Helper function to break array up into smaller batches when number of filters is
+ * too long for TG API e.g when using ids as filters. Returns object containing batch
+ * array + array containing remaining values
+ */
+
+async function _tradegecko_prepare_for_batch_request (values, batch_size=200){
+  if (values.length == 0 ||  typeof values === 'undefined' || values === null || !Array.isArray(values)){
+    throw new VError(`values parameter not usable`);
+  }
+
+  let batch = [];
+
+  for (let i = 0; i < batch_size; i++){
+    let v = values.pop();
+    batch.push(v);
+  }
+
+  return {batch: batch, remainder: values};
+}
+
 exports.tradegecko_create_sales_order = tradegecko_create_sales_order;
 exports.tradegecko_get_product_variants = tradegecko_get_product_variants;
 exports.tradegecko_upload_product_images = tradegecko_upload_product_images;
 exports.tradegecko_create_company = tradegecko_create_company;
 exports.tradegecko_create_sales_order_contact = tradegecko_create_sales_order_contact;
+exports.tradegecko_get_products = tradegecko_get_products;
+exports.tradegecko_get_images = tradegecko_get_images;
