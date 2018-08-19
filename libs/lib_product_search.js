@@ -60,7 +60,7 @@ const search_products = async (args) => {
 
     try{
       let {tags, sizes} = await _get_customer_style_info (sub_id);
-      logger.info(`HERE ARE THE TAGS WE GOT: ${tags.toString()}`);
+      logger.info(`HERE ARE THE TAGS WE GOT: ${tags.toString()} AND THE SIZES ${JSON.stringify(sizes, null, 4)}`);
       logger.info('ABOUT TO START LISTING');
       const products = await _list_products(tags);
       logger.info(`PRODUCTS: ${products.length}`);
@@ -142,6 +142,7 @@ async function _list_variants (ids, sizes={}, only_soh=true){
   }
 
   if (!Object.keys(sizes).length === 0){
+    logger.info(`GONNA FILTER!`);
     ret = await _filter_for_sizes(ret, sizes);
   }
 
