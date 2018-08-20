@@ -11,7 +11,6 @@ router.route('/').get(connect.ensureLoggedIn('/hq/login'), async (req, res) => {
 router.route('/').post(async (req, res, next) => {
   try{
     if (req.body.sub_search){
-      logger.info(`it's a sub search!`);
       const args = {
         sub_id: req.body.search_input
       };
@@ -20,6 +19,8 @@ router.route('/').post(async (req, res, next) => {
 
       res.render('product_search', {csrfToken: req.csrfToken(), sub_results:ret});
     }else if (req.body.filter_search){
+      logger.info(`it's a filter search! ${JSON.stringify(req.body)}`);
+
       res.render('product_search', {csrfToken: req.csrfToken(), filter_results:test_obj});
     }
   }catch (err){
