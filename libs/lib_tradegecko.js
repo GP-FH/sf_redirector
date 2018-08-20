@@ -589,7 +589,7 @@ async function _tradegecko_check_for_existing_address (address, company_id){
 }
 
 /*
- * Helper function to break array up into smaller batches when number of filters is
+ * Helper function to break array up into smaller batches when number of filters is 
  * too long for TG API e.g when using ids as filters. Returns object containing batch
  * array + array containing remaining values
  */
