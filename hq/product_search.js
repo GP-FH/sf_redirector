@@ -30,7 +30,7 @@ router.route('/').post(async (req, res, next) => {
 
       const ret = await product_search.search_products(args);
 
-      res.render('product_search', {csrfToken: req.csrfToken(), filter_results:test_obj});
+      res.render('product_search', {csrfToken: req.csrfToken(), filter_results:ret});
     }
   }catch (err){
     logger.error(JSON.stringify( err ));
