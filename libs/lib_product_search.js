@@ -94,22 +94,24 @@ const search_products = async (args) => {
       const images = await _list_images(image_ids);
 
       results = await _create_results_array(products, variants, images);
-
-
     } catch (err){
-      throw new VError(err, 'error calling search functions');
+      throw new VError(err, 'error with sub_id search');
     }
   }else if (args.tags){
     const tags = args.tags;
     const sizes = args.sizes;
 
-    const products = await _list_products(tags);
-    const ids = await _extract_variant_ids(products);
-    const variants = await _list_variants(ids, sizes);
-    const image_ids = await _extract_image_ids(variants);
-    const images = await _list_images(image_ids);
+    try{
+      const products = await _list_products(tags);
+      const ids = await _extract_variant_ids(products);
+      const variants = await _list_variants(ids, sizes);
+      const image_ids = await _extract_image_ids(variants);
+      const images = await _list_images(image_ids);
 
-    results = await _create_results_array(products, variants, images);
+      results = await _create_results_array(products, variants, images);
+    } catch (err){
+      throw new VError(err, 'error with product fields search');
+    }
   }
 
   return results;
