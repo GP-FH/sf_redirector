@@ -1,8 +1,8 @@
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  * The goal for this lib is to provide the foundations for a more flexible product search.
  *
- */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
  const tradegecko = require("../libs/lib_tradegecko");
  const chargebee = require("../libs/lib_chargebee");
@@ -43,6 +43,10 @@ const _product_type_bottoms = [
   'Swimwear',
   'Bloomers',
   'Trackies'
+];
+
+const _product_type_misc = [
+  'Hats'
 ];
 
 /*
@@ -292,6 +296,8 @@ async function _filter_for_sizes (variants, sizes){
       if (variants[i].opt2 == sizes.bottom){
         ret.push(variants[i]);
       }
+    }else if (_product_type_misc.includes(variants[i].product_type)){
+      ret.push(variants[i]);
     }
   }
 
