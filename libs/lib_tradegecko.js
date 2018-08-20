@@ -135,7 +135,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
     const keys = Object.keys(filters);
 
     for (let i = 0; i < keys.length; i++){
-      if (keys[i] == 'ids' && filters[keys[i]].length > 300){
+      if (keys[i] == 'ids' && filters[keys[i]].length > 250){
         batch_request = true;
       }else{
         query[keys[i]] = filters[keys[i]];
@@ -239,7 +239,7 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
     const keys = Object.keys(filters);
 
     for (let i = 0; i < keys.length; i++){
-      if (keys[i] == 'ids' && filters[keys[i]].length > 300){
+      if (keys[i] == 'ids' && filters[keys[i]].length > 250){
         batch_request = true;
       }else{
         query[keys[i]] = filters[keys[i]];
@@ -594,7 +594,7 @@ async function _tradegecko_check_for_existing_address (address, company_id){
  * array + array containing remaining values
  */
 
-async function _tradegecko_prepare_for_batch_request (values, batch_size=300){
+async function _tradegecko_prepare_for_batch_request (values, batch_size=250){
   if (values.length == 0 ||  typeof values === 'undefined' || values === null || !Array.isArray(values)){
     throw new VError(`values parameter not usable`);
   }
