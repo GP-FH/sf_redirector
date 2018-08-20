@@ -1,8 +1,8 @@
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  * The goal for this lib is to provide the foundations for a more flexible product search.
  *
- */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
  const tradegecko = require("../libs/lib_tradegecko");
  const chargebee = require("../libs/lib_chargebee");
@@ -45,8 +45,38 @@ const _product_type_bottoms = [
   'Trackies'
 ];
 
+const _product_type_misc = [
+  'Hats'
+];
+
 /*
- *  generic exposed search function.
+ * Product search function which accepts 2 sets of args:
+ * 1. - when searching with a CB sub
+ *    {
+ *      sub_id:XXXXXXXXXXXX
+ *    }
+ * 2. - when searching with tags and sizes
+ *    {
+ *      tags: [xxxx,xxxx,...],
+ *      sizes: {
+ *              bottom: size,
+ *              top:size
+ *             }
+ *    }
+ *
+ * Returns array on results objects:
+ * {
+ *  id: variant ID
+ *  sku: product sku
+ *  name: name of the product
+ *  stock_on_hand: amount of stock on hand (this does not discount items in active sales orders)
+ *  price: price of the variant
+ *  colour: the colour dummy
+ *  size: the size dummy
+ *  image: url for the variant image
+ *  brand: product brand
+ *  tg_link: link to the variant in TradeGecko
+ * }
  */
 
 const search_products = async (args) => {
@@ -69,6 +99,17 @@ const search_products = async (args) => {
     } catch (err){
       throw new VError(err, 'error calling search functions');
     }
+  }else if (args.tags){
+    const tags = args.tags;
+    const sizes = args.sizes;
+
+    const products = await _list_products(tags);
+    const ids = await _extract_variant_ids(products);
+    const variants = await _list_variants(ids, sizes);
+    const image_ids = await _extract_image_ids(variants);
+    const images = await _list_images(image_ids);
+
+    results = await _create_results_array(products, variants, images);
   }
 
   return results;
@@ -292,6 +333,8 @@ async function _filter_for_sizes (variants, sizes){
       if (variants[i].opt2 == sizes.bottom){
         ret.push(variants[i]);
       }
+    }else if (_product_type_misc.includes(variants[i].product_type)){
+      ret.push(variants[i]);
     }
   }
 
