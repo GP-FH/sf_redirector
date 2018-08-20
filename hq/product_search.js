@@ -23,8 +23,8 @@ router.route('/').post(async (req, res, next) => {
       const args = {
         tags: req.body.style_tags_input.split(','),
         sizes: {
-          bottom: req.body.size_select_input,
-          top: req.body.size_select_input
+          bottom: req.body.size_select_input_bottom,
+          top: req.body.size_select_input_top
         }
       };
 
