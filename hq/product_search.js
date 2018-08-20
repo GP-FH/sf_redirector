@@ -20,6 +20,15 @@ router.route('/').post(async (req, res, next) => {
       res.render('product_search', {csrfToken: req.csrfToken(), sub_results:ret});
     }else if (req.body.filter_search){
       logger.info(`it's a filter search! ${JSON.stringify(req.body)}`);
+      const args = {
+        tags: req.body.style_tags_input.split(','),
+        sizes: {
+          bottom: req.body.size_select_input,
+          top: req.body.size_select_input
+        }
+      };
+
+      const ret = await product_search.search_products(args);
 
       res.render('product_search', {csrfToken: req.csrfToken(), filter_results:test_obj});
     }
