@@ -354,7 +354,7 @@ async function _filter_for_sizes (variants, sizes){
  */
 
 async function _filter_out_already_shipped_variants (variants, email){
-  const companies = await tradegecko.tradegecko_get_companies(email);
+  const companies = await tradegecko.tradegecko_get_companies({"email":email});
   logger.info(`DO WE HAVE A COMPANY: length: ${companies.length}, content: ${companies.toString()}`);
 }
 

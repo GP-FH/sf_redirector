@@ -19,9 +19,8 @@ router.route('/').post(async (req, res, next) => {
 
       res.render('product_search', {csrfToken: req.csrfToken(), sub_results:ret});
     }else if (req.body.filter_search){
-      logger.info(`Am I getting an email? ${req.body.customer_email_input}`);
       let email = '' || req.body.customer_email_input;
-      logger.info(`Am I treating the email right? ${email}`);
+
       const args = {
         tags: req.body.style_tags_input.split(','),
         sizes: {
