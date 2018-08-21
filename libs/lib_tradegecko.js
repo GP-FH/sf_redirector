@@ -444,7 +444,7 @@ const tradegecko_create_sales_order_contact = async (subscription, customer) => 
  * function and keeps making API calls until it has been through all pages
  */
 
-const tradegecko_get_companies = async (filters={}) => {
+const tradegecko_get_companies = async (filters={}, storage=[], page=1) => {
   let get_all = false;
   let url = 'https://api.tradegecko.com/companies/';
 
