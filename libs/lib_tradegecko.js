@@ -439,6 +439,109 @@ const tradegecko_create_sales_order_contact = async (subscription, customer) => 
 };
 
 /*
+ * This function lists companies. If no filters are passed it returns all products.
+ * Filters must be valid according to TG API documentation. It is a recursive
+ * function and keeps making API calls until it has been through all pages
+ */
+
+const tradegecko_get_companies = async (filters={}) => {
+  let get_all = false;
+  let url = 'https://api.tradegecko.com/companies/';
+
+  if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
+    get_all = true;
+  }
+
+  let query = {
+    "limit": 250,
+    "page": page
+  }
+
+  let concat_storage = [];
+  let res;
+  let batch_request = false;
+  let remainder = [];
+  let batch = [];
+
+  /*
+   * Append to the the query object + check for excessive number of filter values
+   * (specificaly ids) and enable batched requests (more recursions)
+   * if necessary
+   */
+
+  if (!get_all){
+    const keys = Object.keys(filters);
+
+    for (let i = 0; i < keys.length; i++){
+      if (keys[i] == 'ids' && filters[keys[i]].length > 250){
+        batch_request = true;
+      }else{
+        query[keys[i]] = filters[keys[i]];
+      }
+    }
+  }
+
+  /*
+   * Calls helper function which splits the array of ids into 2 arrays:
+   * the 'batch' which will be used in the current API request, and the 'remainder'
+   * which will be used in future requests
+   */
+
+  if (batch_request){
+    const ret = await _tradegecko_prepare_for_batch_request(filters.ids);
+    batch  = ret.batch;
+    remainder = ret.remainder
+    query['ids'] = batch;
+  }
+
+  /*
+   * Have to put the URL together with the Q params here instead of using Got's
+   * query arg as got does not seem to support the bracket array format e.g
+   * ids[]=id1&ids[]=id2.... which TG requires.
+   */
+
+  const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
+  url += `?${query_string}`;
+
+  try {
+    res = await got.get(url, {
+      headers:{
+        Authorization: `Bearer ${process.env.TRADEGECKO_TOKEN}`
+      },
+      json: true
+    });
+
+  }
+  catch (err) {
+    throw new VError (err, `Error listing companies via TradeGecko API.` );
+  }
+
+  concat_storage = storage.concat(res.body.companies);
+  const pagination_info = JSON.parse(res.headers["x-pagination"]);
+
+  /*
+   * If it's a multi-page result make the recursive call to get the rest of the
+   * results
+   */
+
+  if (!pagination_info.last_page){
+    return tradegecko_get_companies(query, concat_storage, ++page);
+  }
+
+  /*
+   * If it's a batched request then we want to make a recursive call with the
+   * remainder of the ids we have to start the process again
+   */
+
+  if (batch_request){
+    query['ids'] = remainder;
+    return tradegecko_get_companies(query, concat_storage, ++page);
+  }
+
+  return concat_storage;
+}
+
+/*
  * Bare bones TG company creation helper method. Will export if needed.
  */
 
@@ -589,7 +692,7 @@ async function _tradegecko_check_for_existing_address (address, company_id){
 }
 
 /*
- * Helper function to break array up into smaller batches when number of filters is 
+ * Helper function to break array up into smaller batches when number of filters is
  * too long for TG API e.g when using ids as filters. Returns object containing batch
  * array + array containing remaining values
  */

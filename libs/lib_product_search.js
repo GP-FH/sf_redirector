@@ -86,7 +86,7 @@ const search_products = async (args) => {
     const sub_id = args.sub_id;
 
     try{
-      let {tags, sizes} = await _get_customer_style_info (sub_id);
+      let {tags, sizes} = await _get_customer_style_info(sub_id);
       const products = await _list_products(tags);
       const ids = await _extract_variant_ids(products);
       const variants = await _list_variants(ids, sizes);
@@ -105,6 +105,11 @@ const search_products = async (args) => {
       const products = await _list_products(tags);
       const ids = await _extract_variant_ids(products);
       const variants = await _list_variants(ids, sizes);
+
+      if (args.email){
+        variants = await _filter_out_already_shipped_variants(variants, args.email);
+      }
+
       const image_ids = await _extract_image_ids(variants);
       const images = await _list_images(image_ids);
 
@@ -342,5 +347,15 @@ async function _filter_for_sizes (variants, sizes){
 
   return ret;
 };
+
+/*
+ * Filter out variants that have been sent in Sales Orders to customer with given
+ * email already. Returns updated variants array.
+ */
+
+async function _filter_out_already_shipped_variants (variants, email){
+  const companies = await tradegecko.tradegecko_get_companies(email);
+  logger.info(`DO WE HAVE A COMPANY: length: ${companies.length}, content: ${companies.toString()}`);
+}
 
 exports.search_products = search_products;
