@@ -719,3 +719,4 @@ exports.tradegecko_create_company = tradegecko_create_company;
 exports.tradegecko_create_sales_order_contact = tradegecko_create_sales_order_contact;
 exports.tradegecko_get_products = tradegecko_get_products;
 exports.tradegecko_get_images = tradegecko_get_images;
+exports.tradegecko_get_companies = tradegecko_get_companies;
