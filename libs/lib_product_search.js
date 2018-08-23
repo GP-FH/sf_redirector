@@ -355,7 +355,7 @@ async function _filter_for_sizes (variants, sizes){
 
 async function _filter_out_already_shipped_variants (variants, email){
   const companies = await tradegecko.tradegecko_get_companies({"email":email});
-  const company_ids = await __extract_company_id_objects(companies); 
+  const company_ids = await _extract_company_id_objects(companies); 
   logger.info(`HERE ARE SOME COMPANY IDS ${company_ids.toString()}`); 
   const orders = await Promise.all(company_ids.map(tradegecko.tradegecko_get_orders()));
   
