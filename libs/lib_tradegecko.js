@@ -381,6 +381,8 @@ const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
 const tradegecko_get_orders = async (filters={}, storage=[], page=1) => {
   let get_all = false;
   let url = 'https://api.tradegecko.com/orders/';
+  
+  logger.info(`TG ORDERS FUNCTION RECEIVING: ${JSON.stringify(filters)} AND ${page}`);
 
   if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
     get_all = true;
