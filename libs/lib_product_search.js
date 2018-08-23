@@ -355,6 +355,29 @@ async function _filter_for_sizes (variants, sizes){
 
 async function _filter_out_already_shipped_variants (variants, email){
   const companies = await tradegecko.tradegecko_get_companies({"email":email});
+  const company_ids = await _extract_company_ids(companies);  
+  const orders = await Promise.all(company_ids.map(id => tradegecko.tradegecko_get_orders({"company_id": id})));
+  
+  logger.info(`ORDERS LENGTH ${orders.length} AND FIRST ORDER: ${JSON.stringify(orders[i])}`);  
+}
+
+/*
+ * Takes a TG companies array and extracts all of the IDs and returns them
+ * in an array
+ */
+
+async function _extract_company_ids (companies){
+  if (companies.length == 0 ||  typeof companies === 'undefined' || companies === null || !Array.isArray(companies)){
+    throw new VError(`companies parameter not usable`);
+  }
+
+  let ids = [];
+
+  for (let i = 0; i < companies.length; i++){
+    ids.push(companies[i].id);
+  }
+
+  return ids;
 }
 
 exports.search_products = search_products;
