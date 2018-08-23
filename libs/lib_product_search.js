@@ -355,13 +355,11 @@ async function _filter_for_sizes (variants, sizes){
 
 async function _filter_out_already_shipped_variants (variants, email){
   const companies = await tradegecko.tradegecko_get_companies({"email":email});
-  const company_ids = await _extract_company_ids(companies); 
+  const company_ids = await __extract_company_id_objects(companies); 
   logger.info(`HERE ARE SOME COMPANY IDS ${company_ids.toString()}`); 
-  const orders = await Promise.all(company_ids.map(id => tradegecko.tradegecko_get_orders({"company_id": id})));
+  const orders = await Promise.all(company_ids.map(tradegecko.tradegecko_get_orders()));
   
-  logger.info(`ORDERS LENGTH ${orders.length} AND FIRST ORDER: ${JSON.stringify(orders[0])}`);  
-
-  throw new VError(err, 'error filtering out shipped variants');
+  logger.info(`ORDERS LENGTH ${orders.length} AND FIRST ORDER: ${JSON.stringify(orders[0])}`);    
   
 }
 
@@ -370,7 +368,7 @@ async function _filter_out_already_shipped_variants (variants, email){
  * in an array
  */
 
-async function _extract_company_ids (companies){
+async function _extract_company_id_objects (companies){
   if (companies.length == 0 ||  typeof companies === 'undefined' || companies === null || !Array.isArray(companies)){
     throw new VError(`companies parameter not usable`);
   }
@@ -378,7 +376,7 @@ async function _extract_company_ids (companies){
   let ids = [];
 
   for (let i = 0; i < companies.length; i++){
-    ids.push(companies[i].id);
+    ids.push({"company_id": companies[i].id});
   }
 
   return ids;
