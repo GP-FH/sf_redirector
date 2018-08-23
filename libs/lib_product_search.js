@@ -358,7 +358,7 @@ async function _filter_out_already_shipped_variants (variants, email){
   const company_ids = await _extract_company_ids(companies);  
   const orders = await Promise.all(company_ids.map(id => tradegecko.tradegecko_get_orders({"company_id": id})));
   
-  logger.info(`ORDERS LENGTH ${orders.length} AND FIRST ORDER: ${JSON.stringify(orders[i])}`);  
+  logger.info(`ORDERS LENGTH ${orders.length} AND FIRST ORDER: ${JSON.stringify(orders[0])}`);  
 }
 
 /*
