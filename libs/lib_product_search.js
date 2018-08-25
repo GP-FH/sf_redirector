@@ -398,7 +398,7 @@ async function _extract_order_ids (orders){
   let ids = [];
 
   for (let i = 0; i < orders.length; i++){
-    logger.info(`HERE IS AN ORDER ID: ${orders[i].id}`);
+    logger.info(`HERE IS AN ORDER ID: ${JSON.stringify(orders[i])}`);
     ids.push(orders[i].id);
   }
 
