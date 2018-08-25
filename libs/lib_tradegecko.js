@@ -473,7 +473,7 @@ const tradegecko_get_orders = async (filters={}, storage=[], page=1) => {
     query['ids'] = remainder;
     return tradegecko_get_orders(query, concat_storage, ++page);
   }
-
+  logger.info(`THIS IS WHAT THE TG ORDERS IS RETURNING: ${JSON.stringify(concat_storage.toString(), null, 4)}`);
   return concat_storage;
 }
 
