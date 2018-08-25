@@ -398,7 +398,7 @@ async function _extract_order_ids (orders){
   let ids = [];
 
   for (let i = 0; i < orders.length; i++){
-    for (let j = 0; j < orders[i].length){
+    for (let j = 0; j < orders[i].length; j++){
       ids.push(orders[i][j].id);
     }
   }
