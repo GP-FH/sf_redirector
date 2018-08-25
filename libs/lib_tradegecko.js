@@ -438,6 +438,7 @@ const tradegecko_get_orders = async (filters={}, storage=[], page=1) => {
 
   const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
   url += `?${query_string}`;
+  logger.info(`TG ORDERS URL: ${url}`);
 
   try {
     res = await got.get(url, {
