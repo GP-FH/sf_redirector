@@ -361,7 +361,7 @@ async function _filter_out_already_shipped_variants (variants, email){
   const orders = await Promise.all(promises);
   const order_ids = await _extract_order_ids(orders);
   
-  logger.info(`ORDER IDS ${order_ids.toString()}}`);    
+  logger.info(`ORDER IDS ${order_ids.toString()}`);    
   
 }
 
@@ -398,6 +398,7 @@ async function _extract_order_ids (orders){
   let ids = [];
 
   for (let i = 0; i < orders.length; i++){
+    logger.info(`HERE IS AN ORDER ID: ${orders[i].id}`);
     ids.push(orders[i].id);
   }
 
