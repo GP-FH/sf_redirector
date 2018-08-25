@@ -356,12 +356,13 @@ async function _filter_for_sizes (variants, sizes){
 async function _filter_out_already_shipped_variants (variants, email){
   const companies = await tradegecko.tradegecko_get_companies({"email":email});
   const company_ids = await _extract_company_id_objects(companies); 
-  logger.info(`HERE ARE SOME COMPANY IDS ${company_ids.toString()}`); 
-  const promises = company_ids.map(o => tradegecko.tradegecko_get_orders(o));
+  let promises = company_ids.map(o => tradegecko.tradegecko_get_orders(o));
   const orders = await Promise.all(promises);
   const order_ids = await _extract_order_ids(orders);
-  
-  logger.info(`ORDER IDS ${order_ids.toString()}`);    
+  promises = order_ids.map(o => tradegecko.tradegecko_get_orders_line_items(o));
+  const line_items = await Promise.all(promises);
+  logger.info(`LINE ITEMS: ${JSON.stringify(line_items.toString())}`);
+   
   
 }
 
@@ -387,7 +388,7 @@ async function _extract_company_id_objects (companies){
 
 /*
  * Takes a TG orders array and extracts all of the IDs and returns them
- * in an array
+ * in an array as ready to go TG filter objects
  */
 
 async function _extract_order_ids (orders){
@@ -399,7 +400,7 @@ async function _extract_order_ids (orders){
 
   for (let i = 0; i < orders.length; i++){
     for (let j = 0; j < orders[i].length; j++){
-      ids.push(orders[i][j].id);
+      ids.push({"order_id":orders[i][j].id});
     }
   }
 
