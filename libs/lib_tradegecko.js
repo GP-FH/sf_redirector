@@ -453,7 +453,7 @@ const tradegecko_get_orders = async (filters={}, storage=[], page=1) => {
     throw new VError (err, `Error listing orders via TradeGecko API.` );
   }
 
-  concat_storage = storage.concat(res.body.images);
+  concat_storage = storage.concat(res.body.orders);
   const pagination_info = JSON.parse(res.headers["x-pagination"]);
 
   /*
