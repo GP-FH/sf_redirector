@@ -483,7 +483,7 @@ const tradegecko_get_orders = async (filters={}, storage=[], page=1) => {
 
 const tradegecko_get_order_line_items = async (filters={}, storage=[], page=1) => {
   let get_all = false;
-  let url = 'https://api.tradegecko.com/orders/';
+  let url = 'https://api.tradegecko.com/order_line_items/';
   
   logger.info(`TG ORDERS LIST ITEMS FUNCTION RECEIVING: ${JSON.stringify(filters)} AND ${JSON.stringify(page)}`);
 
