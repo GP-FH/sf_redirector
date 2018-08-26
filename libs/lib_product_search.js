@@ -105,10 +105,13 @@ const search_products = async (args) => {
       const products = await _list_products(tags);
       const ids = await _extract_variant_ids(products);
       let variants = await _list_variants(ids, sizes);
+      logger.info(`VARIANTS LENGTH BEFORE: ${variants.length}`);
 
       if (args.email){
         variants = await _filter_out_already_shipped_variants(variants, args.email);
       }
+      
+      logger.info(`VARIANTS LENGTH AFTER: ${variants.length}`);
 
       const image_ids = await _extract_image_ids(variants);
       const images = await _list_images(image_ids);
@@ -361,8 +364,8 @@ async function _filter_out_already_shipped_variants (variants, email){
   const order_ids = await _extract_order_ids(orders);
   promises = order_ids.map(o => tradegecko.tradegecko_get_order_line_items(o));
   const line_items = await Promise.all(promises);
-  logger.info(`LINE ITEMS: ${JSON.stringify(line_items[0][0])}`);
   
+  return await _remove_sent_variants(variants, line_items);
 }
 
 /*
@@ -406,4 +409,32 @@ async function _extract_order_ids (orders){
   return ids;
 }
 
+
+/*
+ * This functions takes an array of variant objects and an array of arrays of order_line_items.
+ * These line items are prodicts that have been sent to the customer before. They are removed
+ * from the variants array and an updated variants array is returned.
+ */
+ 
+async function _remove_sent_variants (variants, line_items){
+  if (variants.length == 0 ||  typeof variants === 'undefined' || variants === null || !Array.isArray(variants)){
+    throw new VError(`variants parameter not usable`);
+  }
+  if (line_items.length == 0 ||  typeof line_items === 'undefined' || line_items === null || !Array.isArray(line_items)){
+    throw new VError(`line_items parameter not usable`);
+  }
+  
+  for (let i = 0; i < line_items; i++){
+    for (let j = 0; j < line_items[i].length; j++){
+      for (let k = 0; k < variants.length; k++){
+        if (variants[k].id == line_items[i][j].variant_id){
+          logger.info(`REMOVING ITEM: ${variants[k].sku}`);
+          variants.splice(k, 1);
+        }
+      }
+    }
+  }
+  
+  return variants;
+}
 exports.search_products = search_products;
