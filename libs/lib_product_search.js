@@ -81,7 +81,12 @@ const _product_type_misc = [
 
 const search_products = async (args) => {
   let results = [];
-
+  
+  /*
+   * If there is a sub_id this means this a CB subscripton ID search. Otherwise
+   * it's a product field search
+   */
+   
   if (args.sub_id){
     const sub_id = args.sub_id;
 
@@ -434,7 +439,7 @@ async function _remove_sent_variants (variants, line_items){
       }
     }
   }
-  
+  logger.info(`VARIANTS LENGTH IN EXTRACTION FUNCTION: ${variants.length}`);
   return variants;
 }
 exports.search_products = search_products;
