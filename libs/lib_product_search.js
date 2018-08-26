@@ -345,7 +345,7 @@ async function _create_results_array (products, variants, images){
 
 async function _filter_for_sizes (variants, sizes){
   let ret = [];
-
+  logger.info(`SIZE FILTERING IS HAPPENING`);
   for (let i = 0; i < variants.length; i++){
     if (_product_type_tops.includes(variants[i].product_type)){
       if (variants[i].opt2 == sizes.top){
