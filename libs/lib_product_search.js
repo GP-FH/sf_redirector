@@ -108,6 +108,7 @@ const search_products = async (args) => {
 
     try{
       const products = await _list_products(tags);
+      logger.info(`PRODUCTS LENGTH: ${products.length}`);
       const ids = await _extract_variant_ids(products);
       let variants = await _list_variants(ids, sizes);
       logger.info(`VARIANTS LENGTH BEFORE: ${variants.length}`);
