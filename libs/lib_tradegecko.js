@@ -577,7 +577,7 @@ const tradegecko_get_order_line_items = async (filters={}, storage=[], page=1) =
     query['ids'] = remainder;
     return tradegecko_get_order_line_items(query, concat_storage, ++page);
   }
-  logger.info(`THIS IS WHAT THE TG ORDERS LIST ITEMS IS RETURNING: ${JSON.stringify(concat_storage.toString(), null, 4)}`);
+  logger.info(`THIS IS WHAT THE TG ORDERS LIST ITEMS IS RETURNING: ${JSON.stringify(concat_storage[0], null, 4)}`);
   return concat_storage;
 }
 
