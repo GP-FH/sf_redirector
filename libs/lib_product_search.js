@@ -185,9 +185,15 @@ async function _list_variants (ids, sizes={}, only_soh=true){
 
     ret = available;
   }
-
-  ret = await _filter_for_sizes(ret, sizes);
-
+  
+  /*
+   * If the sizes object is empty there is no real point in filtering for sizes
+   */
+   
+  if (!(Object.keys(sizes).length === 0)){
+    ret = await _filter_for_sizes(ret, sizes);
+  }
+  
   return ret;
 }
 
