@@ -447,10 +447,10 @@ async function _remove_sent_variants (products, variants, line_items){
   }
   let line_item_variants = [];
   logger.info(`line_items length: ${line_items.length}`);
+  logger.info(`line_items item length: ${line_items[0].length}`);
   for (let i = 0; i < line_items; i++){
     for (let j = 0; j < line_items[i].length; j++){
       line_item_variants.push(line_items[i][j].variant_id);
-      logger.info(`line item variants array: ${JSON.stringify(line_items[i][j])}`);
     }
   }
 
