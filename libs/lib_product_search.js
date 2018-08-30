@@ -446,13 +446,14 @@ async function _remove_sent_variants (products, variants, line_items){
     throw new VError(`line_items parameter not usable`);
   }
   let line_item_variants = [];
-
+  logger.info(`line_items length: ${line_items.length}`);
   for (let i = 0; i < line_items; i++){
     for (let j = 0; j < line_items[i].length; j++){
       line_item_variants.push(line_items[i][j].variant_id);
+      logger.info(`line item variants array: ${JSON.stringify(line_items[i][j])}`);
     }
   }
-  logger.info(`line item variants array: ${line_item_variants.toString()}`);
+
 
   logger.info(`VARIANTS LENGTH IN EXTRACTION FUNCTION: ${variants.length}`);
   return variants;
