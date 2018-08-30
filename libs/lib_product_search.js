@@ -455,8 +455,27 @@ async function _remove_sent_variants (products, variants, line_items){
     }
   }
 
+  logger.info(`line_items_variants length ${line_item_variants.length}`);
+  //TODO: get all products with line item variant ids and add other variant ids to the line_item variants arrays
+  let all_product_variants = [];
+  for (let i = 0; i < products.length; i++){
+    for (let j = 0; j < line_item_variants.length; j++){
+      if (products[i].variant_ids.includes(line_item_variants[j])){
+        all_product_variants = all_product_variants.concat(products[i].variant_ids);
+      }
+    }
+  }
+  logger.info(`VARIANTS before EXTRACTION: ${variants.length}`);
+  //TODO: remove all matching variants from the variants array and return
+  for (let i = 0; i < variants.length; i++){
+    for (let j = 0; j < all_product_variants.length; j++){
+      if(variants.indexOf(all_product_variants[j])){
+        variants.splice(variants.indexOf(all_product_variants[j]), 1);
+      }
+    }
+  }
 
-  logger.info(`VARIANTS LENGTH IN EXTRACTION FUNCTION: ${variants.length}`);
+  logger.info(`VARIANTS after EXTRACTION: ${variants.length}`);
   return variants;
 }
 exports.search_products = search_products;
