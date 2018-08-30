@@ -81,12 +81,12 @@ const _product_type_misc = [
 
 const search_products = async (args) => {
   let results = [];
-  
+
   /*
    * If there is a sub_id this means this a CB subscripton ID search. Otherwise
    * it's a product field search
    */
-   
+
   if (args.sub_id){
     const sub_id = args.sub_id;
 
@@ -110,13 +110,13 @@ const search_products = async (args) => {
       const products = await _list_products(tags);
       logger.info(`PRODUCTS LENGTH: ${products.length}`);
       const ids = await _extract_variant_ids(products);
-      let variants = await _list_variants(ids, sizes);
+      let variants = await _list_variants(products, ids, sizes);
       logger.info(`VARIANTS LENGTH BEFORE: ${variants.length}`);
 
       if (args.email){
         variants = await _filter_out_already_shipped_variants(variants, args.email);
       }
-      
+
       logger.info(`VARIANTS LENGTH AFTER: ${variants.length}`);
 
       const image_ids = await _extract_image_ids(variants);
@@ -163,9 +163,12 @@ async function _list_products (tags){
  * Returns a list of product variants based on ids, sizes and stock on hand.
  */
 
-async function _list_variants (ids, sizes={}, only_soh=true){
+async function _list_variants (products, ids, sizes={}, email=false, only_soh=true ){
   if (typeof ids === 'undefined' || ids === null){
     throw new VError(`ids parameter not usable`);
+  }
+  if (typeof ids === 'undefined' || ids === null){
+    throw new VError(`products parameter not usable`);
   }
 
   let ret = await tradegecko.tradegecko_get_product_variants({"ids": ids});
@@ -185,15 +188,19 @@ async function _list_variants (ids, sizes={}, only_soh=true){
 
     ret = available;
   }
-  
+
+  if (email){
+     ret = await _filter_out_already_shipped_variants(products, ret, email);
+  }
+
   /*
    * If the sizes object is empty there is no real point in filtering for sizes
    */
-   
-  if (sizes == {}){
+
+  if (sizes != {}){
     ret = await _filter_for_sizes(ret, sizes);
   }
-  
+
   return ret;
 }
 
@@ -368,16 +375,16 @@ async function _filter_for_sizes (variants, sizes){
  * email already. Returns updated variants array.
  */
 
-async function _filter_out_already_shipped_variants (variants, email){
+async function _filter_out_already_shipped_variants (products, variants, email){
   const companies = await tradegecko.tradegecko_get_companies({"email":email});
-  const company_ids = await _extract_company_id_objects(companies); 
+  const company_ids = await _extract_company_id_objects(companies);
   let promises = company_ids.map(o => tradegecko.tradegecko_get_orders(o));
   const orders = await Promise.all(promises);
   const order_ids = await _extract_order_ids(orders);
   promises = order_ids.map(o => tradegecko.tradegecko_get_order_line_items(o));
   const line_items = await Promise.all(promises);
-  
-  return await _remove_sent_variants(variants, line_items);
+
+  return await _remove_sent_variants(products, variants, line_items);
 }
 
 /*
@@ -423,22 +430,26 @@ async function _extract_order_ids (orders){
 
 
 /*
- * This functions takes an array of variant objects and an array of arrays of order_line_items.
- * These line items are prodicts that have been sent to the customer before. They are removed
- * from the variants array and an updated variants array is returned.
+ * This function takes an array of product objects, an array of variant objects and an array of
+ * arrays of order_line_items. These line items are variants that have been sent to
+ * the customer before. We remove any variants that have been sent to the customer before
+ * + accompanying variants in the same product group, from the variants array. Removing the
+ * accompanying variants means we won't do something silly like return a product they've
+ * had before but in a different colour/size in the search results
  */
- 
-async function _remove_sent_variants (variants, line_items){
+
+async function _remove_sent_variants (products, variants, line_items){
   if (variants.length == 0 ||  typeof variants === 'undefined' || variants === null || !Array.isArray(variants)){
     throw new VError(`variants parameter not usable`);
   }
   if (line_items.length == 0 ||  typeof line_items === 'undefined' || line_items === null || !Array.isArray(line_items)){
     throw new VError(`line_items parameter not usable`);
   }
-  
+
   for (let i = 0; i < line_items; i++){
     for (let j = 0; j < line_items[i].length; j++){
       for (let k = 0; k < variants.length; k++){
+        logger.info(`here is the id from the variants array: ${variants[k].id} and here is the id from the line_item: ${line_items[i][j].variant_id}`);
         if (variants[k].id == line_items[i][j].variant_id){
           logger.info(`REMOVING ITEM: ${variants[k].sku}`);
           variants.splice(k, 1);
