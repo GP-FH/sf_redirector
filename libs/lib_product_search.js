@@ -114,7 +114,7 @@ const search_products = async (args) => {
       logger.info(`VARIANTS LENGTH BEFORE: ${variants.length}`);
 
       if (args.email){
-        variants = await _filter_out_already_shipped_variants(variants, args.email);
+        variants = await _filter_out_already_shipped_variants(products, variants, args.email);
       }
 
       logger.info(`VARIANTS LENGTH AFTER: ${variants.length}`);
