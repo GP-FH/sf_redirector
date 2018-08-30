@@ -445,18 +445,15 @@ async function _remove_sent_variants (products, variants, line_items){
   if (line_items.length == 0 ||  typeof line_items === 'undefined' || line_items === null || !Array.isArray(line_items)){
     throw new VError(`line_items parameter not usable`);
   }
+  let line_item_variants = [];
 
   for (let i = 0; i < line_items; i++){
     for (let j = 0; j < line_items[i].length; j++){
-      for (let k = 0; k < variants.length; k++){
-        logger.info(`here is the id from the variants array: ${variants[k].id} and here is the id from the line_item: ${line_items[i][j].variant_id}`);
-        if (variants[k].id == line_items[i][j].variant_id){
-          logger.info(`REMOVING ITEM: ${variants[k].sku}`);
-          variants.splice(k, 1);
-        }
-      }
+      line_item_variants.push(line_items[i][j].variant_id);
     }
   }
+  logger.info(`line item variants array: ${line_item_variants.toString()}`);
+
   logger.info(`VARIANTS LENGTH IN EXTRACTION FUNCTION: ${variants.length}`);
   return variants;
 }
