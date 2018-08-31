@@ -450,7 +450,6 @@ async function _remove_sent_variants (products, variants, line_items){
 
   logger.info(`line_items_variants length ${line_item_variants.length}`);
   //logger.info(`line_items_variants first index ${line_item_variants[0]}`);
-  logger.info(`product first index ${products[0].variant_ids.toString()}`);
   //TODO: get all products with line item variant ids and add other variant ids to the line_item variants arrays
   let all_product_variants = [];
   for (let i = 0; i < products.length; i++){
@@ -480,7 +479,7 @@ async function _remove_sent_variants (products, variants, line_items){
 
 function _extract_line_item_variants (line_items){
   let line_item_variants = [];
-  logger.info(`line item length: ${line_items.length}`);
+
   for (let i = 0; i < line_items; i++){
     for (let j = 0; j < line_items[i].length; j++){
       line_item_variants.push(line_items[i][j].variant_id);
