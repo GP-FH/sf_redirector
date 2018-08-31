@@ -446,23 +446,13 @@ async function _remove_sent_variants (products, variants, line_items){
     throw new VError(`line_items parameter not usable`);
   }
   
-  let line_item_variants = await _extract_line_item_variants(line_items);
-
-  logger.info(`line_items_variants length ${line_item_variants.length}`);
-  //logger.info(`line_items_variants first index ${line_item_variants[0]}`);
-  //TODO: get all products with line item variant ids and add other variant ids to the line_item variants arrays
-  let all_product_variants = [];
-  for (let i = 0; i < products.length; i++){
-    for (let j = 0; j < line_item_variants.length; j++){
-      if (products[i].variant_ids.includes(line_item_variants[j])){
-        all_product_variants.push(products[i].variant_ids);
-      }
-    }
-  }
+  const line_item_variants = await _extract_line_item_variants(line_items);
+  const all_product_variants = await _extract_related_product_variants(products, line_item_variants);
   
   logger.info(`VARIANTS before EXTRACTION: ${variants.length}`);
   logger.info(`all_product_variants length: ${all_product_variants.length}`);
   logger.info(`all_product_variants first index: ${all_product_variants[0]}`);
+  logger.info(`line_items_variants length ${line_item_variants.length}`);
   //TODO: remove all matching variants from the variants array and return
   for (let i = 0; i < variants.length; i++){
     for (let j = 0; j < all_product_variants.length; j++){
@@ -486,6 +476,20 @@ async function _extract_line_item_variants (line_items){
   }
   
   return line_item_variants;
+}
+
+async function _extract_related_product_variants (products, line_item_variants){
+  let all_product_variants = [];
+  
+  for (let i = 0; i < products.length; i++){
+    for (let j = 0; j < line_item_variants.length; j++){
+      if (products[i].variant_ids.includes(line_item_variants[j])){
+        all_product_variants.push(products[i].variant_ids);
+      }
+    }
+  }
+  
+  return all_product_variants;
 }
 
 exports.search_products = search_products;
