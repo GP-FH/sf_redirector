@@ -462,10 +462,11 @@ async function _remove_sent_variants (products, variants, line_items){
   for (let i = 0; i < products.length; i++){
     for (let j = 0; j < line_item_variants.length; j++){
       if (products[i].variant_ids.includes(line_item_variants[j])){
-        all_product_variants = all_product_variants.concat(products[i].variant_ids);
+        all_product_variants.push(products[i].variant_ids);
       }
     }
   }
+  
   logger.info(`VARIANTS before EXTRACTION: ${variants.length}`);
   logger.info(`all_product_variants length: ${all_product_variants.length}`);
   logger.info(`all_product_variants first index: ${all_product_variants[0]}`);
