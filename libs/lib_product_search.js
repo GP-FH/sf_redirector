@@ -446,12 +446,7 @@ async function _remove_sent_variants (products, variants, line_items){
     throw new VError(`line_items parameter not usable`);
   }
   
-  let line_item_variants = [];
-  for (let i = 0; i < line_items; i++){
-    for (let j = 0; j < line_items[i].length; j++){
-      line_item_variants.push(line_items[i][j].variant_id);
-    }
-  }
+  let line_item_variants = await _extract_line_item_variants(line_items);
 
   logger.info(`line_items_variants length ${line_item_variants.length}`);
   //logger.info(`line_items_variants first index ${line_item_variants[0]}`);
@@ -482,4 +477,17 @@ async function _remove_sent_variants (products, variants, line_items){
   logger.info(`VARIANTS after EXTRACTION: ${variants.length}`);
   return variants;
 }
+
+function _extract_line_item_variants (line_items){
+  let line_item_variants = [];
+  
+  for (let i = 0; i < line_items; i++){
+    for (let j = 0; j < line_items[i].length; j++){
+      line_item_variants.push(line_items[i][j].variant_id);
+    }
+  }
+  
+  return line_item_variants;
+}
+
 exports.search_products = search_products;
