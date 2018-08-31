@@ -455,7 +455,6 @@ async function _remove_sent_variants (products, variants, line_items){
   for (let i = 0; i < products.length; i++){
     for (let j = 0; j < line_item_variants.length; j++){
       if (products[i].variant_ids.includes(line_item_variants[j])){
-        logger.info('hello?');
         all_product_variants.push(products[i].variant_ids);
       }
     }
@@ -477,7 +476,7 @@ async function _remove_sent_variants (products, variants, line_items){
   return variants;
 }
 
-function _extract_line_item_variants (line_items){
+async function _extract_line_item_variants (line_items){
   let line_item_variants = [];
 
   for (let i = 0; i < line_items; i++){
