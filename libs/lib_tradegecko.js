@@ -485,8 +485,6 @@ const tradegecko_get_orders = async (filters={}, storage=[], page=1) => {
 const tradegecko_get_order_line_items = async (filters={}, storage=[], page=1) => {
   let get_all = false;
   let url = 'https://api.tradegecko.com/order_line_items/';
-  
-  logger.info(`TG ORDERS LIST ITEMS FUNCTION RECEIVING: ${JSON.stringify(filters)} AND ${JSON.stringify(page)}`);
 
   if ((Object.keys(filters).length === 0 && filters.constructor === Object) ||  typeof filters === 'undefined' || filters === null){
     get_all = true;
@@ -542,7 +540,6 @@ const tradegecko_get_order_line_items = async (filters={}, storage=[], page=1) =
 
   const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
   url += `?${query_string}`;
-  logger.info(`TG ORDERS list item URL: ${url}`);
 
   try {
     res = await got.get(url, {
@@ -578,7 +575,7 @@ const tradegecko_get_order_line_items = async (filters={}, storage=[], page=1) =
     query['ids'] = remainder;
     return tradegecko_get_order_line_items(query, concat_storage, ++page);
   }
-  logger.info(`THIS IS WHAT THE TG ORDERS LIST ITEMS IS RETURNING: ${JSON.stringify(concat_storage[0], null, 4)}`);
+
   return concat_storage;
 }
 
