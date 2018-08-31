@@ -445,6 +445,7 @@ async function _remove_sent_variants (products, variants, line_items){
   if (line_items.length == 0 ||  typeof line_items === 'undefined' || line_items === null || !Array.isArray(line_items)){
     throw new VError(`line_items parameter not usable`);
   }
+  
   let line_item_variants = [];
   logger.info(`line_items length: ${line_items.length}`);
   logger.info(`line_items item length: ${line_items[0].length}`);
@@ -466,6 +467,8 @@ async function _remove_sent_variants (products, variants, line_items){
     }
   }
   logger.info(`VARIANTS before EXTRACTION: ${variants.length}`);
+  logger.info(`all_product_variants length: ${all_product_variants.length}`);
+  logger.info(`all_product_variants first index: ${all_product_variants[0]}`);
   //TODO: remove all matching variants from the variants array and return
   for (let i = 0; i < variants.length; i++){
     for (let j = 0; j < all_product_variants.length; j++){
