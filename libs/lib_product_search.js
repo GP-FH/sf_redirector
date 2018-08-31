@@ -457,7 +457,7 @@ async function _remove_sent_variants (products, variants, line_items){
   }
 
   logger.info(`line_items_variants length ${line_item_variants.length}`);
-  logger.info(`product first index ${JSON.stringify(products[0])}`);
+  logger.info(`product first index ${products[0].variant_ids.toString()}`);
   //TODO: get all products with line item variant ids and add other variant ids to the line_item variants arrays
   let all_product_variants = [];
   for (let i = 0; i < products.length; i++){
