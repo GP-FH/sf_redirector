@@ -384,7 +384,9 @@ async function _filter_out_already_shipped_variants (products, variants, email){
   promises = order_ids.map(o => tradegecko.tradegecko_get_order_line_items(o));
   const line_items = await Promise.all(promises);
 
-  return await _remove_sent_variants(products, variants, line_items);
+  const updated_variants = await _remove_sent_variants(products, variants, line_items);
+  
+  return updated_variants;
 }
 
 /*
@@ -446,8 +448,8 @@ async function _remove_sent_variants (products, variants, line_items){
     throw new VError(`line_items parameter not usable`);
   }
   
-  const line_item_variants = await _extract_line_item_variants(line_items);
-  const all_product_variants = await _extract_related_product_variants(products, line_item_variants);
+  const line_item_variants = await _extract_line_item_variant_ids(line_items);
+  const all_product_variants = await _extract_related_product_variant_ids(products, line_item_variants);
   
   logger.info(`VARIANTS before EXTRACTION: ${variants.length}`);
   logger.info(`all_product_variants length: ${all_product_variants.length}`);
@@ -456,8 +458,8 @@ async function _remove_sent_variants (products, variants, line_items){
   //TODO: remove all matching variants from the variants array and return
   for (let i = 0; i < variants.length; i++){
     for (let j = 0; j < all_product_variants.length; j++){
-      if(variants.indexOf(all_product_variants[j])){
-        variants.splice(variants.indexOf(all_product_variants[j]), 1);
+      if(all_product_variants[j].includes(variants[i].id)){
+        variants.splice(i, 1);
       }
     }
   }
@@ -466,7 +468,11 @@ async function _remove_sent_variants (products, variants, line_items){
   return variants;
 }
 
-async function _extract_line_item_variants (line_items){
+/*
+ * Extracts variant ids from array of order line items. Returns them in an array.
+ */
+ 
+async function _extract_line_item_variant_ids (line_items){
   let line_item_variants = [];
 
   for (let i = 0; i < line_items; i++){
@@ -478,7 +484,12 @@ async function _extract_line_item_variants (line_items){
   return line_item_variants;
 }
 
-async function _extract_related_product_variants (products, line_item_variants){
+/*
+ * Extracts all variant IDs from products where product's variant ID array contains
+ * ID matching a line item variant ID. Returns array of arrays of variant IDs.
+ */
+ 
+async function _extract_related_product_variant_ids (products, line_item_variants){
   let all_product_variants = [];
   
   for (let i = 0; i < products.length; i++){
