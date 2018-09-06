@@ -495,6 +495,7 @@ async function _extract_related_product_variant_ids (products, line_item_variant
   for (let i = 0; i < products.length; i++){
     for (let j = 0; j < line_item_variants.length; j++){
       if (products[i].variant_ids.includes(line_item_variants[j])){
+        logger.info(`EXTRACTING ITEM: ${products[i].name}`);
         all_product_variants.push(products[i].variant_ids);
       }
     }
