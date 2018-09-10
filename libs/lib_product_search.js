@@ -105,12 +105,15 @@ const search_products = async (args) => {
   }else if (args.tags){
     const tags = args.tags;
     const sizes = args.sizes;
-    logger.info(`TAGS: ${tags}`);
+    
+    /*
+     * make an array as that is what the TG API wants
+     */
+     
     let tags_array = tags.toString().split(",");
-    logger.info(`tags_array is array? ${Array.isArray(tags_array)}`);
 
     try{
-      const products = await _list_products(tags);
+      const products = await _list_products(tags_array);
       logger.info(`PRODUCTS LENGTH: ${products.length}`);
       const ids = await _extract_variant_ids(products);
       let variants = await _list_variants(products, ids, sizes);

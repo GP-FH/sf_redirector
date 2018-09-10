@@ -349,6 +349,7 @@ const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
 
   const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
   url += `?${query_string}`;
+  logger.info(`TG PRODUCTS API URL: ${url}`);
 
   try {
     res = await got.get(url, {
