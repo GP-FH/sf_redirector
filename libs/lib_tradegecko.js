@@ -321,28 +321,24 @@ const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
     get_all = true;
   }
 
-  let query = {};
+  let query = {
+    "limit": 250,
+    "page": page,
+    "status": "active"
+  }
 
   let concat_storage = [];
   let res;
 
   /*
-   * Append to the the query object and only do it the first function call, Otherwise
-   * just use the filters object received as this will contain everything needed
+   * Append to the the query object
    */
 
-  if (!get_all && page == 1){
-    query = {
-      "limit": 250,
-      "page": page,
-      "status": "active"
-    };
+  if (!get_all){
     const keys = Object.keys(filters);
     for (let i = 0; i < keys.length; i++){
       query[keys[i]] = filters[keys[i]];
     }
-  }else{
-    query = filters;
   }
   logger.info(`QUERY OBJECT: ${JSON.stringify(query, null, 4)}`);
   logger.info(`FILTER OBJECT: ${JSON.stringify(filters, null, 4)}`);
