@@ -331,13 +331,15 @@ const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
   let res;
 
   /*
-   * Append to the the query object
+   * Append to the the query object (except page as we want this to update each call)
    */
 
   if (!get_all){
     const keys = Object.keys(filters);
     for (let i = 0; i < keys.length; i++){
-      query[keys[i]] = filters[keys[i]];
+      if (keys[i] != 'page'){
+        query[keys[i]] = filters[keys[i]];
+      }
     }
   }
   logger.info(`QUERY OBJECT: ${JSON.stringify(query, null, 4)}`);
