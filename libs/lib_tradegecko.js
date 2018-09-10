@@ -327,7 +327,8 @@ const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
   let res;
 
   /*
-   * Append to the the query object and only do it the first function call
+   * Append to the the query object and only do it the first function call, Otherwise
+   * just use the filters object received as this will contain everything needed
    */
 
   if (!get_all && page == 1){
@@ -341,7 +342,7 @@ const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
       query[keys[i]] = filters[keys[i]];
     }
   }else{
-    query = filter;
+    query = filters;
   }
   logger.info(`QUERY OBJECT: ${JSON.stringify(query, null, 4)}`);
   logger.info(`FILTER OBJECT: ${JSON.stringify(filters, null, 4)}`);
