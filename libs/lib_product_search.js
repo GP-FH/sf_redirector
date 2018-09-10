@@ -106,6 +106,7 @@ const search_products = async (args) => {
     const tags = args.tags;
     const sizes = args.sizes;
     logger.info(`TAGS: ${tags}`);
+    logger.info(`TAGS SPLIT: ${tags.split(",").toString()}`);
 
     try{
       const products = await _list_products(tags);
