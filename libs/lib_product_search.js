@@ -110,7 +110,7 @@ const search_products = async (args) => {
      * make an array as that is what the TG API wants
      */
      
-    let tags_array = tags.toString().split(",");
+    let tags_array = await _transform_tags_for_tg(tags);
 
     try{
       const products = await _list_products(tags_array);
@@ -508,6 +508,21 @@ async function _extract_related_product_variant_ids (products, line_item_variant
   }
   
   return all_product_variants;
+}
+
+/*
+ * Sanitize tags input for TG API
+ */
+ 
+async function _transform_tags_for_tg (tags){
+  const tags_array = tags.toString().split(",");
+  let ret = [];
+  
+  for (let i = 0; i < tags_array.length; i++){
+    ret.push(tags_array[i].trim());
+  }
+  
+  return ret;
 }
 
 exports.search_products = search_products;
