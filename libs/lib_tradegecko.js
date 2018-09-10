@@ -137,7 +137,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
     for (let i = 0; i < keys.length; i++){
       if (keys[i] == 'ids' && filters[keys[i]].length > 250){
         batch_request = true;
-      }else{
+      }else if (keys[i] != 'page'){
         query[keys[i]] = filters[keys[i]];
       }
     }
@@ -241,7 +241,7 @@ const tradegecko_get_images = async (filters={}, storage=[], page=1) => {
     for (let i = 0; i < keys.length; i++){
       if (keys[i] == 'ids' && filters[keys[i]].length > 250){
         batch_request = true;
-      }else{
+      }else if (keys[i] != 'page'){
         query[keys[i]] = filters[keys[i]];
       }
     }
@@ -415,7 +415,7 @@ const tradegecko_get_orders = async (filters={}, storage=[], page=1) => {
     for (let i = 0; i < keys.length; i++){
       if (keys[i] == 'ids' && filters[keys[i]].length > 250){
         batch_request = true;
-      }else{
+      }else if (keys[i] != 'page'){
         query[keys[i]] = filters[keys[i]];
       }
     }
