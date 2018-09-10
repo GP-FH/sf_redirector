@@ -51,7 +51,7 @@ const _product_type_misc = [
 
 /*
  * Product search function which accepts 2 sets of args:
- * 1. - when searching with a CB sub
+ * 1. - when searching with a CB sub - SOON TO BE DEPRECATED I THINK
  *    {
  *      sub_id:XXXXXXXXXXXX
  *    }
@@ -105,6 +105,7 @@ const search_products = async (args) => {
   }else if (args.tags){
     const tags = args.tags;
     const sizes = args.sizes;
+    logger.info(`TAGS: ${tags}`);
 
     try{
       const products = await _list_products(tags);
