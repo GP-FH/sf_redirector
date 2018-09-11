@@ -87,8 +87,8 @@ const search_products = async (args) => {
    * it's a product field search
    */
 
-  if (args.sub_id){
-    /*const sub_id = args.sub_id;
+  /*if (args.sub_id){
+    const sub_id = args.sub_id;
 
     try{
       let {tags, sizes} = await _get_customer_style_info(sub_id);
@@ -102,7 +102,7 @@ const search_products = async (args) => {
     } catch (err){
       throw new VError(err, 'error with sub_id search');
     }
-  }else if (args.tags){*/
+  //}else if (args.tags){*/
     logger.info(`TAGS?`);
     const tags = args.tags;
     const sizes = args.sizes;
