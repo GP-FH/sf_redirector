@@ -358,13 +358,21 @@ async function _filter_for_sizes (variants, sizes){
     if (_product_type_tops.includes(variants[i].product_type)){
       if (!sizes.top){
         ret.push(variants[i]);
-      }else if (variants[i].opt2 == sizes.top){
+      }else if (!Array.isArray(sizes.top){
+        if(variants[i].opt2 == sizes.top){
+          ret.push(variants[i]);
+        }
+      }else if (sizes.top.includes(variants[i].opt2)){
         ret.push(variants[i]);
       }
     }else if (_product_type_bottoms.includes(variants[i].product_type)){
       if (!sizes.bottom){
         ret.push(variants[i]);
-      }else if (variants[i].opt2 == sizes.bottom){
+      }else if (!Array.isArray(sizes.bottom){
+        if(variants[i].opt2 == sizes.bottom){
+          ret.push(variants[i]);
+        }
+      }else if (sizes.bottom.includes(variants[i].opt2)){
         ret.push(variants[i]);
       }
     }else if (_product_type_misc.includes(variants[i].product_type)){
