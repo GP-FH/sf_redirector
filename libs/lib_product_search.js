@@ -103,6 +103,7 @@ const search_products = async (args) => {
       throw new VError(err, 'error with sub_id search');
     }
   }else if (args.tags){
+    logger.info(`TAGS?`);
     const tags = args.tags;
     const sizes = args.sizes;
     let tags_array = [];
