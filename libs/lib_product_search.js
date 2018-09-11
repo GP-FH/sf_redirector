@@ -199,13 +199,7 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
      ret = await _filter_out_already_shipped_variants(products, ret, email);
   }
 
-  /*
-   * If the sizes object is empty there is no real point in filtering for sizes
-   */
-
-  if (!(Object.keys(sizes).length === 0 && sizes.constructor === Object)){
-    ret = await _filter_for_sizes(ret, sizes);
-  }
+  ret = await _filter_for_sizes(ret, sizes);
 
   return ret;
 }
@@ -353,7 +347,8 @@ async function _create_results_array (products, variants, images){
 }
 
 /*
- * Filter variants array for given sizes. Returns filtered array
+ * Filter variants array for given sizes. Adds all variants if no size 
+ * is given. Returns filtered array
  */
 
 async function _filter_for_sizes (variants, sizes){
@@ -361,11 +356,15 @@ async function _filter_for_sizes (variants, sizes){
   logger.info(`SIZE FILTERING IS HAPPENING`);
   for (let i = 0; i < variants.length; i++){
     if (_product_type_tops.includes(variants[i].product_type)){
-      if (variants[i].opt2 == sizes.top){
+      if (!sizes.top){
+        ret.push(variants[i]);
+      }else if (variants[i].opt2 == sizes.top){
         ret.push(variants[i]);
       }
     }else if (_product_type_bottoms.includes(variants[i].product_type)){
-      if (variants[i].opt2 == sizes.bottom){
+      if (!sizes.bottom){
+        ret.push(variants[i]);
+      }else if (variants[i].opt2 == sizes.bottom){
         ret.push(variants[i]);
       }
     }else if (_product_type_misc.includes(variants[i].product_type)){
