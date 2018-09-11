@@ -159,7 +159,7 @@ async function _list_products (tags){
     throw new VError(`tags parameter not usable`);
   }
   
-  let args {};
+  let args = {};
   
   if (tags.length != 0){
     args["tags"] = tags;
