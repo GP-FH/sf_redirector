@@ -190,7 +190,7 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
   /*
    * If only_soh is true then we only want to return stock on hand.
    */
-
+   logger.info(`returned variant object length: ${ret.length}`);
   if (only_soh){
     for (let i = 0; i < ret.length; i++){
       if (ret[i].stock_on_hand != "0"){
@@ -200,6 +200,8 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
 
     ret = available;
   }
+  
+  logger.info(`returned after SOH filter length: ${ret.length}`);
 
   if (email){
      ret = await _filter_out_already_shipped_variants(products, ret, email);
