@@ -342,8 +342,6 @@ const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
       }
     }
   }
-  logger.info(`QUERY OBJECT: ${JSON.stringify(query, null, 4)}`);
-  logger.info(`FILTER OBJECT: ${JSON.stringify(filters, null, 4)}`);
 
   /*
    * Have to put the URL together with the Q params here instead of using Got's
@@ -353,7 +351,6 @@ const tradegecko_get_products = async (filters={}, storage=[], page=1) => {
 
   const query_string = qs.stringify(query, {arrayFormat: 'brackets', encode: false});
   url += `?${query_string}`;
-  logger.info(`TG PRODUCTS API URL: ${url}`);
 
   try {
     res = await got.get(url, {

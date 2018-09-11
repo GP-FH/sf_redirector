@@ -105,25 +105,23 @@ const search_products = async (args) => {
   }else if (args.tags){
     const tags = args.tags;
     const sizes = args.sizes;
-    
+    let tags_array = [];
     /*
      * make an array as that is what the TG API wants
      */
-     
-    let tags_array = await _transform_tags_for_tg(tags);
+    if (!!tags){
+      tags_array = await _transform_tags_for_tg(tags);
+    }
+    
 
     try{
       const products = await _list_products(tags_array);
-      logger.info(`PRODUCTS LENGTH: ${products.length}`);
       const ids = await _extract_variant_ids(products);
       let variants = await _list_variants(products, ids, sizes);
-      logger.info(`VARIANTS LENGTH BEFORE: ${variants.length}`);
 
       if (args.email){
         variants = await _filter_out_already_shipped_variants(products, variants, args.email);
       }
-
-      logger.info(`VARIANTS LENGTH AFTER: ${variants.length}`);
 
       const image_ids = await _extract_image_ids(variants);
       const images = await _list_images(image_ids);
@@ -153,15 +151,21 @@ async function _get_customer_style_info (subscription_id){
 }
 
 /*
- * Returns list of filtered products from TG
+ * Returns list of filtered products from TG.
  */
 
 async function _list_products (tags){
   if (typeof tags === 'undefined' || tags === null){
     throw new VError(`tags parameter not usable`);
   }
-
-  const ret = await tradegecko.tradegecko_get_products ({"tags": tags});
+  
+  let args {};
+  
+  if (tags.length == 0){
+    args["tags"] = tags;
+  }
+  
+  const ret = await tradegecko.tradegecko_get_products (args);
   return ret;
 }
 
@@ -353,7 +357,6 @@ async function _create_results_array (products, variants, images){
 
 async function _filter_for_sizes (variants, sizes){
   let ret = [];
-  logger.info(`SIZE FILTERING IS HAPPENING`);
   for (let i = 0; i < variants.length; i++){
     if (_product_type_tops.includes(variants[i].product_type)){
       if (!sizes.top){
@@ -460,14 +463,10 @@ async function _remove_sent_variants (products, variants, line_items){
   if (line_items.length == 0 ||  typeof line_items === 'undefined' || line_items === null || !Array.isArray(line_items)){
     throw new VError(`line_items parameter not usable`);
   }
-  logger.info(`LINE ITEM: ${JSON.stringify(line_items[0], null, 4)}`);
+
   const line_item_variants = await _extract_line_item_variant_ids(line_items);
   const all_product_variants = await _extract_related_product_variant_ids(products, line_item_variants);
   
-  logger.info(`VARIANTS before EXTRACTION: ${variants.length}`);
-  logger.info(`line_items_variants length ${line_item_variants.length}`);
-  logger.info(`all_product_variants length: ${all_product_variants.length}`);
-  logger.info(`all_product_variants first index: ${all_product_variants[0][0]}`);
   //TODO: remove all matching variants from the variants array and return
   for (let i = 0; i < variants.length; i++){
     for (let j = 0; j < all_product_variants.length; j++){
@@ -477,7 +476,6 @@ async function _remove_sent_variants (products, variants, line_items){
     }
   }
 
-  logger.info(`VARIANTS after EXTRACTION: ${variants.length}`);
   return variants;
 }
 
@@ -508,7 +506,6 @@ async function _extract_related_product_variant_ids (products, line_item_variant
   for (let i = 0; i < products.length; i++){
     for (let j = 0; j < line_item_variants.length; j++){
       if (products[i].variant_ids.includes(line_item_variants[j])){
-        logger.info(`EXTRACTING ITEM: ${products[i].name}`);
         all_product_variants.push(products[i].variant_ids);
       }
     }
