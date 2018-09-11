@@ -161,7 +161,7 @@ async function _list_products (tags){
   
   let args {};
   
-  if (tags.length == 0){
+  if (tags.length != 0){
     args["tags"] = tags;
   }
   
