@@ -117,9 +117,10 @@ const search_products = async (args) => {
 
     try{
       const products = await _list_products(tags_array);
+      logger.info(`PRODUCTS LENGTH: ${products.length}`);
       const ids = await _extract_variant_ids(products);
       let variants = await _list_variants(products, ids, sizes);
-
+      logger.info(`VARIANTSS LENGTH: ${variants.length}`);
       if (args.email){
         variants = await _filter_out_already_shipped_variants(products, variants, args.email);
       }
