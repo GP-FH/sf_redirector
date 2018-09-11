@@ -358,7 +358,7 @@ async function _filter_for_sizes (variants, sizes){
     if (_product_type_tops.includes(variants[i].product_type)){
       if (!sizes.top){
         ret.push(variants[i]);
-      }else if (!Array.isArray(sizes.top){
+      }else if (!Array.isArray(sizes.top)){
         if(variants[i].opt2 == sizes.top){
           ret.push(variants[i]);
         }
@@ -368,7 +368,7 @@ async function _filter_for_sizes (variants, sizes){
     }else if (_product_type_bottoms.includes(variants[i].product_type)){
       if (!sizes.bottom){
         ret.push(variants[i]);
-      }else if (!Array.isArray(sizes.bottom){
+      }else if (!Array.isArray(sizes.bottom)){
         if(variants[i].opt2 == sizes.bottom){
           ret.push(variants[i]);
         }
