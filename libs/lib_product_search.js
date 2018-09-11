@@ -203,7 +203,7 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
    * If the sizes object is empty there is no real point in filtering for sizes
    */
 
-  if (sizes != {}){
+  if (!(Object.keys(sizes).length === 0 && sizes.constructor === Object)){
     ret = await _filter_for_sizes(ret, sizes);
   }
 
