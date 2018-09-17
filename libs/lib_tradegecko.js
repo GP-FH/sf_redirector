@@ -125,7 +125,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
   let remainder = [];
   let batch = [];
   
-  logger.info(`filter object received: ${JSON.stringify(filters, null, 4)}`);
+  //logger.info(`filter object received: ${JSON.stringify(filters, null, 4)}`);
 
   /*
    * Append to the the query object + check for excessive number of filter values
@@ -145,7 +145,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
     }
   }
   
-  logger.info(`query object post-adding of filters: ${JSON.stringify(query, null, 4)}`);
+  //logger.info(`query object post-adding of filters: ${JSON.stringify(query, null, 4)}`);
 
   /*
    * Calls helper function which splits the array of product_ids into 2 arrays:
@@ -159,7 +159,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
     remainder = ret.remainder
     query['ids'] = batch;
     logger.info(`This is a batch request. Number of remaining ids: ${ret.remainder.length}`);
-    logger.info(`query object after batching: ${JSON.stringify(query, null, 4)}`);
+    //logger.info(`query object after batching: ${JSON.stringify(query, null, 4)}`);
   }
 
   /*
