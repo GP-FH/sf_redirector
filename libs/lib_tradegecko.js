@@ -124,6 +124,8 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
   let batch_request = false;
   let remainder = [];
   let batch = [];
+  
+  logger.info(`filter object received: ${JSON.stringify(filters, null, 4)}`);
 
   /*
    * Append to the the query object + check for excessive number of filter values
@@ -142,6 +144,8 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
       }
     }
   }
+  
+  logger.info(`query object post-adding of filters: ${JSON.stringify(query, null, 4)}`);
 
   /*
    * Calls helper function which splits the array of product_ids into 2 arrays:
@@ -154,6 +158,8 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
     batch  = ret.batch;
     remainder = ret.remainder
     query['ids'] = batch;
+    logger.info(`This is a batch request. Number of remaining ids: ${ret.remainder.length}`);
+    logger.info(`query object after batching: ${JSON.stringify(query, null, 4)}`);
   }
 
   /*
@@ -188,6 +194,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
    */
 
   if (!pagination_info.last_page){
+    logger.info(`Multi-page result. Calling API again with following query object: ${JSON.stringify(query, null, 4)}`);
     return tradegecko_get_product_variants(query, concat_storage, ++page);
   }
 
@@ -197,6 +204,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
    */
 
   if (batch_request){
+    logger.info(`batch_request && last_page`);
     query['ids'] = remainder;
     return tradegecko_get_product_variants(query, concat_storage, ++page);
   }
