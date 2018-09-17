@@ -113,6 +113,7 @@ const search_products = async (args) => {
     const images = await _list_images(image_ids);
 
     results = await _create_results_array(products, variants, images);
+    logger.info(`results length: ${results.length}`);
   } catch (err){
     throw new VError(err, 'error with product fields search');
   }
