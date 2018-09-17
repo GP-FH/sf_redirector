@@ -173,7 +173,7 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
   /*
    * If only_soh is true then we only want to return stock on hand.
    */
-   logger.info(`returned variant object length: ${ret.length}`);
+  logger.info(`returned variant object length: ${ret.length}`);
   if (only_soh){
     for (let i = 0; i < ret.length; i++){
       if (ret[i].stock_on_hand != "0"){
@@ -247,16 +247,16 @@ async function _transform_custom_fields_to_tags_and_size (subscription){
 
 async function _extract_variant_ids (products){
   if (products.length == 0 ||  typeof products === 'undefined' || products === null || !Array.isArray(products)){
-    throw new VError(`product parameter not usable`);
+    throw new VError(`products parameter not usable`);
   }
 
   let ids = [];
-  let ret = [];
 
   for (let i = 0; i < products.length; i++){
     ids = ids.concat(products[i].variant_ids);
   }
-
+  
+  logger.info(`Number of variant IDs extracted: ${ids.length}`);
   return ids;
 }
 
