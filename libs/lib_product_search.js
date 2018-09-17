@@ -166,6 +166,8 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
   if (typeof ids === 'undefined' || ids === null){
     throw new VError(`products parameter not usable`);
   }
+  
+  logger.info(`sizes received: ${sizes}`);
 
   let ret = await tradegecko.tradegecko_get_product_variants({"ids": ids});
 
