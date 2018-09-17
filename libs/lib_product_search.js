@@ -166,8 +166,6 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
   if (typeof ids === 'undefined' || ids === null){
     throw new VError(`products parameter not usable`);
   }
-  
-  logger.info(`sizes received: ${JSON.stringify(sizes, null, 4)}`);
 
   let ret = await tradegecko.tradegecko_get_product_variants({"ids": ids});
 
@@ -192,8 +190,10 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
   if (email){
      ret = await _filter_out_already_shipped_variants(products, ret, email);
   }
-
-  ret = await _filter_for_sizes(ret, sizes);
+  
+  if (!!sizes.bottom || !!sizes.top){
+    ret = await _filter_for_sizes(ret, sizes);
+  }
 
   return ret;
 }
