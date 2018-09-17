@@ -206,7 +206,7 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
   if (batch_request){
     logger.info(`batch_request && last_page`);
     query['ids'] = remainder;
-    return tradegecko_get_product_variants(query, concat_storage, ++page);
+    return tradegecko_get_product_variants(query, concat_storage, 1);
   }
 
   return concat_storage;
