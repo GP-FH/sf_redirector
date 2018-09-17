@@ -87,53 +87,36 @@ const search_products = async (args) => {
    * it's a product field search
    */
 
-  /*if (args.sub_id){
-    const sub_id = args.sub_id;
+  const tags = args.tags;
+  const sizes = args.sizes;
+  let tags_array = [];
+  
+  /*
+   * make an array as that is what the TG API wants
+   */
+  if (!!tags){
+    tags_array = await _transform_tags_for_tg(tags);
+  }
 
-    try{
-      let {tags, sizes} = await _get_customer_style_info(sub_id);
-      const products = await _list_products(tags);
-      const ids = await _extract_variant_ids(products);
-      const variants = await _list_variants(ids, sizes);
-      const image_ids = await _extract_image_ids(variants);
-      const images = await _list_images(image_ids);
 
-      results = await _create_results_array(products, variants, images);
-    } catch (err){
-      throw new VError(err, 'error with sub_id search');
+  try{
+    const products = await _list_products(tags_array);
+    logger.info(`PRODUCTS LENGTH: ${products.length}`);
+    const ids = await _extract_variant_ids(products);
+    let variants = await _list_variants(products, ids, sizes);
+    logger.info(`VARIANTSS LENGTH: ${variants.length}`);
+    if (args.email){
+      variants = await _filter_out_already_shipped_variants(products, variants, args.email);
     }
-  //}else if (args.tags){*/
-    logger.info(`TAGS?`);
-    const tags = args.tags;
-    const sizes = args.sizes;
-    let tags_array = [];
-    /*
-     * make an array as that is what the TG API wants
-     */
-    if (!!tags){
-      tags_array = await _transform_tags_for_tg(tags);
-    }
-    
 
-    try{
-      const products = await _list_products(tags_array);
-      logger.info(`PRODUCTS LENGTH: ${products.length}`);
-      const ids = await _extract_variant_ids(products);
-      let variants = await _list_variants(products, ids, sizes);
-      logger.info(`VARIANTSS LENGTH: ${variants.length}`);
-      if (args.email){
-        variants = await _filter_out_already_shipped_variants(products, variants, args.email);
-      }
+    const image_ids = await _extract_image_ids(variants);
+    const images = await _list_images(image_ids);
 
-      const image_ids = await _extract_image_ids(variants);
-      const images = await _list_images(image_ids);
-
-      results = await _create_results_array(products, variants, images);
-    } catch (err){
-      throw new VError(err, 'error with product fields search');
-    }
-  //}
-
+    results = await _create_results_array(products, variants, images);
+  } catch (err){
+    throw new VError(err, 'error with product fields search');
+  }
+  
   return results;
 };
 
