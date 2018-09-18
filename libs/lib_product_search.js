@@ -34,7 +34,9 @@ const _product_type_tops = [
   'Leotards',
   'Playsuits',
   'Hoodies',
-  'Henleys'
+  'Henleys',
+  'Shirts',
+  'Sleep Suits'
  ];
 
 const _product_type_bottoms = [
@@ -42,20 +44,24 @@ const _product_type_bottoms = [
   'Shorts',
   'Swimwear',
   'Bloomers',
-  'Trackies'
+  'Trackies',
+  'Skirts',
+  'Jeans',
+  'Pants'
 ];
 
 const _product_type_misc = [
-  'Hats'
+  'Hats',
+  'Bibs',
+  'Blankets and Wraps',
+  'Scarfs',
+  'Socks'
+  
 ];
 
 /*
- * Product search function which accepts 2 sets of args:
- * 1. - when searching with a CB sub
- *    {
- *      sub_id:XXXXXXXXXXXX
- *    }
- * 2. - when searching with tags and sizes
+ * Product search function which accepts the following args:
+ * 
  *    {
  *      tags: [xxxx,xxxx,...],
  *      sizes: {
@@ -82,38 +88,50 @@ const _product_type_misc = [
 const search_products = async (args) => {
   let results = [];
 
-  if (args.sub_id){
-    const sub_id = args.sub_id;
+  /*
+   * If there is a sub_id this means this a CB subscripton ID search. Otherwise
+   * it's a product field search
+   */
 
-    try{
-      let {tags, sizes} = await _get_customer_style_info (sub_id);
-      const products = await _list_products(tags);
-      const ids = await _extract_variant_ids(products);
-      const variants = await _list_variants(ids, sizes);
-      const image_ids = await _extract_image_ids(variants);
-      const images = await _list_images(image_ids);
-
-      results = await _create_results_array(products, variants, images);
-    } catch (err){
-      throw new VError(err, 'error with sub_id search');
-    }
-  }else if (args.tags){
-    const tags = args.tags;
-    const sizes = args.sizes;
-
-    try{
-      const products = await _list_products(tags);
-      const ids = await _extract_variant_ids(products);
-      const variants = await _list_variants(ids, sizes);
-      const image_ids = await _extract_image_ids(variants);
-      const images = await _list_images(image_ids);
-
-      results = await _create_results_array(products, variants, images);
-    } catch (err){
-      throw new VError(err, 'error with product fields search');
-    }
+  const tags = args.tags;
+  const sizes = args.sizes;
+  let tags_array = [];
+  
+  /*
+   * make an array as that is what the TG API wants
+   */
+  if (!!tags){
+    tags_array = await _transform_tags_for_tg(tags);
   }
 
+
+  try{
+    const products = await _list_products(tags_array);
+    
+    const ids = await _extract_variant_ids(products);
+    let variants = await _list_variants(products, ids, sizes);
+    
+    if (args.email){
+      variants = await _filter_out_already_shipped_variants(products, variants, args.email);
+    }
+
+    const image_ids = await _extract_image_ids(variants);
+    const images = await _list_images(image_ids);
+
+    results = await _create_results_array(products, variants, images);
+    
+    /*
+     * Some logging for gemeral visibility
+     */
+    logger.info(`ARGS RECEIVED: ${JSON.stringify(args, null, 4)}`);
+    logger.info(`PRODUCTS LENGTH: ${products.length}`);
+    logger.info(`VARIANTS LENGTH: ${variants.length}`);
+    logger.info(`RESULTS LENGTH: ${results.length}`);
+    
+  } catch (err){
+    throw new VError(err, 'error with product fields search');
+  }
+  
   return results;
 };
 
@@ -133,15 +151,21 @@ async function _get_customer_style_info (subscription_id){
 }
 
 /*
- * Returns list of filtered products from TG
+ * Returns list of filtered products from TG.
  */
 
 async function _list_products (tags){
   if (typeof tags === 'undefined' || tags === null){
     throw new VError(`tags parameter not usable`);
   }
-
-  const ret = await tradegecko.tradegecko_get_products ({"tags": tags});
+  
+  let args = {};
+  
+  if (tags.length != 0){
+    args["tags"] = tags;
+  }
+  
+  const ret = await tradegecko.tradegecko_get_products (args);
   return ret;
 }
 
@@ -149,9 +173,12 @@ async function _list_products (tags){
  * Returns a list of product variants based on ids, sizes and stock on hand.
  */
 
-async function _list_variants (ids, sizes={}, only_soh=true){
+async function _list_variants (products, ids, sizes={}, email=false, only_soh=true ){
   if (typeof ids === 'undefined' || ids === null){
     throw new VError(`ids parameter not usable`);
+  }
+  if (typeof ids === 'undefined' || ids === null){
+    throw new VError(`products parameter not usable`);
   }
 
   let ret = await tradegecko.tradegecko_get_product_variants({"ids": ids});
@@ -161,7 +188,7 @@ async function _list_variants (ids, sizes={}, only_soh=true){
   /*
    * If only_soh is true then we only want to return stock on hand.
    */
-
+  
   if (only_soh){
     for (let i = 0; i < ret.length; i++){
       if (ret[i].stock_on_hand != "0"){
@@ -172,8 +199,12 @@ async function _list_variants (ids, sizes={}, only_soh=true){
     ret = available;
   }
 
+  if (email){
+     ret = await _filter_out_already_shipped_variants(products, ret, email);
+  }
+  
   ret = await _filter_for_sizes(ret, sizes);
-
+  
   return ret;
 }
 
@@ -229,16 +260,15 @@ async function _transform_custom_fields_to_tags_and_size (subscription){
 
 async function _extract_variant_ids (products){
   if (products.length == 0 ||  typeof products === 'undefined' || products === null || !Array.isArray(products)){
-    throw new VError(`product parameter not usable`);
+    throw new VError(`products parameter not usable`);
   }
 
   let ids = [];
-  let ret = [];
 
   for (let i = 0; i < products.length; i++){
     ids = ids.concat(products[i].variant_ids);
   }
-
+  
   return ids;
 }
 
@@ -320,27 +350,199 @@ async function _create_results_array (products, variants, images){
 }
 
 /*
- * Filter variants array for given sizes. Returns filtered array
+ * Filter variants array for given sizes. Adds all variants if no size 
+ * is given. Returns filtered array.
  */
 
 async function _filter_for_sizes (variants, sizes){
   let ret = [];
-
+  
+  /*
+   * If both sizes aren't defined, return everything (not ideal I know but until
+   * we settle down regarding product types this is the least terrible option)
+   */
+   
+  if (!sizes.top || !sizes.bottom){
+    return variants;
+  }
+  
   for (let i = 0; i < variants.length; i++){
+    // if a recognised 'top' type
     if (_product_type_tops.includes(variants[i].product_type)){
-      if (variants[i].opt2 == sizes.top){
+      // check for multiple sizes in sizes.top
+      if (!Array.isArray(sizes.top)){
+        // if a single size then push all variants with a size that matches
+        if(variants[i].opt2 == sizes.top){
+          ret.push(variants[i]);
+        }
+      }else if (sizes.top.includes(variants[i].opt2)){
+        // else if array of sizes then check array for matchinf size and push
         ret.push(variants[i]);
       }
+    // else if a recognised 'bottom' type....same again
     }else if (_product_type_bottoms.includes(variants[i].product_type)){
-      if (variants[i].opt2 == sizes.bottom){
+      if (!Array.isArray(sizes.bottom)){
+        if(variants[i].opt2 == sizes.bottom){
+          ret.push(variants[i]);
+        }
+      }else if (sizes.bottom.includes(variants[i].opt2)){
         ret.push(variants[i]);
       }
+      // else if misc product type e.g hats, accessories etc.
     }else if (_product_type_misc.includes(variants[i].product_type)){
-      ret.push(variants[i]);
+      // if size is One Size Fits All, then push
+      if (variants[i].opt2 == 'OSFA'){
+        ret.push(variants[i]);
+      }
+      
+      // TODO: need to do better for socks and other misc items - map sizes
     }
   }
 
   return ret;
-};
+};  
+
+/*
+ * Filter out variants that have been sent in Sales Orders to customer with given
+ * email already. Returns updated variants array.
+ */
+
+async function _filter_out_already_shipped_variants (products, variants, email){
+  const companies = await tradegecko.tradegecko_get_companies({"email":email});
+  const company_ids = await _extract_company_id_objects(companies);
+  let promises = company_ids.map(o => tradegecko.tradegecko_get_orders(o));
+  const orders = await Promise.all(promises);
+  const order_ids = await _extract_order_ids(orders);
+  promises = order_ids.map(o => tradegecko.tradegecko_get_order_line_items(o));
+  const line_items = await Promise.all(promises);
+
+  const updated_variants = await _remove_sent_variants(products, variants, line_items);
+  
+  return updated_variants;
+}
+
+/*
+ * Takes a TG companies array and extracts all of the IDs and returns them
+ * in an array as ready to go TG filter objects
+ */
+
+async function _extract_company_id_objects (companies){
+  if (companies.length == 0 ||  typeof companies === 'undefined' || companies === null || !Array.isArray(companies)){
+    throw new VError(`companies parameter not usable`);
+  }
+
+  let ids = [];
+
+  for (let i = 0; i < companies.length; i++){
+    ids.push({"company_id": companies[i].id});
+  }
+
+  return ids;
+}
+
+
+/*
+ * Takes a TG orders array and extracts all of the IDs and returns them
+ * in an array as ready to go TG filter objects
+ */
+
+async function _extract_order_ids (orders){
+  if (orders.length == 0 ||  typeof orders === 'undefined' || orders === null || !Array.isArray(orders)){
+    throw new VError(`orders parameter not usable`);
+  }
+
+  let ids = [];
+
+  for (let i = 0; i < orders.length; i++){
+    for (let j = 0; j < orders[i].length; j++){
+      ids.push({"order_id":orders[i][j].id});
+    }
+  }
+
+  return ids;
+}
+
+
+/*
+ * This function takes an array of product objects, an array of variant objects and an array of
+ * arrays of order_line_items. These line items are variants that have been sent to
+ * the customer before. We remove any variants that have been sent to the customer before
+ * + accompanying variants in the same product group, from the variants array. Removing the
+ * accompanying variants means we won't do something silly like return a product they've
+ * had before but in a different colour/size in the search results
+ */
+
+async function _remove_sent_variants (products, variants, line_items){
+  if (variants.length == 0 ||  typeof variants === 'undefined' || variants === null || !Array.isArray(variants)){
+    throw new VError(`variants parameter not usable`);
+  }
+  if (line_items.length == 0 ||  typeof line_items === 'undefined' || line_items === null || !Array.isArray(line_items)){
+    throw new VError(`line_items parameter not usable`);
+  }
+
+  const line_item_variants = await _extract_line_item_variant_ids(line_items);
+  const all_product_variants = await _extract_related_product_variant_ids(products, line_item_variants);
+  
+  //TODO: remove all matching variants from the variants array and return
+  for (let i = 0; i < variants.length; i++){
+    for (let j = 0; j < all_product_variants.length; j++){
+      if(all_product_variants[j].includes(variants[i].id)){
+        variants.splice(i, 1);
+      }
+    }
+  }
+
+  return variants;
+}
+
+/*
+ * Extracts variant ids from array of arrays of order line items. Returns them in an array.
+ */
+ 
+async function _extract_line_item_variant_ids (line_items){
+  let line_item_variants = [];
+
+  for (let i = 0; i < line_items.length; i++){
+    for (let j = 0; j < line_items[i].length; j++){
+      line_item_variants.push(line_items[i][j].variant_id);
+    }
+  }
+  
+  return line_item_variants;
+}
+
+/*
+ * Extracts all variant IDs from products where product's variant ID array contains
+ * ID matching a line item variant ID. Returns array of arrays of variant IDs.
+ */
+ 
+async function _extract_related_product_variant_ids (products, line_item_variants){
+  let all_product_variants = [];
+  
+  for (let i = 0; i < products.length; i++){
+    for (let j = 0; j < line_item_variants.length; j++){
+      if (products[i].variant_ids.includes(line_item_variants[j])){
+        all_product_variants.push(products[i].variant_ids);
+      }
+    }
+  }
+  
+  return all_product_variants;
+}
+
+/*
+ * Sanitize tags input for TG API
+ */
+ 
+async function _transform_tags_for_tg (tags){
+  const tags_array = tags.toString().split(",");
+  let ret = [];
+  
+  for (let i = 0; i < tags_array.length; i++){
+    ret.push(tags_array[i].trim());
+  }
+  
+  return ret;
+}
 
 exports.search_products = search_products;
