@@ -124,8 +124,8 @@ const search_products = async (args) => {
      * Some logging for gemeral visibility
      */
     logger.info(`ARGS RECEIVED: ${JSON.stringify(args, null, 4)}`);
-    logger.info(`VARIANTS LENGTH: ${variants.length}`);
     logger.info(`PRODUCTS LENGTH: ${products.length}`);
+    logger.info(`VARIANTS LENGTH: ${variants.length}`);
     logger.info(`RESULTS LENGTH: ${results.length}`);
     
   } catch (err){
