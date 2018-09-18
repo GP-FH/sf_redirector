@@ -5,35 +5,12 @@
       {{error}}
     </div>
   {{/if}}
-  <!-- Removing this for now because it is confusing and pribs gonna go
-  <div class="card ml-5 mt-3 mr-5">
-    <div class="card-header">
-      Get products by Subscription ID (experimental)
-    </div>
-    <div class="card-body">
-      <p class="card-text">See all products that match a sub's style profile</p>
-      <form action="/hq/product_search" method="post" id="sub_search_input">
-        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-        <input type="hidden" name="sub_search" value="1">
-        <div class="form-group">
-          <input type="text" class="form-control" id="search_input" placeholder="Enter Chargebee subscription ID" name=search_input>
-        </div>
-        <button id="sub_search_button" type="submit" class="btn btn-primary">Search</button>
-      </form>
-    </div>
-    <div class="row text-center text-lg-left" id="sub_results">
-      {{#each sub_results}}
-        <div class="col-lg-3 col-md-4 col-xs-6">
-          <a href="{{this.tg_link}}" class="d-block mb-4 h-100" target="_blank">
-            <figure class="figure">
-              <img class="figure-img img-fluid img-thumbnail" src="{{this.image}}" alt="">
-              <figcaption class="figure-caption"><b>SKU:</b>{{this.sku}}<br><b>Name:</b>{{this.name}}<br><b>Brand:</b>{{this.brand}}<br><b>Colour:</b>{{this.colour}}<br><b>Size:</b>{{this.size}}<br><b>Stock On Hand:</b>{{this.stock_on_hand}}<br><b>Value:</b>{{this.price}}</figcaption>
-            </figure>
-          </a>
-        </div>
-      {{/each}}
-    </div>
-  </div> -->
+  
+  {{#if results}}
+    <script type="text/javascript">
+      window.onload = window.location.hash = '#{results}';
+    </script>
+  {{/if}}
 
   <div class="card ml-5 mt-3 mr-5">
     <div class="card-header">
@@ -117,7 +94,7 @@
             <ul>
               <li>This is an optional field. If you choose no sizes it will return products of all sizes.</li>
               <li>However if you choose a size you must select one for both Bottom and Top. (I will remove this limitation soon)</li>
-              <li>You can select multiple sizes for each my Ctrl-clicking</li>
+              <li>You can select multiple sizes for each by Ctrl-clicking</li>
             </ul>
           </div>
         </div>
@@ -125,6 +102,7 @@
       </form>
     </div>
     <div class="row text-center text-lg-left" id="reg_results">
+      <a name="results"></a>
       {{#each filter_results}}
       <div class="col-lg-3 col-md-4 col-xs-6">
         <a href="{{this.tg_link}}" class="d-block mb-4 h-100" target="_blank">

@@ -124,8 +124,6 @@ const tradegecko_get_product_variants = async (filters={}, storage=[], page=1) =
   let batch_request = false;
   let remainder = [];
   let batch = [];
-  
-  //logger.info(`filter object received: ${JSON.stringify(filters, null, 4)}`);
 
   /*
    * Append to the the query object + check for excessive number of filter values

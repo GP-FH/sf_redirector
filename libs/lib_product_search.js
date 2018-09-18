@@ -60,12 +60,8 @@ const _product_type_misc = [
 ];
 
 /*
- * Product search function which accepts 2 sets of args:
- * 1. - when searching with a CB sub - SOON TO BE DEPRECATED I THINK
- *    {
- *      sub_id:XXXXXXXXXXXX
- *    }
- * 2. - when searching with tags and sizes
+ * Product search function which accepts the following args:
+ * 
  *    {
  *      tags: [xxxx,xxxx,...],
  *      sizes: {
@@ -111,10 +107,10 @@ const search_products = async (args) => {
 
   try{
     const products = await _list_products(tags_array);
-    logger.info(`PRODUCTS LENGTH: ${products.length}`);
+    
     const ids = await _extract_variant_ids(products);
     let variants = await _list_variants(products, ids, sizes);
-    logger.info(`VARIANTSS LENGTH: ${variants.length}`);
+    
     if (args.email){
       variants = await _filter_out_already_shipped_variants(products, variants, args.email);
     }
@@ -123,7 +119,15 @@ const search_products = async (args) => {
     const images = await _list_images(image_ids);
 
     results = await _create_results_array(products, variants, images);
-    logger.info(`results length: ${results.length}`);
+    
+    /*
+     * Some logging for gemeral visibility
+     */
+    logger.info(`ARGS RECEIVED: ${JSON.stringify(args, null, 4)}`);
+    logger.info(`VARIANTS LENGTH: ${variants.length}`);
+    logger.info(`PRODUCTS LENGTH: ${products.length}`);
+    logger.info(`RESULTS LENGTH: ${results.length}`);
+    
   } catch (err){
     throw new VError(err, 'error with product fields search');
   }
@@ -184,7 +188,7 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
   /*
    * If only_soh is true then we only want to return stock on hand.
    */
-  logger.info(`returned variant object length: ${ret.length}`);
+  
   if (only_soh){
     for (let i = 0; i < ret.length; i++){
       if (ret[i].stock_on_hand != "0"){
@@ -194,8 +198,6 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
 
     ret = available;
   }
-  
-  logger.info(`returned after SOH filter length: ${ret.length}`);
 
   if (email){
      ret = await _filter_out_already_shipped_variants(products, ret, email);
@@ -267,7 +269,6 @@ async function _extract_variant_ids (products){
     ids = ids.concat(products[i].variant_ids);
   }
   
-  logger.info(`Number of variant IDs extracted: ${ids.length}`);
   return ids;
 }
 

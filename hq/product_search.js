@@ -23,7 +23,7 @@ router.route('/').post(async (req, res, next) => {
 
     const ret = await product_search.search_products(args);
 
-    res.render('product_search', {csrfToken: req.csrfToken(), filter_results:ret});
+    res.render('product_search', {csrfToken: req.csrfToken(), filter_results:ret, results:true});
   }catch (err){
     logger.error(JSON.stringify( err ));
     res.render('product_search', {csrfToken: req.csrfToken(), error: err.message});
