@@ -40,13 +40,18 @@
       Get products by fields
     </div>
     <div class="card-body">
-      <p class="card-text">See all products that match filters you select</p>
+      <h2 class="card-text">See all products that match filters you select</h2>
       <form action="/hq/product_search" method="post" id="filter_search_input">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <input type="hidden" name="filter_search" value="1">
         <div class="form-group">
           <label for="style_tags_input">Style Tags - case sensitive e.g Urban = Yes urban = no</label>
           <input type="text" class="form-control" id="style_tags_input" placeholder="a,comma,separated,list" name="style_tags_input" >
+          <div class="card ml-5 mt-3 mr-5">
+            <div class="card-header">
+              Another?
+            </div>
+          </div>
           <br>
           <label for="customer_email_input">Customer email - filters out products already sent to this customer from search results (optional)</label>
           <input type="text" class="form-control" id="customer_email_input" placeholder="person@thing.com" name="customer_email_input" >
@@ -59,7 +64,7 @@
             <option>6m12</option>
             <option>1</option>
             <option>1y2</option>
-            <option>2</option>
+            <option>2</option>  
             <option>2y3</option>
             <option>3</option>
             <option>3y4</option>
