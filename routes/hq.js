@@ -5,6 +5,7 @@ const Strategy = require('passport-local').Strategy;
 const db = require("../libs/lib_db");
 const logger = require("../libs/lib_logger");
 const bcrypt = require("bcrypt");
+const csrf = require('csurf');
 
 passport.use(new Strategy((username, password, cb) => {
   db.find_user_by_name(username)
@@ -32,19 +33,21 @@ passport.deserializeUser(function(id, cb) {
     .catch((err) =>{
       return cb(err);
     });
-});
+}); 
 
 const shipped_product_search = require('../hq/shipped_product_search');
+const product_search = require('../hq/product_search');
 const login = require('../hq/login');
 const hq_home = require('../hq/hq_home');
 const stylist_home = require('../hq/stylist_home');
 
-
+router.use(csrf()); // csrf protection (adds crumb to route)
 
 /* * * * * * * * * * * * * *
  * Put your HQ routes here
  * * * * * * * * * * * * * */
 router.use('/shipped_product_search', shipped_product_search);
+router.use('/product_search', product_search);
 router.use('/login', login);
 router.use('/hq_home', hq_home);
 router.use('/stylist_home', stylist_home);

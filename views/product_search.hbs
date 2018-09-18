@@ -1,0 +1,122 @@
+<div class="container">
+  <h1 class="my-4 text-center text-lg-left">Product Search</h1>
+  {{#if error}}
+    <div id="search_error" class="alert alert-danger mt-3" role="alert">
+      {{error}}
+    </div>
+  {{/if}}
+  
+  {{#if results}}
+    <script type="text/javascript">
+      window.onload = window.location.hash = '#results';
+    </script>
+  {{/if}}
+
+  <div class="card ml-5 mt-3 mr-5">
+    <div class="card-header">
+      <p>See all products that match filters you select that we have SOH for</p>
+    </div>
+    <div class="card-body">
+      
+      <form action="/hq/product_search" method="post" id="filter_search_input">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <input type="hidden" name="filter_search" value="1">
+        <div class="form-group">
+          <label for="style_tags_input"><h3>Style Tags</h3></label>
+          <div class="alert alert-warning" role="alert">
+            Some notes on tags:
+            <ul>
+              <li>This field is optional: if you include no tags, it will return everything</li>
+              <li>'tis case sensitive (e.g Urban does not equal urban). Copy pasting the tags below will help :)</li>
+            </ul>
+            
+            Existing tags (though I'm sure there are others): <br><br>
+            
+            Animal Patterns, Basic, Black and White Line Patterns, Boho, Bold Character Patterns, Bold Monochrome, Bold Patterns, 
+            Boys, Classic Patterns, Cool Neutrals, Floral, Hip Patterns, Long Bottoms, Luxe, Monochrome, Natural Neutral, Neutrals, OSFA, 
+            Oversized, Pared Back, Sky Pastels, Sophisticated, Street, Subtle Monochrome, Tops, Bottoms, Unisex, Urban, Warm Neutrals, Warm Tops
+          </div>
+          <input type="text" class="form-control" id="style_tags_input" placeholder="a,comma,separated,list" name="style_tags_input" >
+          <br>
+          <label for="customer_email_input"><h3>Customer email</h3></label>
+          <div class="alert alert-warning" role="alert">
+            Some notes on customer email:
+            <ul>
+              <li>This field is optional</li>
+              <li>It doesn't back at cin7 orders (though this is less and less relevant) so you'll have to head <a href="/hq/shipped_product_search">here</a> to check</li>
+              <li>It doesn't just filter out the exact variant we sent but instances of this variant in other sizes as well</li>
+            </ul>
+          </div>
+          <input type="text" class="form-control" id="customer_email_input" placeholder="person@thing.com" name="customer_email_input" >
+        </div>
+        <div class="form-group">
+          <label for="size_select"><h3>Bottom Size</h3></label>
+          <select multiple class="form-control" id="size_select_input" name="size_select_input_bottom">
+            <option>0m3</option>
+            <option>3m6</option>
+            <option>6m12</option>
+            <option>1</option>
+            <option>1y2</option>
+            <option>2</option>  
+            <option>2y3</option>
+            <option>3</option>
+            <option>3y4</option>
+            <option>4</option>
+            <option>4y5</option>
+            <option>5</option>
+            <option>5y6</option>
+            <option>6</option>
+            <option>6y7</option>
+            <option>7</option>
+          </select>
+          <br>
+          <label for="size_select"><h3>Top Size</h3></label>
+          <select multiple class="form-control" id="size_select_input" name="size_select_input_top">
+            <option>0m3</option>
+            <option>3m6</option>
+            <option>6m12</option>
+            <option>1</option>
+            <option>1y2</option>
+            <option>2</option>
+            <option>2y3</option>
+            <option>3</option>
+            <option>3y4</option>
+            <option>4</option>
+            <option>4y5</option>
+            <option>5</option>
+            <option>5y6</option>
+            <option>6</option>
+            <option>6y7</option>
+            <option>7</option>
+          </select>
+          <br>
+          <div class="alert alert-warning" role="alert">
+            Some notes about sizes:
+            <ul>
+              <li>This is an optional field. If you choose no sizes it will return products of all sizes.</li>
+              <li>However if you choose a size you must select one for both Bottom and Top. (I will remove this limitation soon)</li>
+              <li>You can select multiple sizes for each by Ctrl-clicking</li>
+            </ul>
+          </div>
+        </div>
+        <button id="reg_search_button" type="submit" class="btn btn-primary mb-2">Search</button>
+      </form>
+    </div>
+    <a name="results"></a>
+    {{#if results}}
+      <h3>Found {{filter_results.length}} results</h3>
+    {{/if}}
+    <div class="row text-center text-lg-left" id="reg_results">
+      {{#each filter_results}}
+      <div class="col-lg-3 col-md-4 col-xs-6">
+        <a href="{{this.tg_link}}" class="d-block mb-4 h-100" target="_blank">
+          <figure class="figure">
+            <img class="figure-img img-fluid img-thumbnail" src="{{this.image}}" alt="">
+            <figcaption class="figure-caption"><b>SKU:</b>{{this.sku}}<br><b>Name:</b>{{this.name}}<br><b>Brand:</b>{{this.brand}}<br><b>Colour:</b>{{this.colour}}<br><b>Size:</b>{{this.size}}<br><b>Stock On Hand:</b>{{this.stock_on_hand}}<br><b>Value:</b>{{this.price}}</figcaption>
+          </figure>
+        </a>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
