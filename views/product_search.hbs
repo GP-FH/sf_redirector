@@ -8,7 +8,7 @@
   
   {{#if results}}
     <script type="text/javascript">
-      window.onload = window.location.hash = '#{results}';
+      window.onload = window.location.hash = '#results';
     </script>
   {{/if}}
 
@@ -103,6 +103,7 @@
     </div>
     <div class="row text-center text-lg-left" id="reg_results">
       <a name="results"></a>
+      <h3>Found {{filter_results.length}} results</h3>
       {{#each filter_results}}
       <div class="col-lg-3 col-md-4 col-xs-6">
         <a href="{{this.tg_link}}" class="d-block mb-4 h-100" target="_blank">
