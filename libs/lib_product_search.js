@@ -34,7 +34,9 @@ const _product_type_tops = [
   'Leotards',
   'Playsuits',
   'Hoodies',
-  'Henleys'
+  'Henleys',
+  'Shirts',
+  'Sleep Suits'
  ];
 
 const _product_type_bottoms = [
@@ -42,11 +44,19 @@ const _product_type_bottoms = [
   'Shorts',
   'Swimwear',
   'Bloomers',
-  'Trackies'
+  'Trackies',
+  'Skirts',
+  'Jeans',
+  'Pants'
 ];
 
 const _product_type_misc = [
-  'Hats'
+  'Hats',
+  'Bibs',
+  'Blankets and Wraps',
+  'Scarfs',
+  'Socks'
+  
 ];
 
 /*
@@ -191,10 +201,8 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
      ret = await _filter_out_already_shipped_variants(products, ret, email);
   }
   
-  if (!!sizes.bottom || !!sizes.top){
-    ret = await _filter_for_sizes(ret, sizes);
-  }
-
+  ret = await _filter_for_sizes(ret, sizes);
+  
   return ret;
 }
 
@@ -342,39 +350,56 @@ async function _create_results_array (products, variants, images){
 
 /*
  * Filter variants array for given sizes. Adds all variants if no size 
- * is given. Returns filtered array
+ * is given. Returns filtered array.
  */
 
 async function _filter_for_sizes (variants, sizes){
   let ret = [];
+  
+  /*
+   * If both sizes aren't defined, return everything (not ideal I know but until
+   * we settle down regarding product types this is the least terrible option)
+   */
+   
+  if (!sizes.top || !sizes.bottom){
+    return variants;
+  }
+  
   for (let i = 0; i < variants.length; i++){
+    // if a recognised 'top' type
     if (_product_type_tops.includes(variants[i].product_type)){
-      if (!sizes.top){
-        ret.push(variants[i]);
-      }else if (!Array.isArray(sizes.top)){
+      // check for multiple sizes in sizes.top
+      if (!Array.isArray(sizes.top)){
+        // if a single size then push all variants with a size that matches
         if(variants[i].opt2 == sizes.top){
           ret.push(variants[i]);
         }
       }else if (sizes.top.includes(variants[i].opt2)){
+        // else if array of sizes then check array for matchinf size and push
         ret.push(variants[i]);
       }
+    // else if a recognised 'bottom' type....same again
     }else if (_product_type_bottoms.includes(variants[i].product_type)){
-      if (!sizes.bottom){
-        ret.push(variants[i]);
-      }else if (!Array.isArray(sizes.bottom)){
+      if (!Array.isArray(sizes.bottom)){
         if(variants[i].opt2 == sizes.bottom){
           ret.push(variants[i]);
         }
       }else if (sizes.bottom.includes(variants[i].opt2)){
         ret.push(variants[i]);
       }
+      // else if misc product type e.g hats, accessories etc.
     }else if (_product_type_misc.includes(variants[i].product_type)){
-      ret.push(variants[i]);
+      // if size is One Size Fits All, then push
+      if (variants[i].opt2 == 'OSFA'){
+        ret.push(variants[i]);
+      }
+      
+      // TODO: need to do better for socks - map sizes
     }
   }
 
   return ret;
-};
+};  
 
 /*
  * Filter out variants that have been sent in Sales Orders to customer with given
