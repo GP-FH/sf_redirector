@@ -394,7 +394,7 @@ async function _filter_for_sizes (variants, sizes){
         ret.push(variants[i]);
       }
       
-      // TODO: need to do better for socks - map sizes
+      // TODO: need to do better for socks and other misc items - map sizes
     }
   }
 
