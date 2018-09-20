@@ -16,11 +16,14 @@ const logger = require("../libs/lib_logger");
  * needs to fill it
  */
 
-const tradegecko_create_sales_order = async ( subscription, customer, company_id = "21313869" ) => {
-  let { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer );
+const tradegecko_create_sales_order = async ( subscription, customer, company_id = "21313869", customer_exists = false ) => {
+  let { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer, customer_exists );
+  const date = new Date();
+  const today = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`
+  logger.info(`HERE IS THE DATE: ${today}`);
   let order = {
     "company_id": company_id, // defaults to Stylist
-    "issued_at": "13-03-2018",
+    "issued_at": today,
     "tags": tags,
     "status": "draft",
     "notes": notes
@@ -63,7 +66,7 @@ const tradegecko_create_sales_order = async ( subscription, customer, company_id
  * into Tradegecko via a new Sales Order.
  */
 
-async function _prep_subscription_for_sending ( subscription, customer ) {
+async function _prep_subscription_for_sending ( subscription, customer, customer_exists ) {
   return {
     "shipping_address": { // the customers address -> this will be automagically added to the Stylists relationship
       "address1": subscription.shipping_address.line1,
@@ -76,6 +79,7 @@ async function _prep_subscription_for_sending ( subscription, customer ) {
     },
     "notes":`
       Chargebee Subscription ID: ${subscription.id}
+      Existing Customer: ${customer_exists}
       Box Type: ${subscription.plan_id}
       First Name: ${customer.first_name}
       Last Name: ${customer.last_name}
