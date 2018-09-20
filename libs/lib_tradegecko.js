@@ -20,7 +20,7 @@ const tradegecko_create_sales_order = async ( subscription, customer, company_id
   let { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer);
   const date = new Date();
   const today = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`
-  logger.info(`HERE IS THE DATE: ${today}`);
+
   let order = {
     "company_id": company_id, // defaults to Stylist
     "issued_at": today,
