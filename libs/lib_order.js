@@ -85,7 +85,7 @@ const order_process_renewal = async ( subscription, customer ) => {
         if ( new_order ) {
           const ret = await tradegecko.tradegecko_create_sales_order_contact(subscription, customer);
           const company = ret.company;
-          await tradegecko.tradegecko_create_sales_order( subscription, customer, company.id);
+          await tradegecko.tradegecko_create_sales_order(subscription, customer, company.id);
         }
 
         break;
@@ -99,7 +99,7 @@ const order_process_renewal = async ( subscription, customer ) => {
         if ( new_order ) {
           const ret = await tradegecko.tradegecko_create_sales_order_contact(subscription, customer);
           const company = ret.company;
-          await tradegecko.tradegecko_create_sales_order( subscription, customer, company.id);
+          await tradegecko.tradegecko_create_sales_order(subscription, customer, company.id);
         }
 
         break;
