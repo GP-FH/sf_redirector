@@ -98,8 +98,9 @@ const search_products = async (args) => {
   let tags_array = [];
   
   /*
-   * make an array as that is what the TG API wants
+   * Make an array as that is what the TG API wants
    */
+   
   if (!!tags){
     tags_array = await _transform_tags_for_tg(tags);
   }
@@ -107,12 +108,13 @@ const search_products = async (args) => {
 
   try{
     const products = await _list_products(tags_array);
-    
     const ids = await _extract_variant_ids(products);
-    let variants = await _list_variants(products, ids, sizes);
-    
+    let variants;
+     
     if (args.email){
-      variants = await _filter_out_already_shipped_variants(products, variants, args.email);
+      variants = await _list_variants(products, ids, sizes, args.email);
+    }else{
+      variants = await _list_variants(products, ids, sizes);
     }
 
     const image_ids = await _extract_image_ids(variants);
@@ -123,6 +125,7 @@ const search_products = async (args) => {
     /*
      * Some logging for gemeral visibility
      */
+     
     logger.info(`ARGS RECEIVED: ${JSON.stringify(args, null, 4)}`);
     logger.info(`PRODUCTS LENGTH: ${products.length}`);
     logger.info(`VARIANTS LENGTH: ${variants.length}`);
@@ -191,18 +194,28 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
   
   if (only_soh){
     for (let i = 0; i < ret.length; i++){
-      if (ret[i].stock_on_hand != "0"){
+      const soh = ret[i].stock_on_hand - ret[i].committed_stock;
+      if (soh > 0){
         available.push(ret[i]);
       }
     }
 
     ret = available;
   }
-
+  
+  /*
+   * If email parameter is not false, then filter out variants already sent to 
+   * customer associated with this email
+   */
+   
   if (email){
      ret = await _filter_out_already_shipped_variants(products, ret, email);
   }
   
+  /*
+   * Filter out all variants that don't match the received sixe values
+   */
+   
   ret = await _filter_for_sizes(ret, sizes);
   
   return ret;
@@ -541,6 +554,26 @@ async function _transform_tags_for_tg (tags){
   
   for (let i = 0; i < tags_array.length; i++){
     ret.push(tags_array[i].trim());
+  }
+  
+  return ret;
+}
+
+/* 
+ * This function filters out variants that have no usable stock on hand.
+ * It does this by subtracting the commit stock from the stock on hand 
+ * to give us the true number of items available
+ */
+ 
+async function _filter_out_committed_stock (variants){
+  let ret = [];
+  
+  for (let i = 0; i < variants.length; i++){
+    const true_soh = variants[i].stock_on_hand - variants[i].committed_stock;
+    
+    if (true_soh > 0){
+      ret.push(variants[i]);
+    }
   }
   
   return ret;
