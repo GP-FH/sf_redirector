@@ -314,8 +314,7 @@ async function _create_results_array (products, variants, images){
   }
 
   let ret = [];
-  logger.info(`Variant object: ${JSON.stringify(variants[0], null, 4)}`);
-  logger.info(`HELLO FRIENDS`);
+
   // eeeeew
   for (let i = 0; i < variants.length; i++){
     let o = {};
