@@ -314,7 +314,7 @@ async function _create_results_array (products, variants, images){
   }
 
   let ret = [];
-  logger.info(`SOH = stock_on_hand: ${variants[0].stock_on_hand} - commited_stock: ${variants[0].commited_stock}`);
+  logger.info(`SOH = stock_on_hand: ${variants[0].stock_on_hand} - commited_stock: ${variants[0].committed_stock}`);
   // eeeeew
   for (let i = 0; i < variants.length; i++){
     let o = {};
