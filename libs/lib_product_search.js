@@ -314,15 +314,14 @@ async function _create_results_array (products, variants, images){
   }
 
   let ret = [];
-
+  logger.info(`SOH = stock_on_hand: ${variants[0].stock_on_hand} - commited_stock: ${variants[0].commited_stock}`);
   // eeeeew
   for (let i = 0; i < variants.length; i++){
-    console.log(`SOH = stock_on_hand: ${variants[i].stock_on_hand} - commited_stock: ${variants[i].commited_stock}`);
     let o = {};
     o['id'] = variants[i].id;
     o['sku'] = variants[i].sku;
     o['name'] = variants[i].product_name;
-    o['stock_on_hand'] = variants[i].stock_on_hand - variants[i].commited_stock;
+    o['stock_on_hand'] = variants[i].stock_on_hand - variants[i].committed_stock;
     o['price'] = `$${variants[i].wholesale_price}`;
     o['colour'] = variants[i].opt1;
     o['size'] = variants[i].opt2;
