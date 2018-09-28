@@ -500,10 +500,12 @@ async function _remove_sent_variants (products, variants, line_items){
   logger.info(`line item variant ids: ${line_item_variants.toString()}`);
   const all_product_variants = await _extract_related_product_variant_ids(products, line_item_variants);
   
-  logger.info(`EXAMPLE VARIANT: ${JSON.stringify(variants[0], null, 4)}`);
   
   //TODO: remove all matching variants from the variants array and return
   for (let i = 0; i < variants.length; i++){
+    if (variants[i].id == "40975379"){
+      logger.info(`Previously ordered variant is in the variant list`);
+    }
     for (let j = 0; j < all_product_variants.length; j++){
       if(all_product_variants[j].includes(variants[i].id)){
         variants.splice(i, 1);
