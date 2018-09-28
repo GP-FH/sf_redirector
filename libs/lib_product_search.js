@@ -428,9 +428,10 @@ async function _filter_out_already_shipped_variants (products, variants, email){
   let promises = company_ids.map(o => tradegecko.tradegecko_get_orders(o));
   const orders = await Promise.all(promises);
   const order_ids = await _extract_order_ids(orders);
+  logger.info(`ORDER IDS: ${order_ids.toString()} and length: ${order_ids.length}`);
   promises = order_ids.map(o => tradegecko.tradegecko_get_order_line_items(o));
   const line_items = await Promise.all(promises);
-
+  logger.info(`LINE ITEMS: ${line_items.toString()} and length: ${line_items.length}`);
   const updated_variants = await _remove_sent_variants(products, variants, line_items);
   
   return updated_variants;
