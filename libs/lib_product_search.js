@@ -559,24 +559,4 @@ async function _transform_tags_for_tg (tags){
   return ret;
 }
 
-/* 
- * This function filters out variants that have no usable stock on hand.
- * It does this by subtracting the commit stock from the stock on hand 
- * to give us the true number of items available
- */
- 
-async function _filter_out_committed_stock (variants){
-  let ret = [];
-  
-  for (let i = 0; i < variants.length; i++){
-    const true_soh = variants[i].stock_on_hand - variants[i].committed_stock;
-    
-    if (true_soh > 0){
-      ret.push(variants[i]);
-    }
-  }
-  
-  return ret;
-}
-
 exports.search_products = search_products;
