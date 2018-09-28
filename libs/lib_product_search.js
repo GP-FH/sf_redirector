@@ -131,6 +131,18 @@ const search_products = async (args) => {
     logger.info(`VARIANTS LENGTH: ${variants.length}`);
     logger.info(`RESULTS LENGTH: ${results.length}`);
     
+    for (let i = 0; i < variants.length; i++){
+      if (variants[i].id == 40975379){
+        logger.info(`THE ID IS IN THE VARIANTS ARRAY`);
+      }
+    }
+    
+    for (let i = 0; i < results.length; i++){
+      if (results[i].id == 40975379){
+        logger.info(`THE ID IS IN THE RESULTS ARRAY`);
+      }
+    }
+    
   } catch (err){
     throw new VError(err, 'error with product fields search');
   }
