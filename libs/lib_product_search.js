@@ -209,7 +209,8 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
    */
    
   if (email){
-     ret = await _filter_out_already_shipped_variants(products, ret, email);
+    logger.info(`DOING SOME EMAIL FILTERING`);
+    ret = await _filter_out_already_shipped_variants(products, ret, email);
   }
   
   /*
