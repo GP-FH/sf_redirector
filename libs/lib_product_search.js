@@ -513,6 +513,9 @@ async function _remove_sent_variants (products, variants, line_items){
   const all_product_variants = await _extract_related_product_variant_ids(products, line_item_variants);
   
   for (let i = 0; i < variants.length; i++){
+    if (variants[i].id == 40975379){
+      logger.info(`THE ID IS IN THE VARIANTS ARRAY in _remove_sent_variants()`);
+    }
     for (let j = 0; j < all_product_variants.length; j++){
       if(all_product_variants[j].includes(variants[i].id)){
         variants.splice(i, 1);
