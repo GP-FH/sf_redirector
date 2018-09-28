@@ -318,10 +318,11 @@ async function _create_results_array (products, variants, images){
   // eeeeew
   for (let i = 0; i < variants.length; i++){
     let o = {};
+    const soh = variants[i].stock_on_hand - variants[i].committed_stock;
     o['id'] = variants[i].id;
     o['sku'] = variants[i].sku;
     o['name'] = variants[i].product_name;
-    o['stock_on_hand'] = (variants[i].stock_on_hand - variants[i].committed_stock);
+    o['stock_on_hand'] = soh;
     o['price'] = `$${variants[i].wholesale_price}`;
     o['colour'] = variants[i].opt1;
     o['size'] = variants[i].opt2;
