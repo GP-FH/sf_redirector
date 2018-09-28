@@ -515,10 +515,8 @@ async function _remove_sent_variants (products, variants, line_items){
   
   for (let i = 0; i < variants.length; i++){
     for (let j = 0; j < all_product_variants.length; j++){
-      if (all_product_variants[j].includes(40975379)){
-        logger.info(`THE ID IS IN THE VARIANTS ARRAY in _remove_sent_variants`);
-      }
       if(all_product_variants[j].includes(variants[i].id)){
+        logger.info(`REMOVING VARIANT WITH THE FOLLOWING ID: ${variants[i].id}`);
         variants.splice(i, 1);
       }
     }
