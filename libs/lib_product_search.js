@@ -511,12 +511,13 @@ async function _remove_sent_variants (products, variants, line_items){
   const line_item_variants = await _extract_line_item_variant_ids(line_items);
   logger.info(`line item variant ids: ${line_item_variants.toString()}`);
   const all_product_variants = await _extract_related_product_variant_ids(products, line_item_variants);
+  logger.info(`example all_product_variants ${all_product_variants[0].toString()}`);
   
   for (let i = 0; i < variants.length; i++){
-    if (variants[i].id == 40975379){
-      logger.info(`THE ID IS IN THE VARIANTS ARRAY in _remove_sent_variants`);
-    }
     for (let j = 0; j < all_product_variants.length; j++){
+      if (all_product_variants[j].includes(40975379)){
+        logger.info(`THE ID IS IN THE VARIANTS ARRAY in _remove_sent_variants`);
+      }
       if(all_product_variants[j].includes(variants[i].id)){
         variants.splice(i, 1);
       }
