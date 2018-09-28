@@ -516,11 +516,12 @@ async function _remove_sent_variants (products, variants, line_items){
   for (let i = 0; i < variants.length; i++){
     for (let j = 0; j < all_product_variants.length; j++){
       if(all_product_variants[j].includes(variants[i].id)){
-        logger.info(`REMOVING VARIANT WITH THE FOLLOWING ID: ${variants[i].id}`);
         variants.splice(i, 1);
       }
     }
   }
+  
+  //NOTE: it's not in the all_product_variants array :thinking:
 
   return variants;
 }
@@ -554,6 +555,12 @@ async function _extract_related_product_variant_ids (products, line_item_variant
       if (products[i].variant_ids.includes(line_item_variants[j])){
         all_product_variants.push(products[i].variant_ids);
       }
+    }
+  }
+  
+  for (let i = 0; i < all_product_variants.length; i++){
+    for (let j = 0; j < all_product_variants[i].length; j++){
+      logger.info(`all_product_variants V ID: ${all_product_variants[i][j]}`);
     }
   }
   
