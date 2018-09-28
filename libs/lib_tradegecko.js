@@ -17,7 +17,19 @@ const logger = require("../libs/lib_logger");
  */
 
 const tradegecko_create_sales_order = async ( subscription, customer, company_id = "21313869") => {
-  let { shipping_address, notes, tags } = await _prep_subscription_for_sending( subscription, customer);
+  if (typeof subscription === 'undefined' || subscription === null || (Object.keys(subscription).length === 0 && subscription.constructor === Object) || typeof subscription !== 'object') {
+    throw new VError ('subscription parameter invalid');
+  }
+  
+  if (typeof customer === 'undefined' || customer === null || (Object.keys(customer).length === 0 && customer.constructor === Object) || typeof customer !== 'object') {
+    throw new VError ('customer parameter invalid');
+  }
+  
+  if (company_id === null) {
+    throw new VError ('company_id parameter invalid');
+  }
+  
+  let { shipping_address, notes, tags } = await _prep_subscription_for_sending(subscription, customer);
   const date = new Date();
   const today = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`
 
@@ -52,12 +64,11 @@ const tradegecko_create_sales_order = async ( subscription, customer, company_id
       },
       json: true
     });
-
   }
   catch (err) {
     throw new VError (err, `Error creating sales order via TradeGecko API. Note: will need to be manually created for subscription ${subscription.id}` );
   }
-
+  
   return { ok:true };
 }
 
