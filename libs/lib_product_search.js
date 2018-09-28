@@ -502,9 +502,7 @@ async function _remove_sent_variants (products, variants, line_items){
   
   //TODO: remove all matching variants from the variants array and return
   for (let i = 0; i < variants.length; i++){
-    if (variants[i].id == 40975379){
-      logger.info(`Previously ordered variant is in the variant list`);
-    }
+    logger.info(`POOP`);
     for (let j = 0; j < all_product_variants.length; j++){
       if(all_product_variants[j].includes(variants[i].id)){
         variants.splice(i, 1);
