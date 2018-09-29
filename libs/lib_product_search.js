@@ -516,13 +516,10 @@ async function _remove_sent_variants (products, variants, line_items){
   
   for (let i = 0; i < variants.length; i++){
     for (let j = 0; j < all_product_variants.length; j++){
-      const id = variants[i].id;
-      if(id == 40975379){
-        logger.info(`includes() result: ${all_product_variants[j].includes(id)}`);
-      }
-      logger.info(`ITERATION COUNT: ${j}`);
-      if(all_product_variants[j].includes(id)){
-        variants.splice(i, 1);
+      for (let k = 0; k < all_product_variants[j].length; k++){
+        if (all_product_variants[j][k] == variants[i].id){
+          variants.splice(i, 1);
+        }
       }
     }
   }
