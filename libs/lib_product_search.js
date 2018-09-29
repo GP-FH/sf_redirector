@@ -209,7 +209,6 @@ async function _list_variants (products, ids, sizes={}, email=false, only_soh=tr
    */
    
   if (email){
-    logger.info(`DOING SOME EMAIL FILTERING`);
     ret = await _filter_out_already_shipped_variants(products, ret, email);
   }
   
@@ -428,10 +427,8 @@ async function _filter_out_already_shipped_variants (products, variants, email){
   let promises = company_ids.map(o => tradegecko.tradegecko_get_orders(o));
   const orders = await Promise.all(promises);
   const order_ids = await _extract_order_ids(orders);
-  logger.info(`ORDER IDS: ${order_ids.toString()} and length: ${order_ids.length}`);
   promises = order_ids.map(o => tradegecko.tradegecko_get_order_line_items(o));
   const line_items = await Promise.all(promises);
-  logger.info(`LINE ITEMS: ${line_items.toString()} and length: ${line_items.length}`);
   const updated_variants = await _remove_sent_variants(products, variants, line_items);
   
   return updated_variants;
@@ -497,13 +494,19 @@ async function _remove_sent_variants (products, variants, line_items){
   }
 
   const line_item_variants = await _extract_line_item_variant_ids(line_items);
-  logger.info(`line item variant ids: ${line_item_variants.toString()}`);
   const all_product_variants = await _extract_related_product_variant_ids(products, line_item_variants);
   
+  /*
+   * These nested loops aren't really my jam but using Array.includes() was not 
+   * matching in some cases. Doing the manual check cleared this up 
+   */ 
+   
   for (let i = 0; i < variants.length; i++){
     for (let j = 0; j < all_product_variants.length; j++){
-      if(all_product_variants[j].includes(variants[i].id)){
-        variants.splice(i, 1);
+      for (let k = 0; k < all_product_variants[j].length; k++){
+        if (all_product_variants[j][k] == variants[i].id){
+          variants.splice(i, 1);
+        }
       }
     }
   }
@@ -542,7 +545,7 @@ async function _extract_related_product_variant_ids (products, line_item_variant
       }
     }
   }
-  
+    
   return all_product_variants;
 }
 
