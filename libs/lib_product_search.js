@@ -515,7 +515,8 @@ async function _remove_sent_variants (products, variants, line_items){
   
   for (let i = 0; i < variants.length; i++){
     for (let j = 0; j < all_product_variants.length; j++){
-      if(all_product_variants[j].includes(variants[i].id)){
+      const id = variants[i].id;
+      if(all_product_variants[j].includes(id)){
         variants.splice(i, 1);
       }
     }
@@ -557,13 +558,7 @@ async function _extract_related_product_variant_ids (products, line_item_variant
       }
     }
   }
-  
-  for (let i = 0; i < all_product_variants.length; i++){
-    for (let j = 0; j < all_product_variants[i].length; j++){
-      logger.info(`all_product_variants V ID: ${all_product_variants[i][j]}`);
-    }
-  }
-  
+    
   return all_product_variants;
 }
 
