@@ -67,7 +67,7 @@ const chargebee_request_checkout = async (profile, redirect_url, stylist_attribu
       cf_jam: profile.jam,
       cf_doit: profile.doit,
       cf_palette: profile.palette,
-      cf_fave: profile.fav,
+      cf_fave: profile.fave,
       cf_keen: profile.keen,
       cf_else: profile.something_else,
       cf_notes: profile.notes
