@@ -520,6 +520,7 @@ async function _remove_sent_variants (products, variants, line_items){
       if(id == 40975379){
         logger.info(`includes() result: ${all_product_variants[j].includes(id)}`);
       }
+      logger.info(`ITERATION COUNT: ${j}`);
       if(all_product_variants[j].includes(id)){
         variants.splice(i, 1);
       }
