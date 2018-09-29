@@ -164,7 +164,7 @@ async function _transform_profile_for_storage (qs, designs, palette){
     suburb: qs.suburb,
     city: qs.city,
     phone: qs.phone,
-    country: _transform_country_to_iso(qs.country);
+    country: _transform_country_to_iso(qs.country)
   };
 }
 
