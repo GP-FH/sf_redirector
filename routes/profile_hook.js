@@ -204,9 +204,12 @@ function _transform_country_to_iso (country){
   
   let ret = false;
   const l_country = country.toLowerCase();
+  logger.info(`Country name: ${l_country}`);
   
   const keys = Object.keys(country_to_iso);
   const index = keys.indexOf(country);
+  
+  logger.info(`Index of found key: ${index}`);
   
   if (index){
     ret = country_to_iso[keys[index]];
