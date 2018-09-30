@@ -208,7 +208,7 @@ function _transform_country_to_iso (country){
   
   const keys = Object.keys(country_to_iso);
   const index = keys.indexOf(country);
-  
+  logger.info(`Keys: ${keys.toString()}`);
   logger.info(`Index of found key: ${index}`);
   
   if (index){
