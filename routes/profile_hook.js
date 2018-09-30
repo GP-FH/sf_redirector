@@ -197,9 +197,10 @@ function _get_answered_questions (questions){
  */
  
 function _transform_country_to_iso (country){
-  if (typeof filters === 'undefined' || filters == null){
+  if (typeof country === 'undefined' || country == null){
     throw new VError("Unsupported value received for country field");
   }
+  
   let ret = false;
   const l_country = country.toLowerCase();
   
