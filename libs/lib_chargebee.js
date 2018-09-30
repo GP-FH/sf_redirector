@@ -63,14 +63,21 @@ const chargebee_request_checkout = async (profile, redirect_url, stylist_attribu
       cf_childname: profile.childname,
       cf_childage: profile.childage,
       cf_topsize: profile.topsize,
+      cf_ts_fit: profile.ts_fit,
       cf_bottomsize: profile.bottomsize,
-      cf_jam: profile.jam,
-      cf_doit: profile.doit,
+      cf_bs_fit: profile.bs_fit,
       cf_palette: profile.palette,
-      cf_fave: profile.fave,
-      cf_keen: profile.keen,
-      cf_else: profile.something_else,
-      cf_notes: profile.notes
+      cf_style: profile.style,
+      cf_pared_to_bold: profile.pared_to_bold,
+      cf_pared_to_fun: profile.pared_to_fun,
+      cf_vintage_to_fem: profile.vintage_to_fem,
+      cf_vintage_to_beachy: profile.vintage_to_beachy,
+      cf_avoid_colours: profile.avoid_colours,
+      cf_designs: profile.designs,
+      cf_do_not_want: profile.do_not_want,
+      cf_need_most: profile.need_most,
+      cf_unisex: profile.unisex,
+      cf_other_notes: profile.other_notes,
     },
     customer: {
       email: profile.email,
@@ -85,8 +92,10 @@ const chargebee_request_checkout = async (profile, redirect_url, stylist_attribu
       line1: profile.street_address,
       line2: profile.suburb,
       city: profile.city,
-      country: "NZ",
-      phone: profile.phone
+      country: profile.country,
+      phone: profile.phone,
+      zip: profile.postcode
+      
     }
   }).request( ( err, ret ) => {
     if (err){
@@ -105,20 +114,25 @@ const chargebee_update_subscription = async (subscription, new_fields) => {
   }
 
   const updates = {
-    cf_archetype: new_fields.fave,
     cf_gender: new_fields.gender,
     cf_childname: new_fields.childname,
     cf_childage: new_fields.childage,
     cf_topsize: new_fields.topsize,
+    cf_ts_fit: new_fields.ts_fit,
     cf_bottomsize: new_fields.bottomsize,
-    cf_jam: new_fields.jam,
-    cf_doit: new_fields.doit,
+    cf_bs_fit: new_fields.bs_fit,
     cf_palette: new_fields.palette,
-    cf_fave: new_fields.fave,
-    cf_keen: new_fields.keen,
-    cf_else: new_fields.something_else,
-    cf_notes: new_fields.notes,
-    cf_internal_notes: new_fields.internal_notes
+    cf_style: new_fields.style,
+    cf_pared_to_bold: new_fields.pared_to_bold,
+    cf_pared_to_fun: new_fields.pared_to_fun,
+    cf_vintage_to_fem: new_fields.vintage_to_fem,
+    cf_vintage_to_beachy: new_fields.vintage_to_beachy,
+    cf_avoid_colours: new_fields.avoid_colours,
+    cf_designs: new_fields.designs,
+    cf_do_not_want: new_fields.do_not_want,
+    cf_need_most: new_fields.need_most,
+    cf_unisex: new_fields.unisex,
+    cf_other_notes: new_fields.other_notes
   };
 
   return await chargebee.subscription.update(subscription.id, updates).request( (err, ret) => {

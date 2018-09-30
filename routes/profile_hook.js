@@ -145,8 +145,8 @@ async function _transform_profile_for_storage (qs, designs, palette){
     topsize: qs.topsize,
     ts_fit: qs.ts_fit,
     bottomsize: qs.bottomsize,
-    palette: palette,
     bs_fit: qs.bs_fit,
+    palette: palette,
     style: qs.style,
     pared_to_bold: qs.pared_to_bold,
     pared_to_fun: qs.pared_to_fun,
@@ -164,7 +164,8 @@ async function _transform_profile_for_storage (qs, designs, palette){
     suburb: qs.suburb,
     city: qs.city,
     phone: qs.phone,
-    country: _transform_country_to_iso(qs.country)
+    country: _transform_country_to_iso(qs.country),
+    postcode:qs.postcode
   };
 }
 
