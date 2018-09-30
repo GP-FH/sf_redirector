@@ -212,9 +212,6 @@ function _transform_country_to_iso (country){
     }
   }
   
-  if (index){
-    ret = country_to_iso[keys[index]];
-  }
   logger.info(`THE COUNTRY CODE I GENERATE IIIIIISSSSS: ${ret}`);
   return ret;
 }
