@@ -102,7 +102,7 @@ router.get( '/', async function (req, res, next) {
        * event.
        */
        
-      if (req.query.store_profile == 'yes'){
+      if (req.query.store_profile == 'Yes'){
         const profile = await _transform_profile_for_storage(req.query, designs, palette);
         await db.db_aux_store_style_profile(profile);
         res.redirect(`https://${process.env.CHARGEBEE_SITE}.chargebee.com/hosted_pages/plans/${req.query.boxtype}`);
