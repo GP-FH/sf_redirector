@@ -347,7 +347,7 @@ const subscription_tracker_get_upcoming_renewals = async (subscription_list) => 
           throw new VError(err);
         }
         
-        logger.info(`DEBUG: ${reply.toString()}`);
+        logger.info(`DEBUG: ${JSON.stringify(reply)}`);
         if ('count is correct'){
           logger.info(`DEBUG: push to array`);
         }

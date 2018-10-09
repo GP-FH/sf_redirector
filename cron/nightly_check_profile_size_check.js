@@ -77,22 +77,24 @@
         }
       }
       
-      const profile_update_email_due_list_id = 'whatever_it_is';
+      const profile_update_email_due_list_id = 'contactlist_d96add3e-f282-422c-a144-bdb245b19c4a';
       
       if (!debug){
         for (let i = 0; i < matches.length; i++){
           await autopilot.autopilot_remove_contact_from_list(matches[i].customer.email, profile_update_email_due_list_id);
-          await autopilot.autopilot_update_contact(
+          await autopilot.autopilot_update_or_create_contact(
             {
-              "email": matches[i].customer.email,
-              "custom": {
-                "temp_sub_id_for_next_email": matches[i].id, 
-                "temp_kid_name_for_next_email": matches[i].subscription.cf_childname, 
-                "temp_kid_gender_for_next_email": matches[i].subscription.cf_gender
+              "contact":{
+                "Email": matches[i].customer.email,
+                "_autopilot_list": profile_update_email_due_list_id, // including this automagically adds them to the list
+                "custom": {
+                  "temp_sub_id_for_next_email": matches[i].id, 
+                  "temp_kid_name_for_next_email": matches[i].subscription.cf_childname, 
+                  "temp_kid_gender_for_next_email": matches[i].subscription.cf_gender
+                }
               }
             } 
           );
-          await autopilot.autopilot_add_contact_to_list(matches[i].customer.email, profile_update_email_due_list_id);
         }
       }
       

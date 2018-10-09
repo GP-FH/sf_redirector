@@ -47,17 +47,88 @@ const autopilot_move_contact_to_new_list = async ( from, to, email ) => {
   }
 };
 
+/*
+ * Given a list_id and email this function removes the contact associated with the Given
+ * email from the given list. Returns {ok:true} or throws error
+ */
+ 
 const autopilot_remove_contact_from_list = async (email, list_id) => {
-  return true;
+  if (!email){
+    throw new VError(`missing email so cannot remove contact from list`);
+  }
+  
+  if (!list_id){
+    throw new VError(`missing list_id so cannot remove contact from list`);
+  }
+  
+  const options = {
+    method: 'DELETE',
+    url: `${process.env.AUTOPILOY_API_BASE_URL}/list/${list_id}/contact/${email}`,
+    headers: {
+      'autopilotapikey': process.env.AUTOPILOT_API_KEY
+    }
+  };
+  
+  try{
+    request(options, async function (error, response, body) {
+      if (error){
+        throw new VError(error, "Error removing contact from list in Autopilot");
+      }
+      
+      if (response.statusCode != '200'){
+        throw new VError (body.error, "non 200 response from Autopilot API when trying to remove contact from list");
+      }
+      
+      return {ok: true};
+    });
+  }catch (error){
+    throw new VError(error);
+  }
 };
 
-const autopilot_update_contact = async (update_obj) => {
-  return true;
+/*
+ * Given an object with fields to update/include (format here: https://autopilot.docs.apiary.io/#reference/api-methods/addupdate-contact/add-or-update-contact)
+ * this function updates the contact in Autopilot. SOME ASIDES:
+ * 
+ * - if you provide no email in the object it will create a new contact. Including an email will update
+ *   an existing contact or create a new one if one does not already exist 
+ * - if you include an _autopilot_list property in the object this call will also add the newly created/
+ *   updated contact to the list with the matching ID
+ */
+
+const autopilot_update_or_create_contact = async (update_obj) => {
+  if ((Object.keys(subscription).length === 0 && subscription.constructor === Object) || typeof subscription !== 'object'){
+    throw new VError("Cannot update contact in Autopilot as update_obj is not an object");
+  }
+  
+  const options = {
+    method: 'POST',
+    url: `${process.env.AUTOPILOY_API_BASE_URL}/contact`,
+    headers: {
+      'autopilotapikey': process.env.AUTOPILOT_API_KEY,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(update_obj)
+  }
+  
+  request(options, function (error, response, body) {
+    if (error){
+      throw new VError(error, "Error removing contact from list in Autopilot");
+    }
+    
+    if (response.statusCode != '200'){
+      throw new VError (body.error, "non 200 response from Autopilot API when trying to remove contact from list");
+    }
+    
+    return {ok: true};
+  });
 };
 
-const autopilot_add_contact_to_list = async (email, list_id) => {
-  return true;
-};
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Private functions below
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 function local_autopilot_remove_list_contact( email, list_id ) {
   const options = {
@@ -107,5 +178,4 @@ function local_autopilot_add_list_user( email, list_id ) {
 
 exports.autopilot_move_contact_to_new_list = autopilot_move_contact_to_new_list;
 exports.autopilot_remove_contact_from_list = autopilot_remove_contact_from_list;
-exports.autopilot_update_contact = autopilot_update_contact;
-exports.autopilot_add_contact_to_list = autopilot_add_contact_to_list;
+exports.autopilot_update_or_create_contact = autopilot_update_or_create_contact;
