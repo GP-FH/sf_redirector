@@ -154,8 +154,17 @@ const chargebee_pause_subscription = async (subscription_id) => {
   })
 };
 
+const chargebee_list_subscriptions = async (filters = {}) => {
+  return await chargebee.subscription.list(filters).request((err, ret) => {
+    if ( err ) {
+      throw new VError (err, "Error listing subscription in Chargebee");
+    }
+  });
+};
+
 exports.chargebee_pause_subscription = chargebee_pause_subscription;
 exports.chargebee_get_customer_info = chargebee_get_customer_info;
 exports.chargebee_get_subscription_info = chargebee_get_subscription_info;
 exports.chargebee_request_checkout = chargebee_request_checkout;
 exports.chargebee_update_subscription = chargebee_update_subscription;
+exports.chargebee_list_subscriptions = chargebee_list_subscriptions;

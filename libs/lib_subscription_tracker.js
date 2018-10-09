@@ -319,9 +319,47 @@ const subscription_tracker_set_subscription_count = async ( plan_id, subscriptio
     return;
 };
 
+const subscription_tracker_get_upcoming_renewals = async (subscription_list) => {
+  return new Promise( async (resolve, reject) => {
+    const options = {
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT
+    };
+
+    const client = redis.createClient( options );
+
+    //  listen for errors
+    client.on( 'error', ( err ) => {
+      client.quit();
+      throw new VError(err);
+    } );
+    
+    let renewal_ids = [];
+    
+    for (let i = 0; i < subscription_list.length; i++){
+      
+      /*
+       * Syntax: [key] [cursor] MATCH [pattern]
+       */
+       
+      client.hscan(subscription_list[i].customer.id, 0, `MATCH ${subscription_list[i].subscription.id}`, (err, reply) => {
+        if (err){
+          throw new VError(err);
+        }
+        
+        logger.info(`DEBUG: ${reply.toString()}`);
+        if ('count is correct'){
+          logger.info(`DEBUG: push to array`);
+        }
+      });
+    }
+  });
+};
+
 exports.increment_and_check_monthly = increment_and_check_monthly;
 exports.increment_and_check_weekly = increment_and_check_weekly;
 exports.subscription_tracker_set_subscription_count = subscription_tracker_set_subscription_count;
+exports.subscription_tracker_get_upcoming_renewals = subscription_tracker_get_upcoming_renewals;
 
 exports.set_monthly = set_monthly; // These 2 are exported for test setup. This could be done better.
 exports.set_weekly = set_weekly;
