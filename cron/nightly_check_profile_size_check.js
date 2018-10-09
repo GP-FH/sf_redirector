@@ -81,7 +81,7 @@
       
       if (!debug){
         for (let i = 0; i < matches.length; i++){
-          await autopilot.autopilot_remove_contact_from_list(matches[i].customer.id, profile_update_email_due_list_id);
+          await autopilot.autopilot_remove_contact_from_list(matches[i].customer.email, profile_update_email_due_list_id);
           await autopilot.autopilot_update_contact(
             {
               "email": matches[i].customer.email,
@@ -92,7 +92,7 @@
               }
             } 
           );
-          await autopilot.autopilot_add_contact_to_list(matches[i].customer.email);
+          await autopilot.autopilot_add_contact_to_list(matches[i].customer.email, profile_update_email_due_list_id);
         }
       }
       

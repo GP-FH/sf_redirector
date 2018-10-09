@@ -47,6 +47,18 @@ const autopilot_move_contact_to_new_list = async ( from, to, email ) => {
   }
 };
 
+const autopilot_remove_contact_from_list = async (email, list_id) => {
+  return true;
+};
+
+const autopilot_update_contact = async (update_obj) => {
+  return true;
+};
+
+const autopilot_add_contact_to_list = async (email, list_id) => {
+  return true;
+};
+
 function local_autopilot_remove_list_contact( email, list_id ) {
   const options = {
     method: 'DELETE',
@@ -94,3 +106,6 @@ function local_autopilot_add_list_user( email, list_id ) {
 }
 
 exports.autopilot_move_contact_to_new_list = autopilot_move_contact_to_new_list;
+exports.autopilot_remove_contact_from_list = autopilot_remove_contact_from_list;
+exports.autopilot_update_contact = autopilot_update_contact;
+exports.autopilot_add_contact_to_list = autopilot_add_contact_to_list;
