@@ -106,7 +106,7 @@
       process.exit(0);
       
     }catch (error){
-      logger.error(`nightly_check_profile_size_check.js: error occured: ${error}`);
+      logger.error(`nightly_check_profile_size_check.js: error occured: ${JSON.stringify(error, null, 4)}`);
       process.exit(1);
     }
     
