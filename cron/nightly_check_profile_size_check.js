@@ -57,10 +57,11 @@
     const current_ts = new Date().getTime() / 1000;
     const three_days_from_now = current_ts + 259200;
     const four_days_from_now = current_ts + 345600;
+    const time_array = [three_days_from_now,four_days_from_now];
     
     const filters = {
       "status[is]" : "active",
-      "next_billing_at[between]" : `[${three_days_from_now},${four_days_from_now}]`
+      "next_billing_at[between]" : time_array.toString();
     };
     
     try {
