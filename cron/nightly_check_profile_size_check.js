@@ -61,7 +61,7 @@
     
     const filters = {
       "status[is]" : "active",
-      "next_billing_at[between]" : time_array.toString();
+      "next_billing_at[between]" : time_array.toString()
     };
     
     try {
