@@ -70,7 +70,7 @@
     try {
       const ret = await chargebee.chargebee_list_subscriptions(filters)
       const cb_subs = ret.list;
-      const tracker_subs = await sub_tracker.subscription_tracker_get_upcoming_renewals();
+      const tracker_subs = await sub_tracker.subscription_tracker_get_upcoming_renewals(cb_subs);
       let matches = [];
       
       for (let i = 0; i < cb_subs.length; i++){
