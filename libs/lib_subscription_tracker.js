@@ -335,14 +335,14 @@ const subscription_tracker_get_upcoming_renewals = async (subscription_list) => 
     } );
     
     let renewal_ids = [];
-    
+    logger.info(`Example sub object before I do some hscanning: ${JSON.stringify(subscription_list[0], null, 4)}`);
     for (let i = 0; i < subscription_list.length; i++){
       
       /*
        * Syntax: [key] [cursor] MATCH [pattern]
        */
        
-      client.hscan(subscription_list[i].customer.id, 0, `MATCH ${subscription_list[i].subscription.id}`, (err, reply) => {
+      client.hscan(subscription_list[i].customer.id, 0, 'MATCH', subscription_list[i].subscription.id, (err, reply) => {
         if (err){
           throw new VError(err);
         }
