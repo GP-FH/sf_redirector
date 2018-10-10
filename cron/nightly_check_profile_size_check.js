@@ -59,6 +59,8 @@
     const four_days_from_now = current_ts + 345600;
     const time_array = [three_days_from_now,four_days_from_now];
     
+    logger.info(`time_array: ${time_array.toString()}`);
+    
     const filters = {
       "status[is]" : "active",
       "next_billing_at[between]" : time_array
