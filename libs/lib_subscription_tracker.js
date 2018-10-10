@@ -296,6 +296,7 @@ async function _validate_subscription_count( plan_id, customer_id, subscription_
 /*
  * A glimpse into the future - a generic function for setting the sub count
  */
+ 
 const subscription_tracker_set_subscription_count = async ( plan_id, subscription_id, customer_id ) => {
     switch ( plan_id ) {
       case 'deluxe-box':
@@ -319,6 +320,12 @@ const subscription_tracker_set_subscription_count = async ( plan_id, subscriptio
     return;
 };
 
+/*
+ * This function takes an array of subscription objects (see example here:
+ * https://apidocs.chargebee.com/docs/api/subscriptions?lang=node#list_subscriptions)
+ * and returns all in the array that are due a box next renewal.
+ */
+ 
 const subscription_tracker_get_upcoming_renewals = async (subscription_list) => {
   return new Promise( async (resolve, reject) => {
     const options = {
@@ -334,12 +341,11 @@ const subscription_tracker_get_upcoming_renewals = async (subscription_list) => 
       throw new VError(err);
     } );
     
-    let renewal_ids = [];
-    logger.info(`Example sub object before I do some hscanning: ${JSON.stringify(subscription_list[0], null, 4)}`);
+    let renewal_subs = [];
     for (let i = 0; i < subscription_list.length; i++){
       
       /*
-       * Syntax: [key] [cursor] MATCH [pattern]
+       * Syntax: [key] [cursor] [MATCH] [pattern]
        */
        
       client.hscan(subscription_list[i].customer.id, 0, 'MATCH', subscription_list[i].subscription.id, (err, reply) => {
@@ -347,12 +353,13 @@ const subscription_tracker_get_upcoming_renewals = async (subscription_list) => 
           throw new VError(err);
         }
         
-        logger.info(`DEBUG: ${reply[1].toString()}`);
-        if ('count is correct'){
-          logger.info(`DEBUG: push to array`);
+        if (reply[1][1] == 1 || reply[1][1] == 5){
+          renewal_subs.push(subscription_list[i]);
         }
       });
     }
+    
+    logger.info(`Number of renewing subs being returned: ${renewal_subs.length}`);
   });
 };
 
