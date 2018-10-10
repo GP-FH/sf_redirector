@@ -359,7 +359,7 @@ const subscription_tracker_get_upcoming_renewals = async (subscription_list) => 
       });
     }
     
-    logger.info(`Number of renewing subs being returned: ${renewal_subs.length}`);
+    resolve(renewal_subs);
   });
 };
 
