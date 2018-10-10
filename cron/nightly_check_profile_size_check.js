@@ -64,7 +64,7 @@
     
     const filters = {
       "status[is]" : "active",
-      "next_billing_at[between]" : `[${three_days_from_now},${four_days_from_now}]`;
+      "next_billing_at[between]" : `[${three_days_from_now},${four_days_from_now}]`
     };
     
     try {
