@@ -54,16 +54,17 @@
     *   contact + add contact to 'Profile Update Email Due' list in Autopilot
     */
     
-    const current_ts = new Date().getTime() / 1000;
+    const current_ts = Math.round(new Date().getTime() / 1000);
     const three_days_from_now = current_ts + 259200;
     const four_days_from_now = current_ts + 345600;
     const time_array = [three_days_from_now,four_days_from_now];
     
+    logger.info(`Current ts: ${current_ts}`);
     logger.info(`time_array: ${time_array.toString()}`);
     
     const filters = {
       "status[is]" : "active",
-      "next_billing_at[between]" : time_array
+      "next_billing_at[between]" : `[${three_days_from_now},${four_days_from_now}]`;
     };
     
     try {
