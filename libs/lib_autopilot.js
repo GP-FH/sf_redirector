@@ -114,7 +114,7 @@ const autopilot_update_or_create_contact = async (update_obj) => {
   }
   
   try {
-    request(options, async (error, response, body) => {
+    return request(options, async (error, response, body) => {
       if (error){
         logger.info(`DEBUG: AP Error?`);
         throw new VError(error, "Error updating/adding contact to list in Autopilot");
@@ -126,7 +126,7 @@ const autopilot_update_or_create_contact = async (update_obj) => {
       
       
       
-      return;
+      //return;
     });
   }catch (error){
     throw new VError(error);
