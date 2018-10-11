@@ -8,6 +8,7 @@
 
 const request = require("request");
 const VError = require("verror");
+const got = require("got");
 
 const logger = require("./lib_logger");
 
@@ -114,20 +115,14 @@ const autopilot_update_or_create_contact = async (update_obj) => {
   }
   
   try {
-    return await request(options, async (error, response, body) => {
-      if (error){
-        logger.info(`DEBUG: AP Error?`);
-        throw new VError(error, "Error updating/adding contact to list in Autopilot");
-      }
-      logger.info(`DEBUG: here's what's coming back from AP: ${response.statusCode} + ${JSON.stringify(body, null, 4)}`);
-      if (response.statusCode != '200'){
-        throw new VError (body.error, "non 200 response from Autopilot API when trying to add contact to list");
-      }
+    const ret =  await got.post(options);
+    logger.info(`DEBUG: here's what's coming back from AP: ${response.statusCode} + ${JSON.stringify(response.body, null, 4)}`);
+    if (response.statusCode != '200'){
+      throw new VError (response.body.error, "non 200 response from Autopilot API when trying to add contact to list");
+    }
       
-      
-      
-      //return;
-    });
+    return;
+    
   }catch (error){
     throw new VError(error);
   }
