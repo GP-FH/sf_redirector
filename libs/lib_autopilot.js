@@ -101,6 +101,8 @@ const autopilot_update_or_create_contact = async (update_obj) => {
     throw new VError("Cannot update contact in Autopilot as update_obj is not an object");
   }
   
+  logger.info(`DEBUG: received object by AP lib: ${JSON.stringify(update_obj, null, 4)}`);
+  
   const options = {
     method: 'POST',
     url: `${process.env.AUTOPILOY_API_BASE_URL}/contact`,
@@ -113,7 +115,7 @@ const autopilot_update_or_create_contact = async (update_obj) => {
   
   request(options, function (error, response, body) {
     if (error){
-      throw new VError(error, "Error removing contact from list in Autopilot");
+      throw new VError(error, "Error updating/adding contact to list in Autopilot");
     }
     
     if (response.statusCode != '200'){
