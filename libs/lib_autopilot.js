@@ -63,25 +63,23 @@ const autopilot_remove_contact_from_list = async (email, list_id) => {
   }
   
   const options = {
-    method: 'DELETE',
-    url: `${process.env.AUTOPILOY_API_BASE_URL}/list/${list_id}/contact/${email}`,
     headers: {
       'autopilotapikey': process.env.AUTOPILOT_API_KEY
     }
   };
   
   try{
-    request(options, async (error, response, body) => {
+    const ret = await got.delete(`${process.env.AUTOPILOY_API_BASE_URL}/list/${list_id}/contact/${email}`, options)
       if (error){
         throw new VError(error, "Error removing contact from list in Autopilot");
       }
       
-      if (response.statusCode != '200'){
-        throw new VError (body.error, "non 200 response from Autopilot API when trying to remove contact from list");
+      if (ret.statusCode != '200'){
+        throw new VError (ret.body.error, "non 200 response from Autopilot API when trying to remove contact from list");
       }
       
       return;
-    });
+    );
   }catch (error){
     throw new VError(error);
   }
@@ -108,15 +106,15 @@ const autopilot_update_or_create_contact = async (update_obj) => {
     headers: {
       'autopilotapikey': process.env.AUTOPILOT_API_KEY
     },
-    body: JSON.stringify(update_obj),
+    body: update_obj,
     json: true
   }
   
   try {
-    const ret =  await got.post(`${process.env.AUTOPILOY_API_BASE_URL}/contact`, options);
-    logger.info(`DEBUG: here's what's coming back from AP: ${response.statusCode} + ${JSON.stringify(response.body, null, 4)}`);
-    if (response.statusCode != '200'){
-      throw new VError (response.body.error, "non 200 response from Autopilot API when trying to add contact to list");
+    const ret = await got.post(`${process.env.AUTOPILOY_API_BASE_URL}/contact`, options);
+    logger.info(`DEBUG: here's what's coming back from AP: ${ret.statusCode} + ${JSON.stringify(ret.body, null, 4)}`);
+    if (ret.statusCode != '200'){
+      throw new VError (ret.body.error, "non 200 response from Autopilot API when trying to add contact to list");
     }
       
     return;
