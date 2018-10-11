@@ -344,7 +344,7 @@ const subscription_tracker_check_box_on_next_renewal = async (customer_id, subsc
      * Syntax: [key] [cursor] [MATCH] [pattern]
      */
      
-    client.hscan(customer_id, 0, 'MATCH', subscription_id, async (err, reply) => {
+    return client.hscan(customer_id, 0, 'MATCH', subscription_id, async (err, reply) => {
       if (err){
         throw new VError(err);
       }
@@ -353,10 +353,10 @@ const subscription_tracker_check_box_on_next_renewal = async (customer_id, subsc
       
       if (reply[1][1] == 1 || reply[1][1] == 5){
         return resolve(true);
+      }else {
+        return resolve(false);
       }
     });
-    
-    resolve(false);
   });
 };
 
