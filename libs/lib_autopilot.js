@@ -97,7 +97,7 @@ const autopilot_remove_contact_from_list = async (email, list_id) => {
  */
 
 const autopilot_update_or_create_contact = async (update_obj) => {
-  if ((Object.keys(subscription).length === 0 && subscription.constructor === Object) || typeof subscription !== 'object'){
+  if ((Object.keys(update_obj).length === 0 && update_obj.constructor === Object) || typeof update_obj !== 'object'){
     throw new VError("Cannot update contact in Autopilot as update_obj is not an object");
   }
   
