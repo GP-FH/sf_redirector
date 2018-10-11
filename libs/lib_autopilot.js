@@ -70,7 +70,7 @@ const autopilot_remove_contact_from_list = async (email, list_id) => {
   };
   
   try{
-    request(options, async function (error, response, body) {
+    request(options, async (error, response, body => {
       if (error){
         throw new VError(error, "Error removing contact from list in Autopilot");
       }
@@ -113,17 +113,21 @@ const autopilot_update_or_create_contact = async (update_obj) => {
     body: JSON.stringify(update_obj)
   }
   
-  request(options, function (error, response, body) {
-    if (error){
-      throw new VError(error, "Error updating/adding contact to list in Autopilot");
-    }
-    
-    if (response.statusCode != '200'){
-      throw new VError (body.error, "non 200 response from Autopilot API when trying to remove contact from list");
-    }
-    
-    return {ok: true};
-  });
+  try {
+    request(options, async (error, response, body) => {
+      if (error){
+        throw new VError(error, "Error updating/adding contact to list in Autopilot");
+      }
+      
+      if (response.statusCode != '200'){
+        throw new VError (body.error, "non 200 response from Autopilot API when trying to add contact to list");
+      }
+      
+      return {ok: true};
+    });
+  }catch (error){
+    throw new VError(error);
+  }
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
