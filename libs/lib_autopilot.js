@@ -79,7 +79,7 @@ const autopilot_remove_contact_from_list = async (email, list_id) => {
         throw new VError (body.error, "non 200 response from Autopilot API when trying to remove contact from list");
       }
       
-      return {ok: true};
+      return;
     });
   }catch (error){
     throw new VError(error);
@@ -116,6 +116,7 @@ const autopilot_update_or_create_contact = async (update_obj) => {
   try {
     request(options, async (error, response, body) => {
       if (error){
+        logger.info(`DEBUG: AP Error?`);
         throw new VError(error, "Error updating/adding contact to list in Autopilot");
       }
       logger.info(`DEBUG: here's what's coming back from AP: ${response.statusCode} + ${JSON.stringify(body, null, 4)}`);
@@ -125,7 +126,7 @@ const autopilot_update_or_create_contact = async (update_obj) => {
       
       
       
-      return {ok: true};
+      return;
     });
   }catch (error){
     throw new VError(error);
