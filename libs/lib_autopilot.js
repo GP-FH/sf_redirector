@@ -70,7 +70,7 @@ const autopilot_remove_contact_from_list = async (email, list_id) => {
   };
   
   try{
-    request(options, async (error, response, body => {
+    request(options, async (error, response, body) => {
       if (error){
         throw new VError(error, "Error removing contact from list in Autopilot");
       }
