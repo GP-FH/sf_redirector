@@ -70,6 +70,8 @@
       const tracker_subs = await sub_tracker.subscription_tracker_get_upcoming_renewals(cb_subs);
       let matches = [];
       
+      if (verbose) logger.info(`Number of subs due in 3 days: ${cb_subs.length}. Out of those ${tracker_subs.length} get a box on next renewal`);
+      
       /*
        * Pick out the subs that are due a box next renewal from the array of subs returned
        * by chargebee tha are renewing 3 days from now
