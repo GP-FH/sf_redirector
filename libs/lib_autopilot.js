@@ -103,10 +103,8 @@ const autopilot_update_or_create_contact = async (update_obj) => {
   }
   
   logger.info(`DEBUG: received object by AP lib: ${JSON.stringify(update_obj, null, 4)}`);
-  
+  logger.info(`DEBUG: the URL we are sending to: ${process.env.AUTOPILOY_API_BASE_URL}/contact`);
   const options = {
-    method: 'POST',
-    url: `${process.env.AUTOPILOY_API_BASE_URL}/contact`,
     headers: {
       'autopilotapikey': process.env.AUTOPILOT_API_KEY,
       'Content-Type': 'application/json'
@@ -115,14 +113,13 @@ const autopilot_update_or_create_contact = async (update_obj) => {
   }
   
   try {
-    const ret =  await got.post(options);
+    const ret =  await got.post(`${process.env.AUTOPILOY_API_BASE_URL}/contact`, options);
     logger.info(`DEBUG: here's what's coming back from AP: ${response.statusCode} + ${JSON.stringify(response.body, null, 4)}`);
     if (response.statusCode != '200'){
       throw new VError (response.body.error, "non 200 response from Autopilot API when trying to add contact to list");
     }
       
     return;
-    
   }catch (error){
     throw new VError(error);
   }
