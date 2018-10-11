@@ -106,11 +106,10 @@ const autopilot_update_or_create_contact = async (update_obj) => {
   logger.info(`DEBUG: the URL we are sending to: ${process.env.AUTOPILOY_API_BASE_URL}/contact`);
   const options = {
     headers: {
-      'cache-control': 'no-cache',
-      'autopilotapikey': process.env.AUTOPILOT_API_KEY,
-      'content-type': 'application/json'
+      'autopilotapikey': process.env.AUTOPILOT_API_KEY
     },
-    body: `{\"Email\":\"marcelo@stitchfox.com\"}`//JSON.stringify(update_obj)
+    body: JSON.stringify(update_obj),
+    json: true
   }
   
   try {
