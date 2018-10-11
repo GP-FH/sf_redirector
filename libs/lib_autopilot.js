@@ -118,12 +118,12 @@ const autopilot_update_or_create_contact = async (update_obj) => {
       if (error){
         throw new VError(error, "Error updating/adding contact to list in Autopilot");
       }
-      
+      logger.info(`DEBUG: here's what's coming back from AP: ${response.statusCode} + ${JSON.stringify(body, null, 4)}`);
       if (response.statusCode != '200'){
         throw new VError (body.error, "non 200 response from Autopilot API when trying to add contact to list");
       }
       
-      logger.info(`DEBUG: here's what's coming back from AP: ${response.statusCode} + ${JSON.stringify(body, null, 4)}`);
+      
       
       return {ok: true};
     });
