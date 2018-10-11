@@ -344,7 +344,7 @@ const subscription_tracker_check_box_on_next_renewal = async (customer_id, subsc
      * Syntax: [key] [cursor] [MATCH] [pattern]
      */
      
-    client.hscan(customer_id, 0, 'MATCH', subscription_id, await (err, reply) => {
+    client.hscan(customer_id, 0, 'MATCH', subscription_id, async (err, reply) => {
       if (err){
         throw new VError(err);
       }
