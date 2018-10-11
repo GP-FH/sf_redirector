@@ -59,9 +59,6 @@
     const four_days_from_now = current_ts + 345600;
     const time_array = [three_days_from_now,four_days_from_now];
     
-    logger.info(`Current ts: ${current_ts}`);
-    logger.info(`time_array: ${time_array.toString()}`);
-    
     const filters = {
       "status[is]" : "active",
       "next_billing_at[between]" : `[${three_days_from_now},${four_days_from_now}]`
@@ -90,7 +87,10 @@
       
       if (!debug){
         for (let i = 0; i < matches.length; i++){
+          if (verbose) logger.info(`Removing ${matches[i].customer.email} from Autopilot list (if they're there)`);
           await autopilot.autopilot_remove_contact_from_list(matches[i].customer.email, profile_update_email_due_list_id);
+          
+          if (verbose) logger.info(`(Re-)Adding ${matches[i].customer.email} to list in Autopilot to trigger journey`);
           await autopilot.autopilot_update_or_create_contact(
             {
               "contact":{
