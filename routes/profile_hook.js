@@ -8,6 +8,7 @@
 const express = require("express");
 const mixpanel = require("mixpanel");
 const util = require("underscore");
+const VError = require("verror");
 
 const product_plan =  require("../libs/lib_product_plan");
 const chargebee = require("../libs/lib_chargebee");

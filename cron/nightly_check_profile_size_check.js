@@ -27,7 +27,7 @@
  const option_definitions = [ 
    {
      name: 'debug',
-     alias: 'b',
+     alias: 'd',
      type: Boolean,
      defaultValue: false
    },
@@ -109,6 +109,7 @@
       
       if (debug){
         logger.info(`Job would have moved ${matches.length} customers onto the 'Profile Update Email Due' Autopilot list`);
+        process.exit(0);
       }
       
       logger.info(`Job moved ${matches.length} customers onto the 'Profile Update Email Due' Autopilot list`);
