@@ -321,12 +321,11 @@ const subscription_tracker_set_subscription_count = async ( plan_id, subscriptio
 };
 
 /*
- * This function takes an array of subscription objects (see example here:
- * https://apidocs.chargebee.com/docs/api/subscriptions?lang=node#list_subscriptions)
- * and returns all in the array that are due a box next renewal.
+ * This function takes subscription ID and returns true or false
+ * depending on whether the sub is due a box on next renewal
  */
  
-const subscription_tracker_get_upcoming_renewals = async (subscription_list) => {
+const subscription_tracker_check_box_on_next_renewal = async (customer_id, subscription_id) => {
   return new Promise( async (resolve, reject) => {
     const options = {
       host: process.env.REDIS_HOST,
@@ -340,33 +339,29 @@ const subscription_tracker_get_upcoming_renewals = async (subscription_list) => 
       client.quit();
       throw new VError(err);
     } );
-    
-    let renewal_subs = [];
-    for (let i = 0; i < subscription_list.length; i++){
       
-      /*
-       * Syntax: [key] [cursor] [MATCH] [pattern]
-       */
-       
-      client.hscan(subscription_list[i].customer.id, 0, 'MATCH', subscription_list[i].subscription.id, (err, reply) => {
-        if (err){
-          throw new VError(err);
-        }
-        
-        if (reply[1][1] == 1 || reply[1][1] == 5){
-          renewal_subs.push(subscription_list[i]);
-        }
-      });
-    }
+    /*
+     * Syntax: [key] [cursor] [MATCH] [pattern]
+     */
+     
+    client.hscan(customer_id, 0, 'MATCH', subscription_id, await (err, reply) => {
+      if (err){
+        throw new VError(err);
+      }
+      
+      if (reply[1][1] == 1 || reply[1][1] == 5){
+        return resolve(true);
+      }
+    });
     
-    resolve(renewal_subs);
+    resolve(false);
   });
 };
 
 exports.increment_and_check_monthly = increment_and_check_monthly;
 exports.increment_and_check_weekly = increment_and_check_weekly;
 exports.subscription_tracker_set_subscription_count = subscription_tracker_set_subscription_count;
-exports.subscription_tracker_get_upcoming_renewals = subscription_tracker_get_upcoming_renewals;
+exports.subscription_tracker_check_box_on_next_renewal = subscription_tracker_check_box_on_next_renewal;
 
 exports.set_monthly = set_monthly; // These 2 are exported for test setup. This could be done better.
 exports.set_weekly = set_weekly;

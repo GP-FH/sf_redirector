@@ -190,23 +190,22 @@
       ];
 
 //ret.list;
-      const tracker_subs = await sub_tracker.subscription_tracker_get_upcoming_renewals(cb_subs);
-      let matches = [];
-      
-      if (verbose) logger.info(`Number of subs due in 3 days: ${cb_subs.length}. Out of those ${tracker_subs.length} get a box on next renewal`);
+
+      if (verbose) logger.info(`Number of subs due in 3 days: ${cb_subs.length}`); 
       
       /*
        * Pick out the subs that are due a box next renewal from the array of subs returned
        * by chargebee tha are renewing 3 days from now
        */
        
+      let matches = [];
       for (let i = 0; i < cb_subs.length; i++){
-        for (let j = 0; j < tracker_subs.length; j++){
-          if (cb_subs[i].subscription.id == tracker_subs[j].id){
-            matches.push(cb_subs[i]);
-          }
+        if (await sub_tracker.subscription_tracker_check_box_on_next_renewal(cb_subs[i].customer.id, cb_subs[i].subscription.id)){
+          matches.push(cb_subs[i]);
         }
       }
+      
+      if (verbose) logger.info(`Number of subs due a box on next renewal: ${matches.length}`); 
       
       const profile_update_email_due_list_id = 'contactlist_d96add3e-f282-422c-a144-bdb245b19c4a';
       
