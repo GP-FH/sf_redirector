@@ -215,7 +215,7 @@
           await autopilot.autopilot_remove_contact_from_list(matches[i].customer.email, profile_update_email_due_list_id);
           
           if (verbose) logger.info(`(Re-)Adding ${matches[i].customer.email} to list in Autopilot to trigger journey`);
-          await autopilot.autopilot_update_or_create_contact(
+          const ret = await autopilot.autopilot_update_or_create_contact(
             {
               "contact":{
                 "Email": matches[i].customer.email,
@@ -228,6 +228,8 @@
               }
             } 
           );
+          
+          logger.info(`DEBUG: ret is ${JSON.stringify(ret, null, 4)}`);
         }
       }
       
