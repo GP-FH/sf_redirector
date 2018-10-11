@@ -109,7 +109,7 @@ const autopilot_update_or_create_contact = async (update_obj) => {
       'autopilotapikey': process.env.AUTOPILOT_API_KEY,
       'Content-Type': 'application/json'
     },
-    body: `{\"Email\":\"marcelo@stitchfox.com\"}`;//JSON.stringify(update_obj)
+    body: `{\"Email\":\"marcelo@stitchfox.com\"}`//JSON.stringify(update_obj)
   }
   
   try {
