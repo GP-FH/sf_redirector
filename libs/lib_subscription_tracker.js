@@ -349,8 +349,6 @@ const subscription_tracker_check_box_on_next_renewal = async (customer_id, subsc
         throw new VError(err);
       }
       
-      logger.info(`DEBUG: reply from redis: ${JSON.stringify(reply)}`);
-      
       if (reply[1][1] == 1 || reply[1][1] == 5){
         return resolve(true);
       }else {
