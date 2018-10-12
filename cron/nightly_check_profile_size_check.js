@@ -221,7 +221,7 @@
                 "Email": matches[i].customer.email,
                 "_autopilot_list": profile_update_email_due_list_id, // including this automagically adds them to the list
                 "custom": {
-                  "temp_sub_id_for_next_email": matches[i].id, 
+                  "temp_sub_id_for_next_email": matches[i].subscription.id, 
                   "temp_kid_name_for_next_email": matches[i].subscription.cf_childname, 
                   "temp_kid_gender_for_next_email": matches[i].subscription.cf_gender
                 }
