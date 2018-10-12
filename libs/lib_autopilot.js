@@ -64,22 +64,25 @@ const autopilot_remove_contact_from_list = async (email, list_id) => {
   
   const options = {
     headers: {
-      'autopilotapikey': process.env.AUTOPILOT_API_KEY,
-      'throwHttpErrors': "false"
+      'autopilotapikey': process.env.AUTOPILOT_API_KEY
     }
   };
   
   try{
     const ret = await got.delete(`${process.env.AUTOPILOY_API_BASE_URL}/list/${list_id}/contact/${email}`, options);
   
-    if (ret.statusCode != '200' && ret.statusCode != '404'){
+    if (ret.statusCode != '200'){
       throw new VError (ret.body.error, "non 200 response from Autopilot API when trying to remove contact from list");
     }
     
     return;
 
   }catch (error){
-    throw new VError(error);
+    if (error.statusCode != '404'){
+      throw new VError(error);
+    }
+    
+    return;
   }
 };
 
