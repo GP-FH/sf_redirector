@@ -92,6 +92,5 @@ if (process.env.ENVIRONMENT == 'dev' || process.env.ROLE == 'hq'){
 }else{
   app.listen(80, () => {
     logger.info(`${os.hostname()} started and listening`);
-    console.log(`${os.hostname()} started and listening`);
   });
 }
