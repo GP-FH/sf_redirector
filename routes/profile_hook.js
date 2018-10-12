@@ -213,7 +213,6 @@ function _transform_country_to_iso (country){
     }
   }
   
-  logger.info(`THE COUNTRY CODE I GENERATE IIIIIISSSSS: ${ret}`);
   return ret;
 }
 
