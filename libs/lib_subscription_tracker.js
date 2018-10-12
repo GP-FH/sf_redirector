@@ -296,6 +296,7 @@ async function _validate_subscription_count( plan_id, customer_id, subscription_
 /*
  * A glimpse into the future - a generic function for setting the sub count
  */
+ 
 const subscription_tracker_set_subscription_count = async ( plan_id, subscription_id, customer_id ) => {
     switch ( plan_id ) {
       case 'deluxe-box':
@@ -319,9 +320,50 @@ const subscription_tracker_set_subscription_count = async ( plan_id, subscriptio
     return;
 };
 
+/*
+ * This function takes subscription ID and returns true or false
+ * depending on whether the sub is due a box on next renewal
+ */
+ 
+const subscription_tracker_check_box_on_next_renewal = async (customer_id, subscription_id) => {
+  return new Promise( async (resolve, reject) => {
+    const options = {
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT
+    };
+
+    const client = redis.createClient( options );
+
+    //  listen for errors
+    client.on( 'error', ( err ) => {
+      client.quit();
+      throw new VError(err);
+    } );
+      
+    /*
+     * Syntax: [key] [cursor] [MATCH] [pattern]
+     */
+     
+    return client.hscan(customer_id, 0, 'MATCH', subscription_id, async (err, reply) => {
+      if (err){
+        throw new VError(err);
+      }
+      
+      logger.info(`DEBUG: reply from redis: ${JSON.stringify(reply)}`);
+      
+      if (reply[1][1] == 1 || reply[1][1] == 5){
+        return resolve(true);
+      }else {
+        return resolve(false);
+      }
+    });
+  });
+};
+
 exports.increment_and_check_monthly = increment_and_check_monthly;
 exports.increment_and_check_weekly = increment_and_check_weekly;
 exports.subscription_tracker_set_subscription_count = subscription_tracker_set_subscription_count;
+exports.subscription_tracker_check_box_on_next_renewal = subscription_tracker_check_box_on_next_renewal;
 
 exports.set_monthly = set_monthly; // These 2 are exported for test setup. This could be done better.
 exports.set_weekly = set_weekly;

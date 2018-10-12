@@ -8,11 +8,17 @@
 const express = require("express");
 const mixpanel = require("mixpanel");
 const util = require("underscore");
+const VError = require("verror");
 
 const product_plan =  require("../libs/lib_product_plan");
 const chargebee = require("../libs/lib_chargebee");
 const logger = require("../libs/lib_logger");
 const db = require("../libs/lib_db");
+
+const country_to_iso = {
+  'australia': 'AU', 
+  'new zealand': 'NZ'
+};
 
 /*
  * Set up router level middleware
@@ -52,15 +58,16 @@ router.get( '/', async function (req, res, next) {
   }
 
   /*
-   * The cf_palette and cf_keen field in chargebee cap out at 250. These fields can
+   * The cf_palette and cf_designs field in chargebee cap out at 250. These fields can
    * sometimes be longer so this is a temp fix which truncates them. (Not Ideal).
+   * NOTE: this may not be necessary anymore -> remove if not
    */
 
   let palette = req.query.palette;
-  let keen = _get_answered_questions([req.query.keen1, req.query.keen2, req.query.keen3]);
+  let designs = req.query.designs;
 
-  if (!keen || !palette){
-    logger.error( 'Error occurred on receiving style profile information - palette or keen* fields undefined' );
+  if (!designs || !palette){
+    logger.error( 'Error occurred on receiving style profile information - palette or designs* fields undefined' );
     res.redirect( process.env.BASE_URL + '/error' );
   }
   else {
@@ -68,9 +75,9 @@ router.get( '/', async function (req, res, next) {
       logger.warn( 'Had to truncate palette field string for customer: ' + req.query.email );
       palette = palette.substring( 0, 250 );
     }
-    if ( keen.length > 250 ) {
-      logger.warn( 'Had to truncate keen field string for customer: ' + req.query.email );
-      keen = keen.substring( 0, 250 );
+    if (designs.length > 250 ) {
+      logger.warn( 'Had to truncate designs field string for customer: ' + req.query.email );
+      designs = designs.substring( 0, 250 );
     }
 
     /*
@@ -96,12 +103,12 @@ router.get( '/', async function (req, res, next) {
        * event.
        */
        
-      if (req.query.store_profile == 'true'){
-        const profile = await _transform_profile_for_storage(req.query, keen, palette);
+      if (req.query.store_profile == 'Yes'){
+        const profile = await _transform_profile_for_storage(req.query, designs, palette);
         await db.db_aux_store_style_profile(profile);
         res.redirect(`https://${process.env.CHARGEBEE_SITE}.chargebee.com/hosted_pages/plans/${req.query.boxtype}`);
       } else{
-        const profile = await _transform_profile_for_storage(req.query, keen, palette);
+        const profile = await _transform_profile_for_storage(req.query, designs, palette);
         let checkout = await chargebee.chargebee_request_checkout(profile, redirect_url, stylist_attr);
         res.redirect( checkout.hosted_page.url );
       }
@@ -128,31 +135,38 @@ router.use( ( err, req, res, next ) => {
  * Transforms received profile information to be a little more palatable
  */
 
-async function _transform_profile_for_storage (qs, keen, palette){
+async function _transform_profile_for_storage (qs, designs, palette){
   return {
     ts: new Date().getTime(),
     boxtype: qs.boxtype,
     email: qs.email,
-    archetype: _get_answered_questions([qs.fav1, qs.fav2]),
     gender: qs.gender,
-    childname: _get_answered_questions([qs.hername, qs.hisname]),
-    childage: _get_answered_questions([qs.sheage, qs.heage]),
-    topsize: _get_answered_questions([qs.shetopsize, qs.hetopsize]),
-    bottomsize: _get_answered_questions([qs.shebottomsize, qs.hebottomsize]),
-    jam: _get_answered_questions([qs.jam1, qs.jam2, qs.jam3, qs.jam4, qs.jam5, qs.jam6]),
-    doit: _get_answered_questions([qs.doit1, qs.doit2, qs.doit3, qs.doit4, qs.doit5, qs.doit6]),
+    childname: qs.childname,
+    childage: qs.childage,
+    topsize: qs.topsize,
+    ts_fit: qs.ts_fit,
+    bottomsize: qs.bottomsize,
+    bs_fit: qs.bs_fit,
     palette: palette,
-    fave: _get_answered_questions([qs.fav1, qs.fav2]),
-    keen: keen,
-    something_else: !qs.else ? 'not_yet_defined' : _escape_user_input(qs.else),
-    notes: !qs.notes ? 'not_yet_defined' : _escape_user_input(qs.notes),
-    internal_notes: 'n/a',
-    first_name: qs.fname,
-    last_name: qs.lname,
+    style: qs.style,
+    pared_to_bold: qs.pared_to_bold,
+    pared_to_fun: qs.pared_to_fun,
+    vintage_to_fem: qs.vintage_to_fem,
+    vintage_to_beachy: qs.vintage_to_beachy,
+    avoid_colours: qs.avoid_colours,
+    designs: designs,
+    do_not_want: _get_answered_questions([qs.do_not_want1, qs.do_not_want2, qs.do_not_want3, qs.do_not_want4]),
+    need_most: _get_answered_questions([qs.need_most1, qs.need_most2, qs.need_most3, qs.need_most4]),
+    unisex: qs.unisex,
+    other_notes: qs.other_notes,
+    first_name: qs.firstname,
+    last_name: qs.lastname,
     street_address: qs.streetaddress,
     suburb: qs.suburb,
     city: qs.city,
-    phone: qs.phone
+    phone: qs.phone,
+    country: _transform_country_to_iso(qs.country),
+    postcode:qs.postcode
   };
 }
 
@@ -177,6 +191,29 @@ function _get_answered_questions (questions){
   }
 
   return val;
+}
+
+/*
+ * Chargebee accepts 2-letter ISO 3166 alpha-2 country codes. This function takes a
+ * country name and returns the appropriate ISO code. Returns country code or false
+ */
+ 
+function _transform_country_to_iso (country){
+  if (typeof country === 'undefined' || country == null){
+    return false;
+  }
+  
+  let ret = false;
+  const l_country = country.toLowerCase();
+  
+  const keys = Object.keys(country_to_iso);
+  for (let i = 0; i < keys.length; i++){
+    if (keys[i] == l_country){
+      ret = country_to_iso[keys[i]];
+    }
+  }
+  
+  return ret;
 }
 
 module.exports = router;
