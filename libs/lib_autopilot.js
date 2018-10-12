@@ -111,7 +111,7 @@ const autopilot_update_or_create_contact = async (update_obj) => {
   
   try {
     const ret = await got.post(`${process.env.AUTOPILOY_API_BASE_URL}/contact`, options);
-    logger.info(`DEBUG: here's what's coming back from AP: ${ret.statusCode} + ${JSON.stringify(ret.body, null, 4)}`);
+
     if (ret.statusCode != '200'){
       throw new VError (ret.body.error, "non 200 response from Autopilot API when trying to add contact to list");
     }

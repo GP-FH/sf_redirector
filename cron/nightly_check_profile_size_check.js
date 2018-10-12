@@ -54,7 +54,7 @@
     *   contact + add contact to 'Profile Update Email Due' list in Autopilot
     */
     
-    const current_ts = Math.round(new Date().getTime() / 1000);
+    const current_ts = 1515494430; //Math.round(new Date().getTime() / 1000);
     const three_days_from_now = current_ts + 259200;
     const four_days_from_now = current_ts + 345600;
     const time_array = [three_days_from_now,four_days_from_now];
@@ -66,130 +66,7 @@
     
     try {
       const ret = await chargebee.chargebee_list_subscriptions(filters)
-      const cb_subs = [
-        {
-          subscription: {
-            id: "1mbDWiFR6A97t8JIo",
-            customer_id: "1mbDWiFR6A97t8JIo",
-            plan_id: "luxe-weekly",
-            plan_quantity: 1,
-            plan_unit_price: 2900,
-            plan_amount: 2900,
-            billing_period: 1,
-            billing_period_unit: "week",
-            plan_free_quantity: 0,
-            status: "active",
-            current_term_start: 1538926622,
-            current_term_end: 1539531422,
-            next_billing_at: 1539531422,
-            created_at: 1537720622,
-            started_at: 1537720622,
-            activated_at: 1537720622,
-            affiliate_token: "csmjgcds2d69N8oQ5hOYIetcuNr3T29YFz",
-            created_from_ip: "218.101.90.39",
-            updated_at: 1538926627,
-            has_scheduled_changes: false,
-            resource_version: 1538926627312,
-            deleted: false,
-            object: "subscription",
-            currency_code: "NZD",
-            due_invoices_count: 0,
-            mrr: 10959,
-            exchange_rate: 1,
-            base_currency_code: "NZD",
-            shipping_address: {
-              first_name: "Stephanie",
-              last_name: "Mills",
-              phone: "0210379284",
-              line1: "900A Pungaere Road RD2 l Kerikeri",
-              line2: "Kerikeri",
-              city: "Northland",
-              country: "NZ",
-              validation_status: "not_validated",
-              object: "shipping_address"
-            },
-            cf_gender: "Girl",
-            cf_childname: "Bailey Grace",
-            cf_childage: "14/08/2018",
-            cf_topsize: "0-3 Months",
-            cf_bottomsize: "0-3 Months",
-            cf_jam: "Pared Back, Vintage inspired, Fun",
-            cf_doit: "Street, Oversized",
-            cf_palette: "Classic Patterns, Sky Pastels, Warm Neutrals",
-            cf_keen:
-              "Onesies, Playsuits, Casual Dresses, Skirts, Sweatshirts, Hoodies, Leggings",
-            cf_else: "not_yet_defined",
-            cf_notes: "{{field:}}"
-          },
-          customer: {
-            id: "1mbDWiFR6A97t8JIo",
-            first_name: "Marcelo",
-            last_name: "Hudson",
-            email: "marcelo@stitchfox.com",
-            phone: "0210379284",
-            auto_collection: "on",
-            net_term_days: 0,
-            allow_direct_debit: false,
-            is_location_valid: true,
-            created_at: 1537720622,
-            created_from_ip: "218.101.90.39",
-            taxability: "taxable",
-            updated_at: 1537720625,
-            pii_cleared: "active",
-            resource_version: 1537720625375,
-            deleted: false,
-            object: "customer",
-            billing_address: {
-              first_name: "Stephanie",
-              last_name: "Mills",
-              phone: "0210379284",
-              line1: "900A Pungaere Road RD2 l Kerikeri",
-              line2: "Kerikeri",
-              city: "Northland",
-              country: "NZ",
-              validation_status: "not_validated",
-              object: "billing_address"
-            },
-            card_status: "valid",
-            primary_payment_source_id: "pm_2smoc967R4UR2Abbnk",
-            payment_method: {
-              object: "payment_method",
-              type: "card",
-              reference_id: "5287852446/68zy4sm",
-              gateway: "braintree",
-              gateway_account_id: "gw_IG5rygVQKXoxDf7Kv",
-              status: "valid"
-            },
-            promotional_credits: 0,
-            refundable_credits: 0,
-            excess_payments: 0,
-            unbilled_charges: 0,
-            preferred_currency_code: "NZD"
-          },
-          card: {
-            status: "valid",
-            gateway: "braintree",
-            gateway_account_id: "gw_IG5rygVQKXoxDf7Kv",
-            first_name: "Stephanie",
-            last_name: "Mills",
-            iin: "483561",
-            last4: "3139",
-            card_type: "visa",
-            funding_type: "debit",
-            expiry_month: 3,
-            expiry_year: 2020,
-            issuing_country: "NZ",
-            billing_country: "NZ",
-            ip_address: "218.101.90.39",
-            object: "card",
-            masked_number: "************3139",
-            customer_id: "1mkVvkBR4UQvIPapb",
-            payment_source_id: "pm_2smoc967R4UR2Abbnk"
-          }
-        }
-      ];
-
-//ret.list;
+      const cb_subs = ret.list;
 
       if (verbose) logger.info(`Number of subs due in 3 days: ${cb_subs.length}`); 
       
