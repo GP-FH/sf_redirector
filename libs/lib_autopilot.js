@@ -65,7 +65,7 @@ const autopilot_remove_contact_from_list = async (email, list_id) => {
   const options = {
     headers: {
       'autopilotapikey': process.env.AUTOPILOT_API_KEY,
-      'throwHttpErrors': false
+      'throwHttpErrors': "false"
     }
   };
   
