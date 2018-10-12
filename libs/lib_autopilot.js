@@ -64,14 +64,15 @@ const autopilot_remove_contact_from_list = async (email, list_id) => {
   
   const options = {
     headers: {
-      'autopilotapikey': process.env.AUTOPILOT_API_KEY
+      'autopilotapikey': process.env.AUTOPILOT_API_KEY,
+      'throwHttpErrors': false
     }
   };
   
   try{
     const ret = await got.delete(`${process.env.AUTOPILOY_API_BASE_URL}/list/${list_id}/contact/${email}`, options);
   
-    if (ret.statusCode != '200'){
+    if (ret.statusCode != '200' && ret.statusCode != '404'){
       throw new VError (ret.body.error, "non 200 response from Autopilot API when trying to remove contact from list");
     }
     
@@ -96,9 +97,7 @@ const autopilot_update_or_create_contact = async (update_obj) => {
   if ((Object.keys(update_obj).length === 0 && update_obj.constructor === Object) || typeof update_obj !== 'object'){
     throw new VError("Cannot update contact in Autopilot as update_obj is not an object");
   }
-  
-  logger.info(`DEBUG: received object by AP lib: ${JSON.stringify(update_obj, null, 4)}`);
-  logger.info(`DEBUG: the URL we are sending to: ${process.env.AUTOPILOY_API_BASE_URL}/contact`);
+
   const options = {
     headers: {
       'autopilotapikey': process.env.AUTOPILOT_API_KEY
@@ -116,6 +115,7 @@ const autopilot_update_or_create_contact = async (update_obj) => {
       
     return;
   }catch (error){
+    logger.info(`ERROR is: `);
     throw new VError(error);
   }
 };
