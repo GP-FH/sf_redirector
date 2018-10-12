@@ -46,11 +46,11 @@
  
  async function main (){
    /*
-    * TODO:
+    * ORDER OF OPERATIONS:
     * - get list of subscriptions from chargebee where next billing is 3 days from now
     * - get list of subs from sub tracker where (for monthly) count = 1 or (for weekly) count = 5
-    * - check for matching sub IDs between CB subs and sub tracker subs. 
-    * - for matches: remove contact from 'Profile Update Email Due' list + add temp_* values to 
+    * - filter out those that are getting a box next renewal
+    * - for those getting boxes: remove contact from 'Profile Update Email Due' list + add temp_* values to 
     *   contact + add contact to 'Profile Update Email Due' list in Autopilot
     */
     
