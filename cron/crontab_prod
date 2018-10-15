@@ -1,0 +1,4 @@
+# Edit this file to introduce tasks to be run by cron
+# 
+# m h  dom mon dow   command
+00 11 * * * node /home/dev/redirect_node/current/cron/nightly_check_profile_size_check.js -v
