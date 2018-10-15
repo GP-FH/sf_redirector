@@ -1,5 +1,8 @@
 # Edit this file to introduce tasks to be run by cron
 # 
+# ALWAYS REMEMBER TO HAVE A NEWLINE AFTER THE LAST SCHEDULED JOB
+# ALWAYS REMEMBER TO USE ABSOLUTE PATHS
+#
 # All times in UTC
 # m h  dom mon dow   command
-50 10 * * * node /home/dev/redirect_node/current/cron/nightly_check_profile_size_check.js -v
+50 10 * * * /usr/local/bin/node /home/dev/redirect_node/current/cron/nightly_check_profile_size_check.js -v
