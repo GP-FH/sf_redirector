@@ -84,19 +84,14 @@
       
       if (verbose) logger.info(`Number of subs due a box on next renewal: ${matches.length}`); 
       
-      const profile_update_email_due_list_id = 'contactlist_d96add3e-f282-422c-a144-bdb245b19c4a';
-      
       if (!debug){
-        for (let i = 0; i < matches.length; i++){
-          if (verbose) logger.info(`Removing ${matches[i].customer.email} from Autopilot list (if they're there)`);
-          await autopilot.autopilot_remove_contact_from_list(matches[i].customer.email, profile_update_email_due_list_id);
+        for (let i = 0; i < matches.length; i++){          
+          if (verbose) logger.info(`Updating fields for ${matches[i].customer.email} contact in Autopilot`);
           
-          if (verbose) logger.info(`(Re-)Adding ${matches[i].customer.email} to list in Autopilot to trigger journey`);
           await autopilot.autopilot_update_or_create_contact(
             {
               "contact":{
                 "Email": matches[i].customer.email,
-                "_autopilot_list": profile_update_email_due_list_id, // including this automagically adds them to the list
                 "custom": {
                   "string--temp_sub_id_for_next_email": matches[i].subscription.id, // string-- is necessary: declare the type then a space then the variable name
                   "string--temp_kid_name_for_next_email": matches[i].subscription.cf_childname, 
