@@ -54,6 +54,8 @@ const chargebee_request_checkout = async (profile, redirect_url, stylist_attribu
     throw new VError ("Received parameter not defined");
   }
 
+  logger.info(`DEBUG: ${JSON.stringify(profile)}`);
+
   return await chargebee.hosted_page.checkout_new({
     redirect_url: redirect_url,
     embed: false,
