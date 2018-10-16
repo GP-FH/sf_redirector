@@ -96,7 +96,8 @@ const chargebee_request_checkout = async (profile, redirect_url, stylist_attribu
       city: profile.city,
       country: profile.country,
       phone: profile.phone,
-      zip: profile.postcode
+      // zip: profile.postcode temporarily removing as because we can't provide validation on the front end it can result in people hitting
+      // the error page with no context + the need to go through the entire form again. Not ideal but it's better. 
       
     }
   }).request( ( err, ret ) => {
