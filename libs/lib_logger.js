@@ -8,6 +8,8 @@
 
 const winston = require("winston");
 const papertrail = require("winston-papertrail").Papertrail;
+const os = require("os");
+require('winston-loggly-bulk');
 
 const winstonPapertrail = new winston.transports.Papertrail( {
   host: 'logs5.papertrailapp.com',
@@ -19,6 +21,11 @@ const winstonPapertrail = new winston.transports.Papertrail( {
   }
 } );
 
+const role = process.env.ROLE;
+const hostname = os.hostname();
+
+
+
 const logger = new winston.Logger( {
   transports: [
     winstonPapertrail,
@@ -26,5 +33,15 @@ const logger = new winston.Logger( {
   ],
   exitOnError: false
 } );
+
+logger.add(winston.transports.Loggly, {
+  inputToken: "7dd23f3c-e8d0-4c86-a916-dad068e42b9f",
+  subdomain: "stitchfox",
+  tags: [role, hostname],
+  json:true,
+  handleExceptions: true,
+  humanReadableUnhandledException: true
+});
+
 
 module.exports = logger;
