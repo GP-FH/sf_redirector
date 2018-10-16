@@ -54,8 +54,6 @@ const chargebee_request_checkout = async (profile, redirect_url, stylist_attribu
     throw new VError ("Received parameter not defined");
   }
 
-  logger.info(`DEBUG: ${JSON.stringify(profile)}`);
-
   return await chargebee.hosted_page.checkout_new({
     redirect_url: redirect_url,
     embed: false,
@@ -96,7 +94,7 @@ const chargebee_request_checkout = async (profile, redirect_url, stylist_attribu
       city: profile.city,
       country: profile.country,
       phone: profile.phone,
-      // zip: profile.postcode temporarily removing as because we can't provide validation on the front end it can result in people hitting
+      // zip: profile.postcode temporarily removing zip as because we can't provide validation on the front end it can result in people hitting
       // the error page with no context + the need to go through the entire form again. Not ideal but it's better. 
       
     }
