@@ -8,6 +8,10 @@
  *   FORMAT: 2 columns - Variant + Image
  *
  * -b | --bucket: digitalocean space with the images to upload (named the same as the spreadsheet)
+ * 
+ * Limitations:
+ * - image file names must not have spaces in them
+ * - path to csv must be absolute
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -149,7 +153,7 @@ async function upload_images(list, base_url){
   for(let i = 0; i < list.length; i++){
     if (verbose){console.log(`${list[i].product_id}, ${list[i].variant_id[0]}, ${base_url}${list[i].Image}`)};
 
-    let ret = await trade_gecko.tradegecko_upload_product_images(list[i].product_id, list[i].variant_id, `${base_url}${list[i].Image}`)
+    let ret = await trade_gecko.tradegecko_upload_product_images(list[i].product_id, list[i].variant_id, `${base_url}${list[i].Image}`);
 
     if (!ret.ok){
       if(verbose){
@@ -157,8 +161,8 @@ async function upload_images(list, base_url){
       }
       failures.push({variant:list[i].Variant, image:list[i].Image, error:ret.err});
     }else if (verbose){
-      console.log(`Uploaded ${base_url}${list[i].Image} to TG`)
-    };
+      console.log(`Uploaded ${base_url}${list[i].Image} to TG`);
+    }
 
     await sleep(1000);
   }
