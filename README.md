@@ -13,7 +13,7 @@ The redirector repo is all of the code that we have had to write to tie all of t
 - Mixpanel: web metrics and analytics
 - Slack: Where Work Happens
 
-## Features
+## Features - THIS NEEDS UPDATING
 
 ### Subscription flow
 
@@ -42,13 +42,39 @@ We have arrangements with stylists who get paid for sending people to our site w
 
 To accurately track people moving through our subscription creation flow we fire a `profile_form_complete` event to mixpanel when we receive the initial request to `/profile_hook`. This allows us to create a funnel in mixpanel and see where people are dropping off. If you wish to add more events/edit the event name, just edit the config file.
 
-### Needed improvements
-- cron to tidy up duplicate addresses attached to the `Stylist` relationship in TradeGecko
-- move stylist attribution into it's own lib
-- cron to renew SSL certs in dev and prod
-- create standard return format for all `lib_*.js` functions. Currently all over the place.
+## AUDIT - what needs to be done
+
+### Application
+- move stylist attribution into it's own lib (or remove)
+- move all product plan switches into the `product_plan` lib
+- create helpers for function returns (e.g ret_ok()/ret_error()) and helpers for validating results (e.g is_ok())
 - move away from request module to got module for http requests
+- test coverage for all routes and libs AT LEAST
+- proper log formatting with function attribution and helpers
+- perf instrumentation via middleware for key actions (new orders/renewals)
+- Job Queue for key functions
+- do some load testing
+- make sure we are stateless
+- pre-merge linter tests
+
+### Ops
+- cron to renew SSL certs in dev
+- look into puppet/chef so we can set configurations for this thing to run OR a set of startup scripts
+- scripts for server spin-up and process for configuration and adding to LB
+- JSON config for PM2 + multi core use
+- put together a general diagram of architecture list services + storage etc
+
+### HQ
+- product search polishing 
+- removal of cin7 search
+
+### Security
+- removal of api route for HQ, full switch to POST with csrf crumbs
+- install helmet
+
+
+
+
 - using zapier for autopilot makes no sense and results in incomplete data making it into autopilot profiles. We can handle this much better: details in Slack - https://stitchfox.slack.com/archives/C4AAT050A/p1503763459000009
-- tests need a proper rewrite. Should focus on function inputs and outputs from the perspective of the calling party. got stuck testing 3rd party calls which is dumb in this case
-- proper queueing system for calls to third party APIs with retry strategies
-- perf instrumentation via middleware
+- 
+
