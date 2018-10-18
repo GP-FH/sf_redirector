@@ -55,6 +55,7 @@ To accurately track people moving through our subscription creation flow we fire
 - Job Queue for key functions
 - do some load testing
 - make sure we are stateless
+- pre-merge linter tests
 
 ### Ops
 - cron to renew SSL certs in dev
