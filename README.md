@@ -71,10 +71,6 @@ To accurately track people moving through our subscription creation flow we fire
 ### Security
 - removal of api route for HQ, full switch to POST with csrf crumbs
 - install helmet
-
-
-
-
-- using zapier for autopilot makes no sense and results in incomplete data making it into autopilot profiles. We can handle this much better: details in Slack - https://stitchfox.slack.com/archives/C4AAT050A/p1503763459000009
-- 
+- remove unnecessary packages
+- PROBABLY A BUNCH OF THINGS IM TOO MUCH OF A DUMMY TO KNOW RIGHT NOW
 
