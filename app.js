@@ -57,8 +57,12 @@ app.use(passport.session());
  */
 app.use("/health_check", health_check);
 if (process.env.ROLE == 'redirect'){
-  app.use("/sub_hook", sub_hook);
-  app.use("/profile_hook", profile_hook);
+  /*
+   * Commented out the routes below as part of the hiatus :(
+   */
+
+  // app.use("/sub_hook", sub_hook);
+  // app.use("/profile_hook", profile_hook);
 }else if (process.env.ROLE == 'hq'){
   app.use("/hq", hq);
   app.use("/api", api);
