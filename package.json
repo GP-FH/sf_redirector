@@ -27,7 +27,7 @@
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
     "proxyquire": "^1.8.0",
-    "qs": "^6.5.2",
+    "qs": "^6.5.3",
     "redis": "^2.7.1",
     "redis-mock": "^0.17.1",
     "request": "^2.88.0",
